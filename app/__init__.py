@@ -1,15 +1,23 @@
 # app/__init__.py
-import os
+# app/__init__.py
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from .config import Config
+from .models import db
 
-db = SQLAlchemy()
+migrate = Migrate()
 
 def create_app():
     app = Flask(__name__)
-
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config.from_object(Config)
 
     db.init_app(app)
+    migrate.init_app(app, db)
+
+    with app.app_context():
+        from .routes import main
+        app.register_blueprint(main)
+
     return app
+
