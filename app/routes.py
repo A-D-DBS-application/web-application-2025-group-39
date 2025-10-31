@@ -17,13 +17,47 @@ def index():
 def register():
     if request.method == 'POST':
         username = request.form['username']
-        if User.query.filter_by(username=username).first() is None:
-            new_user = User(username=username)
-            db.session.add(new_user)
-            db.session.commit()
-            session['user_id'] = new_user.id
-            return redirect(url_for('main.index'))
-        return 'Username already registered'
+        name = request.form['name']
+        role = request.form['role']
+        company_name = request.form['company_name']
+        
+        print(f"📝 Registratie poging: {username}, {name}, {role}, {company_name}")  # ✅ Debug print
+        
+        try:
+            # Controleer of gebruiker al bestaat in Supabase
+            print("🔍 Controleren of gebruiker bestaat...")
+            existing_user = supabase.table('users').select('*').eq('username', username).execute()
+            
+            print(f"📊 Bestaande gebruiker response: {existing_user}")
+            
+            if existing_user.data:
+                flash('Gebruikersnaam bestaat al', 'error')
+                return render_template('register.html')
+            
+            # Nieuwe gebruiker toevoegen aan Supabase
+            new_user = {
+                'username': username,
+                'name': name,
+                'role': role,
+                'company_name': company_name
+            }
+            
+            print(f"💾 Nieuwe gebruiker opslaan: {new_user}")  # ✅ Debug print
+            
+            response = supabase.table('users').insert(new_user).execute()
+            
+            print(f"📨 Supabase response: {response}")  # ✅ Debug print
+            
+            if response.data:
+                flash('Registratie succesvol! Je kunt nu inloggen.', 'success')
+                return redirect(url_for('main.login'))
+            else:
+                flash('Registratie mislukt', 'error')
+                
+        except Exception as e:
+            print(f"❌ FOUT in registratie: {str(e)}")  # ✅ Debug print
+            flash(f'Registratie error: {str(e)}', 'error')
+    
     return render_template('register.html')
 
 @main.route('/login', methods=['GET', 'POST'])

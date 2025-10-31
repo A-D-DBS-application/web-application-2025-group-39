@@ -2,12 +2,62 @@
 <html>
 <head>
     <title>Register</title>
+    <style>
+        .flash-messages {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .form-group { margin: 15px 0; }
+        label { display: inline-block; width: 120px; }
+        input, select { padding: 5px; width: 200px; }
+    </style>
 </head>
 <body>
     <h1>Register</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
     <form method="post">
-        Username: <input type="text" name="username" required>
+        <div class="form-group">
+            <label for="name">Volledige naam:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="role">Rol:</label>
+            <select id="role" name="role" required>
+                <option value="">Kies een rol</option>
+                <option value="user">User</option>
+                <option value="founder">Founder</option>
+                <option value="PM">PM</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="company_name">Bedrijfsnaam:</label>
+            <input type="text" id="company_name" name="company_name" required>
+        </div>
+        
         <input type="submit" value="Register">
     </form>
+    
+    <p>Al een account? <a href="{{ url_for('main.login') }}">Login hier</a></p>
 </body>
 </html>
