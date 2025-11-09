@@ -1,97 +1,144 @@
-# app/routes.py
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
+from app import db
+from app.models import Profile, Company
 
-from flask import Blueprint, request, redirect, url_for, render_template, session
-from .models import db, User, Listing
-
+# Blueprint aanmaken
 main = Blueprint('main', __name__)
 
-@main.route('/')
+# ==============================
+# 🏠 INDEX ROUTE
+# ==============================
+@main.route('/', methods=['GET', 'POST'])
 def index():
-    if 'user_id' in session:
-        user = User.query.get(session['user_id'])
-        listings = Listing.query.filter_by(user_id=user.id).all()  # Fetch listings for logged-in user
-        return render_template('index.html', username=user.username, listings=listings)
-    return render_template('index.html', username=None)
-
-@main.route('/register', methods=['GET', 'POST'])
-def register():
     if request.method == 'POST':
-        username = request.form['username']
-        name = request.form['name']
-        role = request.form['role']
-        company_name = request.form['company_name']
-        
-        print(f"📝 Registratie poging: {username}, {name}, {role}, {company_name}")  # ✅ Debug print
-        
-        try:
-            # Controleer of gebruiker al bestaat in Supabase
-            print("🔍 Controleren of gebruiker bestaat...")
-            existing_user = supabase.table('users').select('*').eq('username', username).execute()
-            
-            print(f"📊 Bestaande gebruiker response: {existing_user}")
-            
-            if existing_user.data:
-                flash('Gebruikersnaam bestaat al', 'error')
-                return render_template('register.html')
-            
-            # Nieuwe gebruiker toevoegen aan Supabase
-            new_user = {
-                'username': username,
-                'name': name,
-                'role': role,
-                'company_name': company_name
-            }
-            
-            print(f"💾 Nieuwe gebruiker opslaan: {new_user}")  # ✅ Debug print
-            
-            response = supabase.table('users').insert(new_user).execute()
-            
-            print(f"📨 Supabase response: {response}")  # ✅ Debug print
-            
-            if response.data:
-                flash('Registratie succesvol! Je kunt nu inloggen.', 'success')
-                return redirect(url_for('main.login'))
-            else:
-                flash('Registratie mislukt', 'error')
-                
-        except Exception as e:
-            print(f"❌ FOUT in registratie: {str(e)}")  # ✅ Debug print
-            flash(f'Registratie error: {str(e)}', 'error')
-    
-    return render_template('register.html')
+        flash("Deze actie is niet toegestaan.", "error")
+        return redirect(url_for('main.login'))
 
+    if 'user_id' in session:
+        return redirect(url_for('main.dashboard'))
+
+    return render_template('index.html')
+
+
+# ==============================
+# 🔐 LOGIN ROUTE
+# ==============================
 @main.route('/login', methods=['GET', 'POST'])
 def login():
+    print("🟢 Login route gestart")
     if request.method == 'POST':
-        username = request.form['username']
-        user = User.query.filter_by(username=username).first()
+        username = request.form.get('username')
+        email = request.form.get('email')
+
+        print(f"📨 Login poging ontvangen: username={username}, email={email}")
+
+        # ✅ Zoeken naar gebruiker in profiel met ORM
+        user = Profile.query.filter_by(name=username, email=email).first()
+
         if user:
-            session['user_id'] = user.id
-            return redirect(url_for('main.index'))
-        return 'User not found'
+            session['user_id'] = user.id_profile
+            session['username'] = user.name
+            session['role'] = user.role
+
+            flash("Succesvol ingelogd!", "success")
+            print("✅ Login succesvol")
+            return redirect(url_for('main.dashboard'))
+        else:
+            flash("Ongeldige gebruikersnaam of e-mail.", "error")
+            print("❌ Onjuiste gegevens")
+
     return render_template('login.html')
 
-@main.route('/logout', methods=['POST'])
-def logout():
-    session.pop('user_id', None)
-    return redirect(url_for('main.index'))
 
-@main.route('/add-listing', methods=['GET', 'POST'])
-def add_listing():
-    if 'user_id' not in session:
-        return redirect(url_for('main.login'))
-    
+# ==============================
+# 👤 REGISTER ROUTE (WERKT MET SUPABASE STRUCTUUR)
+# ==============================
+@main.route('/register', methods=['GET', 'POST'])
+def register():
+    print("🟢 Register route gestart")
+
     if request.method == 'POST':
-        listing_name = request.form['listing_name']
-        price = float(request.form['price'])
-        new_listing = Listing(listing_name=listing_name, price=price, user_id=session['user_id'])
-        db.session.add(new_listing)
-        db.session.commit()
-        return redirect(url_for('main.listings'))
+        name = request.form.get('name')
+        username = request.form.get('username')
+        email = request.form.get('email')
+        role = request.form.get('role')
+        company_name = request.form.get('company_name')
 
-    return render_template('add_listing.html')
+        print(f"📨 Gehele request.form inhoud: {request.form}")
+        print(f"📨 Gegevens ontvangen: {username} {email} {role} {company_name}")
 
-@main.route('/listings')
-def listings():
-    all_listings = Listing.query.all()
-    return render_template('listings.html', listings=all_listings)
+        try:
+            # ✅ Bedrijf zoeken (of aanmaken) met ruwe SQL
+            company = db.session.execute(
+                db.text("""
+                    SELECT * FROM public.company WHERE company_name = :company_name LIMIT 1
+                """),
+                {'company_name': company_name}
+            ).fetchone()
+
+            if not company:
+                db.session.execute(
+                    db.text("""
+                        INSERT INTO public.company (company_name)
+                        VALUES (:company_name)
+                    """),
+                    {'company_name': company_name}
+                )
+                db.session.commit()
+
+                company = db.session.execute(
+                    db.text("""
+                        SELECT * FROM public.company WHERE company_name = :company_name LIMIT 1
+                    """),
+                    {'company_name': company_name}
+                ).fetchone()
+
+            # ✅ Nieuw profiel invoegen in Supabase
+            db.session.execute(
+                db.text("""
+                    INSERT INTO public.profile (name, email, role, id_company)
+                    VALUES (:name, :email, :role, :id_company)
+                """),
+                {
+                    'name': username,
+                    'email': email,
+                    'role': role,
+                    'id_company': company.id_company
+                }
+            )
+            db.session.commit()
+
+            flash("✅ Registratie succesvol! Je kunt nu inloggen.", "success")
+            print("✅ Registratie succesvol")
+            return redirect(url_for('main.login'))
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ FOUT tijdens registratie: {e}")
+            flash("Er is een fout opgetreden tijdens registratie.", "danger")
+
+    return render_template('register.html')
+
+
+# ==============================
+# 🧭 DASHBOARD ROUTE
+# ==============================
+@main.route('/dashboard', methods=['GET'])
+def dashboard():
+    if 'user_id' not in session:
+        flash("Je moet eerst inloggen.", "error")
+        return redirect(url_for('main.login'))
+
+    username = session.get('username')
+    role = session.get('role')
+    return render_template('dashboard.html', username=username, role=role)
+
+
+# ==============================
+# 🚪 LOGOUT ROUTE
+# ==============================
+@main.route('/logout')
+def logout():
+    session.clear()
+    flash("Je bent uitgelogd.", "info")
+    return redirect(url_for('main.login'))

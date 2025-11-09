@@ -1,21 +1,26 @@
-from flask_sqlalchemy import SQLAlchemy
+from . import db  # haal db uit __init__.py
 
-db = SQLAlchemy()
+class Company(db.Model):
+    __tablename__ = 'company'
+    __table_args__ = {'schema': 'public'}
+
+    id_company = db.Column(db.Integer, primary_key=True)
+    company_name = db.Column(db.String, nullable=False)
+
+    profiles = db.relationship('Profile', back_populates='company')
 
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    listings = db.relationship('Listing', backref='user', lazy=True)
+class Profile(db.Model):
+    __tablename__ = 'profile'
+    __table_args__ = {'schema': 'public'}
+
+    id_profile = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=True)
+    role = db.Column(db.String, nullable=True)
+    id_company = db.Column(db.Integer, db.ForeignKey('public.company.id_company'))
+
+    company = db.relationship('Company', back_populates='profiles')
 
     def __repr__(self):
-        return f'<User {self.username}>'
-    
-class Listing(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    listing_name = db.Column(db.String(100), nullable=False)
-    price = db.Column(db.Float, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
-    def __repr__(self):
-        return f'<Listing {self.listing_name}, ${self.price}>'
+        return f"<Profile {self.name}>"
