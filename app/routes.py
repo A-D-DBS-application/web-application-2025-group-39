@@ -11,14 +11,13 @@ main = Blueprint('main', __name__)
 @main.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        flash("Deze actie is niet toegestaan.", "error")
-        return redirect(url_for('main.login'))
+        flash("Deze actie is niet toegestaan op de startpagina.", "warning")
+        return redirect(url_for('main.index'))
 
     if 'user_id' in session:
         return redirect(url_for('main.dashboard'))
 
     return render_template('index.html')
-
 
 # ==============================
 # 🔐 LOGIN ROUTE
@@ -141,4 +140,4 @@ def dashboard():
 def logout():
     session.clear()
     flash("Je bent uitgelogd.", "info")
-    return redirect(url_for('main.login'))
+    return redirect(url_for('main.index'))
