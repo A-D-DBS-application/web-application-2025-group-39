@@ -5,13 +5,13 @@ class Company(db.Model):
     __tablename__ = 'company'
     __table_args__ = {'schema': 'public'} #tabel aanmaken in database
     # Primary key
-    companyid = db.Column(db.String, primary_key=True)  
+    id_company = db.Column(db.Integer, primary_key=True)  
 
     # company information
     company_name = db.Column(db.String, nullable=False)
     #relaties:
-    users = db.relationship('User', backref='company', lazy=True)
-    projects = db.relationship('Project', backref='company', lazy=True)
+    profiles = db.relationship('Profile', back_populates='company', lazy=True)
+    projects = db.relationship('Project', back_populates='company', lazy=True)
 
 
 
@@ -25,8 +25,8 @@ class Profile(db.Model):
     email = db.Column(db.String, nullable=True)
     role = db.Column(db.String, nullable=True)
     # Foreign keys
-    id_company = db.Column(db.Integer, db.ForeignKey('public.company.id_company'))
-
+    id_company = db.Column(db.Integer, db.ForeignKey('public.company.id_company'), nullable=False)
+    #realationship
     company = db.relationship('Company', back_populates='profiles')
     #tijd van aanmaak Profile
     createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
@@ -39,28 +39,28 @@ class Project(db.Model):
     __table_args__ = {'schema': 'public'}
 
     # Primaire sleutel
-    id_project= db.Column(db.String, primary_key=True)
+    id_project= db.Column(db.Integer, primary_key=True)
 
     # Foreign keys
-    companyid = db.Column(db.String, db.ForeignKey('company.companyid'), nullable=False)  # Verwijst naar company.companyid
+    id_company = db.Column(db.Integer, db.ForeignKey('public.company.id_company'))  # Verwijst naar company.id_company
     #eigenschappen project
     project_name = db.Column(db.String, nullable=False)
     # Metadata
     createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)  # Datum van project maken
     #relaties
-    features_ideas = db.relationship('Features_ideas', backref='project', lazy=True)
-    #tijd van aanmaak Project
-    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    company = db.relationship('Company', back_populates='projects')
+    features_ideas = db.relationship('Features_ideas', back_populates='project', lazy=True)
+    
 
 class Features_ideas(db.Model):
     __tablename__ = 'features'
     __table_args__ = {'schema': 'public'}
     # Primary key
-    id_feature = db.Column(db.String, primary_key=True)  # Using featureid as primary key for consistency with your table
+    id_feature = db.Column(db.Integer, primary_key=True)  # Using featureid as primary key for consistency with your table
 
     # Foreign keys
-    companyid = db.Column(db.String, db.ForeignKey('company.companyid'), nullable=False)  # Verwijst naar company.companyid
-    id_project = db.Column(db.String, db.ForeignKey('project.id_project'), nullable=False)
+    id_company = db.Column(db.Integer, db.ForeignKey('public.company.id_company'), nullable=False)
+    id_project = db.Column(db.String, db.ForeignKey('public.project.id_project'), nullable=False)
     # feature information
     name_feature = db.Column(db.String, nullable=False)
     gains = db.Column(db.Integer, nullable=False)
@@ -74,3 +74,6 @@ class Features_ideas(db.Model):
 
     # Metadata
     createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    #realations
+    project = db.relationship('Project', back_populates='features_ideas')

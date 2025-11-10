@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app import db
-from app.models import Profile, Company
+from app.models import Profile, Company, Project, Features_ideas
 
 # Blueprint aanmaken
 main = Blueprint('main', __name__)
@@ -141,3 +141,109 @@ def logout():
     session.clear()
     flash("Je bent uitgelogd.", "info")
     return redirect(url_for('main.index'))
+
+
+
+#new route add_feature
+@main.route('/add-feature', methods=['GET', 'POST'])
+def add_feature():
+    # Require login
+    if 'user_id' not in session:
+        flash("Je moet eerst inloggen.", "error")
+        return redirect(url_for('main.login'))
+
+    # Load companies for the dropdown (ORM)
+    companies = Company.query.order_by(Company.company_name.asc()).all()
+
+    if request.method == 'POST':
+        # Read form fields
+        name_feature = request.form.get('name_feature', '').strip()
+        id_company = request.form.get('id_company', '').strip()
+        id_project = request.form.get('id_project', '').strip()
+
+        # Numeric fields: validate and convert to int
+        def to_int(field_name):
+            raw = request.form.get(field_name, '').strip()
+            try:
+                return int(raw)
+            except ValueError:
+                return None
+
+        gains = to_int('gains')
+        costs = to_int('costs')
+        churn_OPEX = to_int('churn_OPEX')
+        opp_cost = to_int('opp_cost')
+        market_value = to_int('market_value')
+        business_value = to_int('business_value')
+        validation_stage = to_int('validation_stage')
+        quality_score = to_int('quality_score')
+
+        # Simple server-side validations
+        errors = []
+        if not name_feature:
+            errors.append("Title is verplicht.")
+        if not id_company:
+            errors.append("Company is verplicht.")
+        if not id_project:
+            errors.append("Project is verplicht.")
+
+        numeric_fields = {
+            'Gains': gains,
+            'Costs': costs,
+            'Churn / OPEX': churn_OPEX,
+            'Opportunity cost': opp_cost,
+            'Market value': market_value,
+            'Business value': business_value,
+            'Validation stage': validation_stage,
+            'Quality score': quality_score
+        }
+        for label, value in numeric_fields.items():
+            if value is None:
+                errors.append(f"{label} moet een geheel getal zijn.")
+
+        # Ensure company and project exist in DB
+        company_exists = Company.query.filter_by(id_company=id_company).first()
+        project_exists = Project.query.filter_by(id_project=id_project, id_company=id_company).first()
+
+        if not company_exists:
+            errors.append("Geselecteerde company bestaat niet.")
+        if not project_exists:
+            errors.append("Geselecteerde project bestaat niet of hoort niet bij deze company.")
+
+        if errors:
+            for e in errors:
+                flash(e, "danger")
+            return render_template('add_feature.html', companies=companies)
+
+        # Create a unique ID for the feature (string PK)
+        new_id = str(uuid.uuid4())
+
+        try:
+            feature = Features_ideas(
+                id_feature=new_id,
+                id_company=id_company,
+                id_project=id_project,
+                name_feature=name_feature,
+                gains=gains,
+                costs=costs,
+                churn_OPEX=churn_OPEX,
+                opp_cost=opp_cost,
+                market_value=market_value,
+                business_value=business_value,
+                validation_stage=validation_stage,
+                quality_score=quality_score
+            )
+            db.session.add(feature)
+            db.session.commit()
+
+            flash("Feature succesvol opgeslagen.", "success")
+            return redirect(url_for('main.dashboard'))
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ Fout bij opslaan feature: {e}")
+            flash("Er is een fout opgetreden bij het opslaan.", "danger")
+            return render_template('add_feature.html', companies=companies)
+
+    # GET: render page
+    return render_template('add_feature.html', companies=companies)
