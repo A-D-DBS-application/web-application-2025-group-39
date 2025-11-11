@@ -6,7 +6,7 @@ from app.models import Profile, Company, Project, Features_ideas
 main = Blueprint('main', __name__)
 
 # ==============================
-# 🏠 INDEX ROUTE
+# INDEX ROUTE
 # ==============================
 @main.route('/', methods=['GET'])
 def index():
@@ -18,7 +18,7 @@ def index():
     return render_template('index.html')
 
 # ==============================
-# 🔐 LOGIN ROUTE
+# LOGIN ROUTE
 # ==============================
 @main.route('/login', methods=['GET', 'POST'])
 def login():
@@ -29,7 +29,7 @@ def login():
 
         print(f"📨 Login poging ontvangen: name={name}, email={email}")
 
-        # ✅ Zoeken naar gebruiker in profiel met ORM
+        # Zoeken naar gebruiker in profiel met ORM
         user = Profile.query.filter_by(name=name, email=email).first()
 
         if user:
@@ -37,22 +37,22 @@ def login():
             session['name'] = user.name
             session['role'] = user.role
 
-            flash("Succesvol ingelogd!", "success")
-            print("✅ Login succesvol")
+            flash("Successfully logged in!", "success")
+            print("Login succesvol")
             return redirect(url_for('main.dashboard'))
         else:
-            flash("Ongeldige gebruikersnaam of e-mail.", "error")
-            print("❌ Onjuiste gegevens")
+            flash("Invalid name or email.", "error")
+            print("Onjuiste gegevens")
 
     return render_template('login.html')
 
 
 # ==============================
-# 👤 REGISTER ROUTE (WERKT MET SUPABASE STRUCTUUR)
+# REGISTER ROUTE (WERKT MET SUPABASE STRUCTUUR)
 # ==============================
 @main.route('/register', methods=['GET', 'POST'])
 def register():
-    print("🟢 Register route gestart")
+    print("Register route gestart")
 
     if request.method == 'POST':
         name = request.form.get('name')
@@ -60,11 +60,11 @@ def register():
         role = request.form.get('role')
         company_name = request.form.get('company_name')
 
-        print(f"📨 Gehele request.form inhoud: {request.form}")
-        print(f"📨 Gegevens ontvangen: {name} {email} {role} {company_name}")
+        print(f"Gehele request.form inhoud: {request.form}")
+        print(f"Gegevens ontvangen: {name} {email} {role} {company_name}")
 
         try:
-            # ✅ Bedrijf zoeken (of aanmaken) met ruwe SQL
+            # Bedrijf zoeken (of aanmaken) met ruwe SQL
             company = db.session.execute(
                 db.text("""
                     SELECT * FROM public.company WHERE company_name = :company_name LIMIT 1
@@ -104,25 +104,25 @@ def register():
             )
             db.session.commit()
 
-            flash("✅ Registratie succesvol! Je kunt nu inloggen.", "success")
-            print("✅ Registratie succesvol")
+            flash("Registration successful! You can now log in.", "success")
+            print("Registratie succesvol")
             return redirect(url_for('main.login'))
 
         except Exception as e:
             db.session.rollback()
-            print(f"❌ FOUT tijdens registratie: {e}")
-            flash("Er is een fout opgetreden tijdens registratie.", "danger")
+            print(f"FOUT tijdens registratie: {e}")
+            flash("An error occurred during registration.", "danger")
 
     return render_template('register.html')
 
 
 # ==============================
-# 🧭 DASHBOARD ROUTE
+# DASHBOARD ROUTE
 # ==============================
 @main.route('/dashboard', methods=['GET'])
 def dashboard():
     if 'user_id' not in session:
-        flash("Je moet eerst inloggen.", "error")
+        flash("You must log in first.", "error")
         return redirect(url_for('main.login'))
 
     name = session.get('name')
@@ -131,22 +131,22 @@ def dashboard():
 
 
 # ==============================
-# 🚪 LOGOUT ROUTE
+# LOGOUT ROUTE
 # ==============================
 @main.route('/logout')
 def logout():
     session.clear()
-    flash("Je bent uitgelogd.", "info")
+    flash("You have been logged out.", "info")
     return redirect(url_for('main.index'))
 
 
 # ==============================
-# 👤 PROFILE PAGE ROUTE
+# PROFILE PAGE ROUTE
 # ==============================
 @main.route('/profile')
 def profile():
     if 'user_id' not in session:
-        flash("Je moet eerst inloggen.", "error")
+        flash("You must log in first.", "error")
         return redirect(url_for('main.login'))
 
     # Haal huidige gebruiker op
@@ -162,14 +162,12 @@ def profile():
     )
 
 
-
-
 #new route add_feature
 @main.route('/add-feature', methods=['GET', 'POST'])
 def add_feature():
     # Require login
     if 'user_id' not in session:
-        flash("Je moet eerst inloggen.", "error")
+        flash("You must log in first.", "error")
         return redirect(url_for('main.login'))
 
     # Load companies for the dropdown (ORM)
@@ -201,11 +199,11 @@ def add_feature():
         # Simple server-side validations
         errors = []
         if not name_feature:
-            errors.append("Title is verplicht.")
+            errors.append("Title is required.")
         if not id_company:
-            errors.append("Company is verplicht.")
+            errors.append("Company is required.")
         if not id_project:
-            errors.append("Project is verplicht.")
+            errors.append("Project is required.")
 
         numeric_fields = {
             'Gains': gains,
@@ -219,16 +217,16 @@ def add_feature():
         }
         for label, value in numeric_fields.items():
             if value is None:
-                errors.append(f"{label} moet een geheel getal zijn.")
+                errors.append(f"{label} must be an integer.")
 
         # Ensure company and project exist in DB
         company_exists = Company.query.filter_by(id_company=id_company).first()
         project_exists = Project.query.filter_by(id_project=id_project, id_company=id_company).first()
 
         if not company_exists:
-            errors.append("Geselecteerde company bestaat niet.")
+            errors.append("Selected company does not exist.")
         if not project_exists:
-            errors.append("Geselecteerde project bestaat niet of hoort niet bij deze company.")
+            errors.append("Selected project does not exist or does not belong to this company.")
 
         if errors:
             for e in errors:
@@ -256,13 +254,13 @@ def add_feature():
             db.session.add(feature)
             db.session.commit()
 
-            flash("Feature succesvol opgeslagen.", "success")
+            flash("Feature saved successfully.", "success")
             return redirect(url_for('main.dashboard'))
 
         except Exception as e:
             db.session.rollback()
-            print(f"❌ Fout bij opslaan feature: {e}")
-            flash("Er is een fout opgetreden bij het opslaan.", "danger")
+            print(f"Fout bij opslaan feature: {e}")
+            flash("An error occurred while saving.", "danger")
             return render_template('add_feature.html', companies=companies)
 
     # GET: render page

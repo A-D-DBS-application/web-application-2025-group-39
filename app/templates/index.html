@@ -69,12 +69,43 @@
         .brand {
             font-weight: 700;
         }
+        
+        /* Flash-meldingen (bijv. fout of succes) */
+        .flash-messages {
+            margin-bottom: 15px;
+        }
+
+        /* Kleuren voor verschillende soorten meldingen */
+        .success, .error, .info {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+
     </style>
 </head>
 
 <body>
     <div class="welcome-container">
         <h1>Welcome to VECTR</h1>
+
+        <!-- Flash-meldingen tonen (bijv. fout bij login) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
         <p class="subtitle">Your smart feature-prioritization assistant.</p>
 
         <div class="auth-box mb-4">
