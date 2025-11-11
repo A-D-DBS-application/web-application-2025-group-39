@@ -1,0 +1,22 @@
+VECTR
+
+#models: ERD & DDL: see supabase:
+link to our supabase: https://supabase.com/dashboard/project/qxyhmqragbcmncabexyo 
+
+# User stories
+
+As a [], I want to [], so that []. Prio
+As a [Customer], I want to [buy a product], so that [I can use it]. 2
+As a [provider], I want to [sell a product], so that [I earn money]. 1
+
+# UI Prototype
+
+https://www.figma.com/design/gnKfmVfhmxbFcTmQ5awSJ1/VECTR?node-id=0-1&p=f&t=3T5i6WDFanhClpVo-0 
+
+
+#Kanban
+https://miro.com/app/dashboard/?userEmail=theresa.ampe@ugent.be&invite=&event=mailInvite&mailUserEmail=theresa.ampe@ugent.be&track=true&utm_source=notification&utm_medium=email&utm_campaign=add-to-team&utm_content=cta-button&share_link_id=846299655112&lid=g15tulvqsdky 
+
+
+
+
