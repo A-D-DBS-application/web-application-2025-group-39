@@ -56,9 +56,21 @@
     </style>
 </head>
 <body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container mt-3">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} mx-auto" style="max-width: 900px;" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
 
     <div class="top-right">
-        <a href="{{ url_for('main.login') }}" class="btn btn-danger">Logout</a>
+        <a href="{{ url_for('main.logout') }}" class="btn btn-danger">Logout</a>
     </div>
 
     <div class="center-content">
