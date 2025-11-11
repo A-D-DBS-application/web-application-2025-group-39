@@ -8,15 +8,13 @@ main = Blueprint('main', __name__)
 # ==============================
 # 🏠 INDEX ROUTE
 # ==============================
-@main.route('/', methods=['GET', 'POST'])
+@main.route('/', methods=['GET'])
 def index():
-    if request.method == 'POST':
-        flash("Deze actie is niet toegestaan op de startpagina.", "warning")
-        return redirect(url_for('main.index'))
-
+    # Als ingelogd → ga naar dashboard
     if 'user_id' in session:
         return redirect(url_for('main.dashboard'))
 
+    # Anders → startpagina tonen
     return render_template('index.html')
 
 # ==============================
@@ -141,6 +139,30 @@ def logout():
     session.clear()
     flash("Je bent uitgelogd.", "info")
     return redirect(url_for('main.index'))
+
+
+# ==============================
+# 👤 PROFILE PAGE ROUTE
+# ==============================
+@main.route('/profile')
+def profile():
+    if 'user_id' not in session:
+        flash("Je moet eerst inloggen.", "error")
+        return redirect(url_for('main.login'))
+
+    # Haal huidige gebruiker op
+    user = Profile.query.get(session['user_id'])
+    company = Company.query.get(user.id_company)
+
+    return render_template(
+        'profile.html',
+        name=user.name,
+        username=user.name,
+        email=user.email,
+        company=company.company_name,
+        role=user.role
+    )
+
 
 
 
