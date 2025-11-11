@@ -141,6 +141,30 @@ def logout():
     return redirect(url_for('main.index'))
 
 
+# ==============================
+# 👤 PROFILE PAGE ROUTE
+# ==============================
+@main.route('/profile')
+def profile():
+    if 'user_id' not in session:
+        flash("Je moet eerst inloggen.", "error")
+        return redirect(url_for('main.login'))
+
+    # Haal huidige gebruiker op
+    user = Profile.query.get(session['user_id'])
+    company = Company.query.get(user.id_company)
+
+    return render_template(
+        'profile.html',
+        name=user.name,
+        username=user.name,
+        email=user.email,
+        company=company.company_name,
+        role=user.role
+    )
+
+
+
 
 #new route add_feature
 @main.route('/add-feature', methods=['GET', 'POST'])
