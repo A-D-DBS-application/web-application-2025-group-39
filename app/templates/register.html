@@ -30,9 +30,9 @@
     {% endwith %}
     
     <form method="post">
-        
+
         <div class="form-group">
-            <label for="name">name:</label>
+            <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
         </div>
 
@@ -43,9 +43,9 @@
         </div>
 
         <div class="form-group">
-            <label for="role">Rol:</label>
+            <label for="role">Role:</label>
             <select id="role" name="role" required>
-                <option value="">Kies een rol</option>
+                <option value="">Choose a role</option>
                 <option value="user">User</option>
                 <option value="founder">Founder</option>
                 <option value="PM">PM</option>
@@ -53,13 +53,13 @@
         </div>
 
         <div class="form-group">
-            <label for="company_name">Bedrijfsnaam:</label>
+            <label for="company_name">Company name:</label>
             <input type="text" id="company_name" name="company_name" required>
         </div>
 
         <input type="submit" value="Register">
     </form>
     
-    <p>Al een account? <a href="{{ url_for('main.login') }}">Login hier</a></p>
+    <p>Already have an account? <a href="{{ url_for('main.login') }}">Login here</a></p>
 </body>
 </html>
