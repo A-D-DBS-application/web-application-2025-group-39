@@ -24,17 +24,17 @@ def index():
 def login():
     print("🟢 Login route gestart")
     if request.method == 'POST':
-        username = request.form.get('username')
+        name = request.form.get('name')
         email = request.form.get('email')
 
-        print(f"📨 Login poging ontvangen: username={username}, email={email}")
+        print(f"📨 Login poging ontvangen: name={name}, email={email}")
 
         # ✅ Zoeken naar gebruiker in profiel met ORM
-        user = Profile.query.filter_by(name=username, email=email).first()
+        user = Profile.query.filter_by(name=name, email=email).first()
 
         if user:
             session['user_id'] = user.id_profile
-            session['username'] = user.name
+            session['name'] = user.name
             session['role'] = user.role
 
             flash("Succesvol ingelogd!", "success")
@@ -56,13 +56,12 @@ def register():
 
     if request.method == 'POST':
         name = request.form.get('name')
-        username = request.form.get('username')
         email = request.form.get('email')
         role = request.form.get('role')
         company_name = request.form.get('company_name')
 
         print(f"📨 Gehele request.form inhoud: {request.form}")
-        print(f"📨 Gegevens ontvangen: {username} {email} {role} {company_name}")
+        print(f"📨 Gegevens ontvangen: {name} {email} {role} {company_name}")
 
         try:
             # ✅ Bedrijf zoeken (of aanmaken) met ruwe SQL
@@ -97,7 +96,7 @@ def register():
                     VALUES (:name, :email, :role, :id_company)
                 """),
                 {
-                    'name': username,
+                    'name': name,
                     'email': email,
                     'role': role,
                     'id_company': company.id_company
@@ -126,9 +125,9 @@ def dashboard():
         flash("Je moet eerst inloggen.", "error")
         return redirect(url_for('main.login'))
 
-    username = session.get('username')
+    name = session.get('name')
     role = session.get('role')
-    return render_template('dashboard.html', username=username, role=role)
+    return render_template('dashboard.html', name=name, role=role)
 
 
 # ==============================
@@ -157,7 +156,6 @@ def profile():
     return render_template(
         'profile.html',
         name=user.name,
-        username=user.name,
         email=user.email,
         company=company.company_name,
         role=user.role
