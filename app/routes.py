@@ -266,4 +266,3 @@ def add_feature():
     # GET: render page
     return render_template('add_feature.html', companies=companies)
 
-# test
