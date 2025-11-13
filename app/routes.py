@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app import db
-from app.models import Profile, Company, Project, FeaturesIdeas
+from app.models import Profile, Company, Project, Features_ideas
+import uuid  # mag blijven staan als je het later nodig hebt
+
 
 # Blueprint aanmaken
 main = Blueprint('main', __name__)
@@ -237,14 +239,13 @@ def add_feature():
         new_id = str(uuid.uuid4())
 
         try:
-            feature = FeaturesIdeas(
-                id_feature=new_id,
-                id_company=id_company,
-                id_project=id_project,
+            feature = Features_ideas(
+                id_company=int(id_company),
+                id_project=int(id_project),
                 name_feature=name_feature,
                 gains=gains,
                 costs=costs,
-                churn_OPEX=churn_OPEX,
+                churn_opex=churn_OPEX,          # let op: kolomnaam in model
                 opp_cost=opp_cost,
                 market_value=market_value,
                 business_value=business_value,
@@ -324,59 +325,68 @@ def add_project():
         company=user_company
     )
 
-
+# ==============================
+# EDIT PROJECT
+# ==============================
 @main.route('/projects/edit/<int:project_id>', methods=['GET', 'POST'])
 def edit_project(project_id):
     if 'user_id' not in session:
-        flash("You must be logged in.", "danger")
+        flash("Je moet eerst inloggen.", "danger")
         return redirect(url_for('main.login'))
 
-    project = Project.query.get_or_404(project_id)
     user = Profile.query.get(session['user_id'])
+    project = Project.query.get_or_404(project_id)
 
-    # Security check: user must own the company of this project
+    # Beveiliging: enkel projecten van eigen company
     if project.id_company != user.id_company:
-        flash("You are not allowed to edit this project.", "danger")
+        flash("Je mag dit project niet bewerken.", "danger")
         return redirect(url_for('main.projects'))
 
     if request.method == 'POST':
-        new_name = request.form.get('project_name')
-        new_company_id = request.form.get('company_id')
+        new_name = request.form.get("project_name", "").strip()
 
         if not new_name:
-            flash("Project name cannot be empty.", "danger")
-            return redirect(request.url)
+            flash("Project name is required.", "danger")
+            return render_template("edit_project.html", project=project)
 
         project.project_name = new_name
-        project.id_company = new_company_id
-
         db.session.commit()
-        flash("Project updated successfully!", "success")
+
+        flash("Project updated!", "success")
         return redirect(url_for('main.projects'))
 
-    # For dropdown
-    companies = Company.query.all()
+    # GET
+    return render_template("edit_project.html", project=project)
 
-    return render_template('edit_project.html', project=project, companies=companies)
 
+# ==============================
+# DELETE PROJECT
+# ==============================
 @main.route('/projects/delete/<int:project_id>')
 def delete_project(project_id):
     if 'user_id' not in session:
-        flash("You must be logged in.", "danger")
+        flash("Je moet eerst inloggen.", "danger")
         return redirect(url_for('main.login'))
 
-    project = Project.query.get_or_404(project_id)
     user = Profile.query.get(session['user_id'])
+    project = Project.query.get_or_404(project_id)
 
-    # Security check
+    # Beveiliging: alleen eigen company
     if project.id_company != user.id_company:
-        flash("You are not allowed to delete this project.", "danger")
+        flash("Je mag dit project niet verwijderen.", "danger")
         return redirect(url_for('main.projects'))
 
-    db.session.delete(project)
-    db.session.commit()
+    try:
+        db.session.delete(project)   # dankzij cascade gaan features_ideas ook weg
+        db.session.commit()
+        flash("Project deleted.", "success")
+    except Exception as e:
+        db.session.rollback()
+        print(f"Fout bij verwijderen project: {e}")
+        flash("Er is iets misgegaan bij het verwijderen.", "danger")
 
-    flash("Project deleted successfully!", "info")
     return redirect(url_for('main.projects'))
+
+
 
 
