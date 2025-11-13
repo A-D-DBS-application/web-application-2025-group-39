@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app import db
-from app.models import Profile, Company, Project, Features_ideas
+from app.models import Profile, Company, Project, FeaturesIdeas
 
 # Blueprint aanmaken
 main = Blueprint('main', __name__)
@@ -237,7 +237,7 @@ def add_feature():
         new_id = str(uuid.uuid4())
 
         try:
-            feature = Features_ideas(
+            feature = FeaturesIdeas(
                 id_feature=new_id,
                 id_company=id_company,
                 id_project=id_project,
@@ -265,4 +265,118 @@ def add_feature():
 
     # GET: render page
     return render_template('add_feature.html', companies=companies)
+
+# ==============================
+# 📁 PROJECTS OVERVIEW ROUTE
+# ==============================
+@main.route('/projects')
+def projects():
+    if 'user_id' not in session:
+        flash("Je moet eerst inloggen.", "danger")
+        return redirect(url_for('main.login'))
+
+    user = Profile.query.get(session['user_id'])
+
+    # Project + Company naam tegelijk ophalen via join
+    projects = (
+        db.session.query(Project, Company.company_name)
+        .join(Company, Project.id_company == Company.id_company)
+        .filter(Project.id_company == user.id_company)
+        .order_by(Project.id_project.desc())
+        .all()
+    )
+
+    return render_template('projects.html', projects=projects)
+
+
+
+
+
+
+@main.route('/add_project', methods=['GET', 'POST'])
+def add_project():
+    if 'user_id' not in session:
+        flash("Je moet eerst inloggen.", "danger")
+        return redirect(url_for('main.login'))
+
+    # Ingelogde gebruiker ophalen
+    user = Profile.query.get(session['user_id'])
+    user_company = Company.query.filter_by(id_company=user.id_company).first()
+
+    if request.method == 'POST':
+        project_name = request.form.get("project_name")
+        company_id = user_company.id_company  # automatisch vullen
+
+        new_project = Project(
+            project_name=project_name,
+            id_company=company_id
+        )
+
+        db.session.add(new_project)
+        db.session.commit()
+
+        flash("Project toegevoegd!", "success")
+        return redirect(url_for('main.projects'))
+
+    # ⬇️ LET OP → we geven slechts 1 bedrijf door (van user)
+    return render_template(
+        "add_project.html",
+        company=user_company
+    )
+
+
+@main.route('/projects/edit/<int:project_id>', methods=['GET', 'POST'])
+def edit_project(project_id):
+    if 'user_id' not in session:
+        flash("You must be logged in.", "danger")
+        return redirect(url_for('main.login'))
+
+    project = Project.query.get_or_404(project_id)
+    user = Profile.query.get(session['user_id'])
+
+    # Security check: user must own the company of this project
+    if project.id_company != user.id_company:
+        flash("You are not allowed to edit this project.", "danger")
+        return redirect(url_for('main.projects'))
+
+    if request.method == 'POST':
+        new_name = request.form.get('project_name')
+        new_company_id = request.form.get('company_id')
+
+        if not new_name:
+            flash("Project name cannot be empty.", "danger")
+            return redirect(request.url)
+
+        project.project_name = new_name
+        project.id_company = new_company_id
+
+        db.session.commit()
+        flash("Project updated successfully!", "success")
+        return redirect(url_for('main.projects'))
+
+    # For dropdown
+    companies = Company.query.all()
+
+    return render_template('edit_project.html', project=project, companies=companies)
+
+@main.route('/projects/delete/<int:project_id>')
+def delete_project(project_id):
+    if 'user_id' not in session:
+        flash("You must be logged in.", "danger")
+        return redirect(url_for('main.login'))
+
+    project = Project.query.get_or_404(project_id)
+    user = Profile.query.get(session['user_id'])
+
+    # Security check
+    if project.id_company != user.id_company:
+        flash("You are not allowed to delete this project.", "danger")
+        return redirect(url_for('main.projects'))
+
+    db.session.delete(project)
+    db.session.commit()
+
+    flash("Project deleted successfully!", "info")
+    return redirect(url_for('main.projects'))
+
 
