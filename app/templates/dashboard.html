@@ -12,7 +12,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: #f5f7fa;
+            background-color: #e9f4ff;
             text-align: center;
             position: relative;
         }
@@ -77,11 +77,9 @@
      <h1>Welcome to your Dashboard</h1>
 
      <div class="main-buttons">
-         <a href="#" class="btn btn-primary">View Features</a>
-         <a href="{{ url_for('main.add_feature') }}" class="btn btn-primary">Add New Feature</a>
-          <a href="#" class="btn btn-primary">View Roadmap</a>
-          <a href="{{ url_for('main.profile') }}" class="btn btn-primary">Go to Profile</a>
           <a href="{{ url_for('main.projects') }}" class="btn btn-primary">Go to Projects</a>
+          <a href="{{ url_for('main.add_project') }}" class="btn btn-primary btn-sm">Add Project</a>
+          <a href="{{ url_for('main.profile') }}" class="btn btn-primary">Go to Profile</a>
      </div>
     </div>
 
