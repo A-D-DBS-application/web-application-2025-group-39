@@ -16,8 +16,12 @@
       padding: 20px;
       margin-bottom: 20px;
     }
+    .top-right {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+        }
     .form-label { font-weight: 600; }
-    .top-right-link { position: absolute; top: 15px; right: 20px; }
     .btn-save {
       float: right;
       min-width: 160px;
@@ -44,9 +48,9 @@
 </head>
 <!-- daadwerkelijke inhoud die gebruiker ziet -->
 <body>
-  <!-- link stuurt gebruiker naar dashboardpagina -->
-  <div class="top-right-link">
-    <a href="{{ url_for('main.dashboard') }}">Go to Dashboard</a>
+  <!-- link stuurt gebruiker naar projects -->
+  <div class="top-right">
+        <a href="{{ url_for('main.projects') }}" class="btn btn-dark btn-sm">Go to Projects</a>
   </div>
 
     <!--Container centreert inhoud-->
