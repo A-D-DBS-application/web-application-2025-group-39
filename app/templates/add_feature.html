@@ -38,6 +38,9 @@
       gap: 18px;
     }
   </style>
+  <!-- bootstrap-icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
 </head>
 <!-- daadwerkelijke inhoud die gebruiker ziet -->
 <body>
@@ -149,16 +152,29 @@
             </select>
           </div>
           <div>
-            <label class="form-label" for="quality_score">Quality score</label>
+            <label class="form-label" for="quality_score">
+              Confidence level
+              <!-- Info-icoon dat modal opent -->
+              <a href="#" class="ms-2" data-bs-toggle="modal" data-bs-target="#confidenceModal" aria-label="Meer info over confidence levels">
+                <i class="bi bi-info-circle" style="font-size:1.2rem;"></i>
+              </a>
+            </label>
+
             <select class="form-select" id="quality_score" name="quality_score" required>
               <option value="">Select score</option>
-              <option value="1">Poor</option>
-              <option value="2">Fair</option>
-              <option value="3">Good</option>
-              <option value="4">Very good</option>
-              <option value="5">Excellent</option>
+              <option value="0.01">Self Conviction — 0.01</option>
+              <option value="0.03">Pitch Deck — 0.03</option>
+              <option value="0.1">Thematic Support — 0.1</option>
+              <option value="0.2">Other’s Opinion — 0.2</option>
+              <option value="0.5">Estimates &amp; Plans — 0.5</option>
+              <option value="1">Anecdotal Evidence — 1</option>
+              <option value="2">Market Data — 2</option>
+              <option value="3">User/Customer Evidence — 3</option>
+              <option value="7">Test Results — 7</option>
+              <option value="10">Launch Data — 10</option>
             </select>
           </div>
+
         </div>
       </div>
 
@@ -202,5 +218,49 @@
       }
     });
   </script>
+  <!-- Modal voor confidence level uitleg -->
+  <div class="modal fade" id="confidenceModal" tabindex="-1" aria-labelledby="confidenceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confidenceModalLabel">Confidence level</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+        </div>
+
+        <div class="modal-body">
+          <p>How confident are you about this project’s success, based on the strongest evidence you have? Below you will find the scale with the source, short description and the corresponding confidence score.</p>
+
+          <div class="table-responsive">
+            <table class="table table-sm table-striped align-middle">
+              <thead>
+                <tr>
+                  <th>Source</th>
+                  <th>Description</th>
+                  <th class="text-end">Confidence Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Self Conviction</td><td>Pure intuition</td><td class="text-end">0.01</td></tr>
+                <tr><td>Pitch Deck</td><td>Concept with slides</td><td class="text-end">0.03</td></tr>
+                <tr><td>Thematic Support</td><td>Trend fits current themes</td><td class="text-end">0.1</td></tr>
+                <tr><td>Other’s Opinion</td><td>Expert or peer opinion</td><td class="text-end">0.2</td></tr>
+                <tr><td>Estimates &amp; Plans</td><td>Early projections</td><td class="text-end">0.5</td></tr>
+                <tr><td>Anecdotal Evidence</td><td>Feedback from few users</td><td class="text-end">1</td></tr>
+                <tr><td>Market Data</td><td>Validated by research</td><td class="text-end">2</td></tr>
+                <tr><td>User/Customer Evidence</td><td>Real user feedback</td><td class="text-end">3</td></tr>
+                <tr><td>Test Results</td><td>Pilot or prototype data</td><td class="text-end">7</td></tr>
+                <tr><td>Launch Data</td><td>Proven post-launch</td><td class="text-end">10</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <hr>
+          <p>Choose the score that best represents the strongest evidence you have—not an average.</p>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
