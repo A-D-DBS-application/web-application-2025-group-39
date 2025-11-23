@@ -12,11 +12,11 @@ main = Blueprint('main', __name__)
 # ==============================
 @main.route('/', methods=['GET'])
 def index():
-    # Als ingelogd → ga naar dashboard
+    # If logged in → go to dashboard
     if 'user_id' in session:
         return redirect(url_for('main.dashboard'))
 
-    # Anders → startpagina tonen
+    # Otherwise → show start page
     return render_template('index.html')
 
 # ==============================
@@ -24,14 +24,14 @@ def index():
 # ==============================
 @main.route('/login', methods=['GET', 'POST'])
 def login():
-    print("🟢 Login route gestart")
+    print("🟢 Login route started")
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
 
-        print(f"📨 Login poging ontvangen: name={name}, email={email}")
+        print(f"📨 Login attempt received: name={name}, email={email}")
 
-        # Zoeken naar gebruiker in profiel met ORM
+        # Search for user in profile with ORM
         user = Profile.query.filter_by(name=name, email=email).first()
 
         if user:
@@ -40,21 +40,21 @@ def login():
             session['role'] = user.role
 
             flash("Successfully logged in!", "success")
-            print("Login succesvol")
+            print("Login successful")
             return redirect(url_for('main.dashboard'))
         else:
             flash("Invalid name or email.", "error")
-            print("Onjuiste gegevens")
+            print("Invalid credentials")
 
     return render_template('login.html')
 
 
 # ==============================
-# REGISTER ROUTE (WERKT MET SUPABASE STRUCTUUR)
+# REGISTER ROUTE (WORKS WITH SUPABASE STRUCTURE)
 # ==============================
 @main.route('/register', methods=['GET', 'POST'])
 def register():
-    print("Register route gestart")
+    print("Register route started")
 
     if request.method == 'POST':
         name = request.form.get('name')
@@ -62,11 +62,11 @@ def register():
         role = request.form.get('role')
         company_name = request.form.get('company_name')
 
-        print(f"Gehele request.form inhoud: {request.form}")
-        print(f"Gegevens ontvangen: {name} {email} {role} {company_name}")
+        print(f"Full request.form content: {request.form}")
+        print(f"Data received: {name} {email} {role} {company_name}")
 
         try:
-            # Bedrijf zoeken (of aanmaken) met ruwe SQL
+            # Search for company (or create) with raw SQL
             company = db.session.execute(
                 db.text("""
                     SELECT * FROM public.company WHERE company_name = :company_name LIMIT 1
@@ -91,7 +91,7 @@ def register():
                     {'company_name': company_name}
                 ).fetchone()
 
-            # ✅ Nieuw profiel invoegen in Supabase
+            # Insert new profile in Supabase
             db.session.execute(
                 db.text("""
                     INSERT INTO public.profile (name, email, role, id_company)
@@ -107,12 +107,12 @@ def register():
             db.session.commit()
 
             flash("Registration successful! You can now log in.", "success")
-            print("Registratie succesvol")
+            print("Registration successful")
             return redirect(url_for('main.login'))
 
         except Exception as e:
             db.session.rollback()
-            print(f"FOUT tijdens registratie: {e}")
+            print(f"ERROR during registration: {e}")
             flash("An error occurred during registration.", "danger")
 
     return render_template('register.html')
@@ -130,7 +130,6 @@ def dashboard():
     name = session.get('name')
     role = session.get('role')
     return render_template('dashboard.html', name=name, role=role)
-
 
 # ==============================
 # LOGOUT ROUTE
@@ -151,7 +150,7 @@ def profile():
         flash("You must log in first.", "error")
         return redirect(url_for('main.login'))
 
-    # Haal huidige gebruiker op
+    # Get current user
     user = Profile.query.get(session['user_id'])
     company = Company.query.get(user.id_company)
 
@@ -164,13 +163,18 @@ def profile():
     )
 
 
-#new route add_feature
+# New route add_feature
 @main.route('/add-feature', methods=['GET', 'POST'])
 def add_feature():
     # Require login
     if 'user_id' not in session:
         flash("You must log in first.", "error")
         return redirect(url_for('main.login'))
+    
+    # Role control: Founder OR PM
+    if session.get('role') not in ['founder', 'PM']:
+        flash("Only Founders or PMs can add new features.", "danger")
+        return redirect(url_for('main.projects'))
 
     # Load companies for the dropdown (ORM)
     companies = Company.query.order_by(Company.company_name.asc()).all()
@@ -245,7 +249,7 @@ def add_feature():
                 name_feature=name_feature,
                 gains=gains,
                 costs=costs,
-                churn_opex=churn_OPEX,          # let op: kolomnaam in model
+                churn_opex=churn_OPEX,          # column name in model
                 opp_cost=opp_cost,
                 market_value=market_value,
                 business_value=business_value,
@@ -260,7 +264,7 @@ def add_feature():
 
         except Exception as e:
             db.session.rollback()
-            print(f"Fout bij opslaan feature: {e}")
+            print(f"Error while saving feature: {e}")
             flash("An error occurred while saving.", "danger")
             return render_template('add_feature.html', companies=companies)
 
@@ -268,17 +272,17 @@ def add_feature():
     return render_template('add_feature.html', companies=companies)
 
 # ==============================
-# 📁 PROJECTS OVERVIEW ROUTE
+# PROJECTS OVERVIEW ROUTE
 # ==============================
 @main.route('/projects')
 def projects():
     if 'user_id' not in session:
-        flash("Je moet eerst inloggen.", "danger")
+        flash("You must log in first.", "danger")
         return redirect(url_for('main.login'))
 
     user = Profile.query.get(session['user_id'])
 
-    # Project + Company naam tegelijk ophalen via join
+    # Project + Company name via join
     projects = (
         db.session.query(Project, Company.company_name)
         .join(Company, Project.id_company == Company.id_company)
@@ -290,23 +294,24 @@ def projects():
     return render_template('projects.html', projects=projects)
 
 
-
-
-
-
 @main.route('/add_project', methods=['GET', 'POST'])
 def add_project():
     if 'user_id' not in session:
-        flash("Je moet eerst inloggen.", "danger")
+        flash("You must log in first.", "danger")
         return redirect(url_for('main.login'))
+    
+    # Role control: Founder OR PM
+    if session.get('role') not in ['founder', 'PM']:
+        flash("Only Founders and Project Managers are allowed to add new projects.", "danger")
+        return redirect(url_for('main.projects'))
 
-    # Ingelogde gebruiker ophalen
+    # Get logged in user
     user = Profile.query.get(session['user_id'])
     user_company = Company.query.filter_by(id_company=user.id_company).first()
 
     if request.method == 'POST':
         project_name = request.form.get("project_name")
-        company_id = user_company.id_company  # automatisch vullen
+        company_id = user_company.id_company  # auto fill
 
         new_project = Project(
             project_name=project_name,
@@ -316,10 +321,10 @@ def add_project():
         db.session.add(new_project)
         db.session.commit()
 
-        flash("Project toegevoegd!", "success")
+        flash("Project added successfully!", "success")
         return redirect(url_for('main.projects'))
 
-    # ⬇️ LET OP → we geven slechts 1 bedrijf door (van user)
+    # ⬇️ Only pass 1 company (from user)
     return render_template(
         "add_project.html",
         company=user_company
@@ -331,15 +336,15 @@ def add_project():
 @main.route('/projects/edit/<int:project_id>', methods=['GET', 'POST'])
 def edit_project(project_id):
     if 'user_id' not in session:
-        flash("Je moet eerst inloggen.", "danger")
+        flash("You must log in first.", "danger")
         return redirect(url_for('main.login'))
 
     user = Profile.query.get(session['user_id'])
     project = Project.query.get_or_404(project_id)
 
-    # Beveiliging: enkel projecten van eigen company
+    # Security: only projects from own company
     if project.id_company != user.id_company:
-        flash("Je mag dit project niet bewerken.", "danger")
+        flash("You are not allowed to edit this project.", "danger")
         return redirect(url_for('main.projects'))
 
     if request.method == 'POST':
@@ -352,7 +357,7 @@ def edit_project(project_id):
         project.project_name = new_name
         db.session.commit()
 
-        flash("Project updated!", "success")
+        flash("Project updated successfully!", "success")
         return redirect(url_for('main.projects'))
 
     # GET
@@ -365,28 +370,24 @@ def edit_project(project_id):
 @main.route('/projects/delete/<int:project_id>')
 def delete_project(project_id):
     if 'user_id' not in session:
-        flash("Je moet eerst inloggen.", "danger")
+        flash("You must log in first.", "danger")
         return redirect(url_for('main.login'))
 
     user = Profile.query.get(session['user_id'])
     project = Project.query.get_or_404(project_id)
 
-    # Beveiliging: alleen eigen company
+    # Security: only own company
     if project.id_company != user.id_company:
-        flash("Je mag dit project niet verwijderen.", "danger")
+        flash("You are not allowed to delete this project.", "danger")
         return redirect(url_for('main.projects'))
 
     try:
-        db.session.delete(project)   # dankzij cascade gaan features_ideas ook weg
+        db.session.delete(project)   # cascade deletes features_ideas too
         db.session.commit()
-        flash("Project deleted.", "success")
+        flash("Project deleted successfully!", "success")
     except Exception as e:
         db.session.rollback()
-        print(f"Fout bij verwijderen project: {e}")
-        flash("Er is iets misgegaan bij het verwijderen.", "danger")
+        print(f"Error while deleting project: {e}")
+        flash("An error occurred while deleting the project.", "danger")
 
     return redirect(url_for('main.projects'))
-
-
-
-

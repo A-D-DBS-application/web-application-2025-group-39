@@ -50,10 +50,10 @@
 <body>
   <!-- link stuurt gebruiker naar projects -->
   <div class="top-right">
-        <a href="{{ url_for('main.projects') }}" class="btn btn-dark btn-sm">Go to Projects</a>
+    <a href="{{ url_for('main.projects') }}" class="btn btn-dark btn-sm">Go to Projects</a>
   </div>
 
-    <!--Container centreert inhoud-->
+  <!-- Container centreert inhoud -->
   <div class="container">
 
     <h2 class="mb-4">Add New Feature</h2>
@@ -78,34 +78,26 @@
         <div class="grid-2">
           <div>
             <label class="form-label" for="name_feature">Title</label>
-            <input type="text" class="form-control" id="name_feature" name="name_feature" placeholder="e.g., In-app onboarding tour" required>
+            <input type="text" class="form-control" id="name_feature" name="name_feature"
+                   placeholder="e.g., In-app onboarding tour" required>
           </div>
 
-          <div>
-            <label class="form-label" for="id_company">Company</label>
-            <select class="form-select" id="id_company" name="id_company" required>
-              <option value="">Select company</option>
-              {% for c in companies %}
-                <option value="{{ c.id_company }}">{{ c.company_name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-
-        <div class="grid-2 mt-3">
           <div>
             <label class="form-label" for="id_project">Project</label>
             <select class="form-select" id="id_project" name="id_project" required>
               <option value="">Select project</option>
-              <!-- Filled dynamically when company changes -->
+              <!-- Filled dynamically -->
             </select>
           </div>
+        </div>
 
-          <div>
-            <label class="form-label" for="description">Description (not stored yet)</label>
-            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Short explanation of the feature..."></textarea>
-            <small class="text-muted">Your current database model doesn’t include a description column. You can add it later if needed.</small>
-          </div>
+        <div class="mt-3">
+          <label class="form-label" for="description">Description</label>
+          <textarea class="form-control" id="description" name="description" rows="3"
+                    placeholder="Short explanation of the feature..."></textarea>
+          <small class="text-muted">
+            Your current database model doesn’t include a description column. You can add it later if needed.
+          </small>
         </div>
       </div>
 
@@ -158,8 +150,8 @@
           <div>
             <label class="form-label" for="quality_score">
               Confidence level
-              <!-- Info-icoon dat modal opent -->
-              <a href="#" class="ms-2" data-bs-toggle="modal" data-bs-target="#confidenceModal" aria-label="Meer info over confidence levels">
+              <a href="#" class="ms-2" data-bs-toggle="modal" data-bs-target="#confidenceModal"
+                 aria-label="More info about confidence levels">
                 <i class="bi bi-info-circle" style="font-size:1.2rem;"></i>
               </a>
             </label>
