@@ -31,7 +31,7 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
-    
+
   </style>
 </head>
 <body>
@@ -54,7 +54,7 @@
       {% endif %}
     {% endwith %}
 
-    <form method="post" action="{{ url_for('main.add_feature') }}">
+    <form method="post" action="{{ url_for('main.add_feature', project_id=project.id_project) }}"></form>
       
       <!-- Basic info -->
       <div class="section-card">
@@ -65,10 +65,12 @@
             <input type="text" class="form-control" id="name_feature" name="name_feature" required>
           </div>
           <div>
-            <label class="form-label" for="id_project">Project</label>
-            <select class="form-select" id="id_project" name="id_project" required>
-              <option value="">Select project</option>
-            </select>
+            <label class="form-label">Project</label>
+            <!-- Toon projectnaam readonly -->
+            <input type="text" class="form-control" value="{{ project.project_name }}" readonly>
+            <!-- Hidden inputs om id_project en id_company mee te sturen -->
+            <input type="hidden" id="id_project" name="id_project" value="{{ project.id_project }}">
+            <input type="hidden" id="id_company" name="id_company" value="{{ company.id_company }}">
           </div>
         </div>
         <div class="mt-3">

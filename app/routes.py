@@ -164,8 +164,8 @@ def profile():
 
 
 # New route add_feature
-@main.route('/add-feature', methods=['GET', 'POST'])
-def add_feature():
+@main.route('/projects/<int:project_id>/add-feature', methods=['GET', 'POST'])
+def add_feature(project_id):
     # Require login
     if 'user_id' not in session:
         flash("You must log in first.", "error")
@@ -176,8 +176,9 @@ def add_feature():
         flash("Only Founders or PMs can add new features.", "danger")
         return redirect(url_for('main.projects'))
 
-    # Load companies for dropdown
-    companies = Company.query.order_by(Company.company_name.asc()).all()
+    # Haal project en company op
+    project = Project.query.get_or_404(project_id)
+    company = project.company
 
     if request.method == 'POST':
         # Helper to convert safely to int
@@ -190,8 +191,6 @@ def add_feature():
 
         # Basic info
         name_feature = request.form.get('name_feature', '').strip()
-        id_company = request.form.get('id_company', '').strip()
-        id_project = request.form.get('id_project', '').strip()
         description = request.form.get('description', '').strip()
 
         # ROI fields
@@ -216,10 +215,6 @@ def add_feature():
         errors = []
         if not name_feature:
             errors.append("Title is required.")
-        if not id_company:
-            errors.append("Company is required.")
-        if not id_project:
-            errors.append("Project is required.")
 
         numeric_fields = {
             'Revenue': revenue,
@@ -236,27 +231,19 @@ def add_feature():
             if value is None:
                 errors.append(f"{label} must be an integer.")
 
-        # Ensure company/project exist
-        company_exists = Company.query.filter_by(id_company=id_company).first()
-        project_exists = Project.query.filter_by(id_project=id_project, id_company=id_company).first()
-        if not company_exists:
-            errors.append("Selected company does not exist.")
-        if not project_exists:
-            errors.append("Selected project does not exist or does not belong to this company.")
-
         if errors:
             for e in errors:
                 flash(e, "danger")
-            return render_template('add_feature.html', companies=companies)
+            return render_template('add_feature.html', project=project, company=company)
 
-        # ✅ Create a unique ID for the feature
+        # Create a unique ID for the feature
         new_id = str(uuid.uuid4())
 
         try:
             feature = Features_ideas(
                 id_feature=new_id,              # primary key
-                id_company=int(id_company),
-                id_project=int(id_project),
+                id_company=company.id_company,
+                id_project=project.id_project,
                 name_feature=name_feature,
                 description=description,
                 revenue=revenue,
@@ -282,10 +269,10 @@ def add_feature():
             db.session.rollback()
             print(f"Error while saving feature: {e}")
             flash("An error occurred while saving.", "danger")
-            return render_template('add_feature.html', companies=companies)
+            return render_template('add_feature.html', project=project, company=company)
 
     # GET
-    return render_template('add_feature.html', companies=companies)
+    return render_template('add_feature.html', project=project, company=company)
 
 # ==============================
 # PROJECTS OVERVIEW ROUTE
