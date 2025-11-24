@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Add Roadmap for Project: {{ project.project_name }}</h2>
+
+<div class="card p-4 shadow mt-3" style="max-width: 550px;">
+    <form method="POST">
+
+        <!-- Quarter -->
+        <div class="mb-3">
+            <label class="form-label">Quarter</label>
+            <select name="quarter" class="form-select" required>
+                <option value="">Select quarter</option>
+                <option value="Q1 2025">Q1 2025</option>
+                <option value="Q2 2025">Q2 2025</option>
+                <option value="Q3 2025">Q3 2025</option>
+                <option value="Q4 2025">Q4 2025</option>
+            </select>
+        </div>
+
+        <!-- Team Size -->
+        <div class="mb-3">
+            <label class="form-label">Team Size</label>
+            <input type="number" name="team_size" class="form-control" required>
+        </div>
+
+        <!-- Sprint Capacity -->
+        <div class="mb-3">
+            <label class="form-label">Sprint Capacity</label>
+            <input type="number" name="sprint_capacity" class="form-control" required>
+        </div>
+
+        <!-- Budget -->
+        <div class="mb-3">
+            <label class="form-label">Budget Allocation</label>
+            <input type="number" name="budget_allocation" class="form-control" required>
+        </div>
+
+        <button class="btn btn-primary">Save Roadmap</button>
+        <a href="{{ url_for('main.projects') }}" class="btn btn-secondary">Cancel</a>
+
+    </form>
+</div>
+
+{% endblock %}

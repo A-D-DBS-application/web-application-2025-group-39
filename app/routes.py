@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app import db
-from app.models import Profile, Company, Project, Features_ideas
+from app.models import Profile, Company, Project, Features_ideas, Roadmap, Milestone
 import uuid  # mag blijven staan als je het later nodig hebt
 
 
@@ -391,3 +391,86 @@ def delete_project(project_id):
         flash("An error occurred while deleting the project.", "danger")
 
     return redirect(url_for('main.projects'))
+
+# ==============================
+# ROADMAP ROUTES 
+# ==============================
+
+
+@main.route('/roadmap/add/<int:project_id>', methods=['GET', 'POST'])
+def add_roadmap(project_id):
+    if 'user_id' not in session:
+        flash("You must log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    # Only founders can create roadmaps
+    if session.get('role') != 'founder':
+        flash("Only Founders can create roadmaps.", "danger")
+        return redirect(url_for('main.projects'))
+
+    user = Profile.query.get(session['user_id'])
+    project = Project.query.get_or_404(project_id)
+
+    # Must belong to same company
+    if project.id_company != user.id_company:
+        flash("You are not allowed to add a roadmap to this project.", "danger")
+        return redirect(url_for('main.projects'))
+
+    if request.method == 'POST':
+        quarter = request.form.get("quarter")
+        team_size = request.form.get("team_size")
+        sprint_capacity = request.form.get("sprint_capacity")
+        budget_allocation = request.form.get("budget_allocation")
+
+        # Check if this quarter already has a roadmap
+        existing = Roadmap.query.filter_by(
+            id_project=project_id,
+            quarter=quarter
+        ).first()
+
+        if existing:
+            flash("This project already has a roadmap for that quarter.", "danger")
+            return render_template('add_roadmap.html', project=project)
+
+
+        # Create roadmap
+        roadmap = Roadmap(
+            id_project=project_id,
+            quarter=quarter,
+            team_size=int(team_size),
+            sprint_capacity=int(sprint_capacity),
+            budget_allocation=int(budget_allocation)
+        )
+
+        db.session.add(roadmap)
+        db.session.commit()
+
+        flash("Roadmap created successfully!", "success")
+        return redirect(url_for('main.roadmap_overview', project_id=project_id))
+
+    return render_template('add_roadmap.html', project=project)
+
+
+@main.route('/roadmap/<int:project_id>')
+def roadmap_overview(project_id):
+    if 'user_id' not in session:
+        flash("You must log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    user = Profile.query.get(session['user_id'])
+    project = Project.query.get_or_404(project_id)
+
+    # Check company ownership
+    if project.id_company != user.id_company:
+        flash("You are not allowed to view this roadmap.", "danger")
+        return redirect(url_for('main.projects'))
+
+    # Alle roadmaps van dit project ophalen
+    roadmaps = project.roadmaps
+
+    return render_template(
+        "roadmap_overview.html",
+        project=project,
+        roadmaps=roadmaps
+    )
+

@@ -69,6 +69,14 @@ class Project(db.Model):
     # relaties
     company = db.relationship("Company", back_populates="projects")
 
+    roadmaps = db.relationship(
+    "Roadmap",
+    back_populates="project",
+    cascade="all, delete",
+    passive_deletes=True
+    )
+
+
     # alle features_ideas die aan dit project hangen
     features_ideas = db.relationship(
         "Features_ideas",
@@ -116,3 +124,61 @@ class Features_ideas(db.Model):
 
     # relatie terug naar project
     project = db.relationship("Project", back_populates="features_ideas")
+
+
+class Roadmap(db.Model):
+    __tablename__ = 'roadmap'
+    __table_args__ = {'schema': 'public'}
+
+    id_roadmap = db.Column(db.Integer, primary_key=True)
+
+    # Foreign key naar project
+    id_project = db.Column(
+        db.Integer,
+        db.ForeignKey('public.project.id_project', ondelete="CASCADE"),
+        nullable=False
+    )
+
+    # Roadmap velden
+    quarter = db.Column(db.String, nullable=False)  # bijv. "Q1 2025"
+    team_size = db.Column(db.Integer, nullable=False)
+    sprint_capacity = db.Column(db.Integer, nullable=False)
+    budget_allocation = db.Column(db.Integer, nullable=False)
+    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+
+    # Relatie terug naar Project
+    project = db.relationship("Project", back_populates="roadmaps")
+
+    # Roadmap → Milestones
+    milestones = db.relationship(
+        "Milestone",
+        back_populates="roadmap",
+        cascade="all, delete",
+        passive_deletes=True
+    )
+
+
+
+class Milestone(db.Model):
+    __tablename__ = 'milestone'
+    __table_args__ = {'schema': 'public'}
+
+    id_milestone = db.Column(db.Integer, primary_key=True)
+
+    # Foreign key naar roadmap
+    id_roadmap = db.Column(
+        db.Integer,
+        db.ForeignKey('public.roadmap.id_roadmap', ondelete="CASCADE"),
+        nullable=False
+    )
+
+    # Milestone velden
+    name = db.Column(db.String, nullable=False)
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    goal = db.Column(db.String)
+    status = db.Column(db.String)  # Planned / In Progress / Done
+
+    roadmap = db.relationship("Roadmap", back_populates="milestones")
+
