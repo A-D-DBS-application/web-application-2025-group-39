@@ -90,8 +90,8 @@ class Features_ideas(db.Model):
     __tablename__ = 'features_ideas'
     __table_args__ = {'schema': 'public'}
 
-    # Primary key
-    id_feature = db.Column(db.Integer, primary_key=True)
+    # Primary key (UUID string)
+    id_feature = db.Column(db.String, primary_key=True)
 
     # Foreign keys
     id_company = db.Column(
@@ -105,24 +105,32 @@ class Features_ideas(db.Model):
         nullable=False
     )
 
-    # feature informatie
+    # Basic info
     name_feature = db.Column(db.String, nullable=False)
-    gains = db.Column(db.Integer, nullable=False)
-    costs = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.Text)
 
-    # ⚠️ kolomnamen exact zoals in Supabase (kleine letters)
-    churn_opex = db.Column(db.Integer, nullable=False)
-    opp_cost = db.Column(db.Integer, nullable=False)
+    # ROI fields
+    revenue = db.Column(db.Integer)
+    cost_savings = db.Column(db.Integer)
+    investment_hours = db.Column(db.Integer)
+    opex_hours = db.Column(db.Integer)
+    other_costs = db.Column(db.Integer)
+    horizon = db.Column(db.Integer)
+    expected_profit = db.Column(db.Integer)
+    roi_percent = db.Column(db.Float)
 
-    market_value = db.Column(db.Integer, nullable=False)
-    business_value = db.Column(db.Integer, nullable=False)
-    validation_stage = db.Column(db.Integer, nullable=False)
-    quality_score = db.Column(db.Integer, nullable=False)
+    # TTV fields
+    ttm_weeks = db.Column(db.Integer)
+    ttbv_weeks = db.Column(db.Integer)
+    ttv_weeks = db.Column(db.Float)
 
-    # metadata
+    # Confidence
+    quality_score = db.Column(db.Float)
+
+    # Metadata
     createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-    # relatie terug naar project
+    # Relatie terug naar project
     project = db.relationship("Project", back_populates="features_ideas")
 
 

@@ -176,16 +176,11 @@ def add_feature():
         flash("Only Founders or PMs can add new features.", "danger")
         return redirect(url_for('main.projects'))
 
-    # Load companies for the dropdown (ORM)
+    # Load companies for dropdown
     companies = Company.query.order_by(Company.company_name.asc()).all()
 
     if request.method == 'POST':
-        # Read form fields
-        name_feature = request.form.get('name_feature', '').strip()
-        id_company = request.form.get('id_company', '').strip()
-        id_project = request.form.get('id_project', '').strip()
-
-        # Numeric fields: validate and convert to int
+        # Helper to convert safely to int
         def to_int(field_name):
             raw = request.form.get(field_name, '').strip()
             try:
@@ -193,16 +188,31 @@ def add_feature():
             except ValueError:
                 return None
 
-        gains = to_int('gains')
-        costs = to_int('costs')
-        churn_OPEX = to_int('churn_OPEX')
-        opp_cost = to_int('opp_cost')
-        market_value = to_int('market_value')
-        business_value = to_int('business_value')
-        validation_stage = to_int('validation_stage')
-        quality_score = to_int('quality_score')
+        # Basic info
+        name_feature = request.form.get('name_feature', '').strip()
+        id_company = request.form.get('id_company', '').strip()
+        id_project = request.form.get('id_project', '').strip()
+        description = request.form.get('description', '').strip()
 
-        # Simple server-side validations
+        # ROI fields
+        revenue = to_int('revenue')
+        cost_savings = to_int('cost_savings')
+        investment_hours = to_int('investment_hours')
+        opex_hours = to_int('opex_hours')
+        other_costs = to_int('other_costs')
+        horizon = to_int('horizon')
+        expected_profit = to_int('expected_profit')
+        roi_percent = request.form.get('roi_percent')  # readonly, string/float
+
+        # TTV fields
+        ttm_weeks = to_int('ttm_weeks')
+        ttbv_weeks = to_int('ttbv_weeks')
+        ttv_weeks = request.form.get('ttv_weeks')  # readonly
+
+        # Confidence
+        quality_score = request.form.get('quality_score')
+
+        # Validations
         errors = []
         if not name_feature:
             errors.append("Title is required.")
@@ -212,23 +222,23 @@ def add_feature():
             errors.append("Project is required.")
 
         numeric_fields = {
-            'Gains': gains,
-            'Costs': costs,
-            'Churn / OPEX': churn_OPEX,
-            'Opportunity cost': opp_cost,
-            'Market value': market_value,
-            'Business value': business_value,
-            'Validation stage': validation_stage,
-            'Quality score': quality_score
+            'Revenue': revenue,
+            'Cost savings': cost_savings,
+            'Investment hours': investment_hours,
+            'OPEX hours': opex_hours,
+            'Other costs': other_costs,
+            'Horizon': horizon,
+            'Expected profit': expected_profit,
+            'TTM weeks': ttm_weeks,
+            'TTBV weeks': ttbv_weeks
         }
         for label, value in numeric_fields.items():
             if value is None:
                 errors.append(f"{label} must be an integer.")
 
-        # Ensure company and project exist in DB
+        # Ensure company/project exist
         company_exists = Company.query.filter_by(id_company=id_company).first()
         project_exists = Project.query.filter_by(id_project=id_project, id_company=id_company).first()
-
         if not company_exists:
             errors.append("Selected company does not exist.")
         if not project_exists:
@@ -239,28 +249,34 @@ def add_feature():
                 flash(e, "danger")
             return render_template('add_feature.html', companies=companies)
 
-        # Create a unique ID for the feature (string PK)
+        # ✅ Create a unique ID for the feature
         new_id = str(uuid.uuid4())
 
         try:
             feature = Features_ideas(
+                id_feature=new_id,              # primary key
                 id_company=int(id_company),
                 id_project=int(id_project),
                 name_feature=name_feature,
-                gains=gains,
-                costs=costs,
-                churn_opex=churn_OPEX,          # column name in model
-                opp_cost=opp_cost,
-                market_value=market_value,
-                business_value=business_value,
-                validation_stage=validation_stage,
+                description=description,
+                revenue=revenue,
+                cost_savings=cost_savings,
+                investment_hours=investment_hours,
+                opex_hours=opex_hours,
+                other_costs=other_costs,
+                horizon=horizon,
+                expected_profit=expected_profit,
+                roi_percent=roi_percent,
+                ttm_weeks=ttm_weeks,
+                ttbv_weeks=ttbv_weeks,
+                ttv_weeks=ttv_weeks,
                 quality_score=quality_score
             )
             db.session.add(feature)
             db.session.commit()
 
             flash("Feature saved successfully.", "success")
-            return redirect(url_for('main.dashboard'))
+            return redirect(url_for('main.projects'))
 
         except Exception as e:
             db.session.rollback()
@@ -268,7 +284,7 @@ def add_feature():
             flash("An error occurred while saving.", "danger")
             return render_template('add_feature.html', companies=companies)
 
-    # GET: render page
+    # GET
     return render_template('add_feature.html', companies=companies)
 
 # ==============================
@@ -321,7 +337,7 @@ def add_project():
         db.session.add(new_project)
         db.session.commit()
 
-        flash("Project added successfully!", "success")
+        flash("Project added successfully.", "success")
         return redirect(url_for('main.projects'))
 
     # ⬇️ Only pass 1 company (from user)
@@ -357,7 +373,7 @@ def edit_project(project_id):
         project.project_name = new_name
         db.session.commit()
 
-        flash("Project updated successfully!", "success")
+        flash("Project updated successfully.", "success")
         return redirect(url_for('main.projects'))
 
     # GET
@@ -384,7 +400,7 @@ def delete_project(project_id):
     try:
         db.session.delete(project)   # cascade deletes features_ideas too
         db.session.commit()
-        flash("Project deleted successfully!", "success")
+        flash("Project deleted successfully.", "success")
     except Exception as e:
         db.session.rollback()
         print(f"Error while deleting project: {e}")
