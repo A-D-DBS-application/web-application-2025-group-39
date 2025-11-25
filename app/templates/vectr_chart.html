@@ -1,26 +1,30 @@
+<!-- vraag basis lauout template-->
 {% extends "base.html" %}
 
 {% block title %}VECTR Prioritization: {{ project.project_name }}{% endblock %}
-
+<!--start hoofinhoud-->
 {% block content %}
+    <!--hoofdtitel graph-->
     <h2 class="text-center mb-4">VECTR Prioritization Chart for {{ project.project_name }}</h2>
     
+    <!--container voor navigatie knoppen-->
     <div class="mb-3 d-flex justify-content-center">
         <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" 
            class="btn btn-secondary me-2">
-            Alle Features
+            All Features
         </a>
         <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}" 
            class="btn btn-primary">
-            + Feature Toevoegen
+            + Add Feature
         </a>
     </div>
 
     <div class="card shadow p-4 mx-auto" style="max-width: 800px; height: 800px;">
         <canvas id="vectrChart"></canvas>
+        <!--legende betekenis assen en bubbelgrote-->
         <p class="text-center mt-3 text-muted">
             X-as: Confidence | Y-as: TtV | 
-            **Bubble Grootte: ROI (Hoe groter de bubbel, hoe hoger de ROI)**
+            **Bubble Size: ROI (The bigger the bubble, the higher the ROI)**
         </p>
     </div>
 {% endblock %}
@@ -118,12 +122,11 @@
                                 label: function(context) {
                                     const item = context.raw;
                                     
-                                    // DE SYNTAX FOUTEN ZATEN HIER (ONTBREKENDE KOMMA'S)
                                     return [
                                         item.name, 
                                         `Confidence (X): ${item.confidence.toFixed(2)}`, 
-                                        `TtV (Y): ${item.ttv.toFixed(0)} weken`, // <-- Komma toegevoegd
-                                        `ROI (Grootte): ${item.roi.toFixed(1)}%` // <-- Komma was nodig voor de volgende regel (nu laatste item)
+                                        `TtV (Y): ${item.ttv.toFixed(0)} weken`, 
+                                        `ROI (Grootte): ${item.roi.toFixed(1)}%` 
                                     ];
                                 }
                             }
