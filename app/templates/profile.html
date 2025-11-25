@@ -1,30 +1,26 @@
 {% extends "base.html" %}
 
 {% block title %}Profile{% endblock %}
+{% block body_class %}profile-body{% endblock %}
 
 {% block content %}
-
-<!-- Top-right dashboard button -->
-<div class="position-absolute" style="top: 20px; right: 20px;">
+  <!-- Top-right dashboard button -->
+  <div class="top-right">
     <a href="{{ url_for('main.dashboard') }}" class="btn btn-dark btn-sm">Go to Dashboard</a>
-</div>
+  </div>
 
-<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="profile-wrapper">
+    <div class="card shadow-lg p-4 profile-card">
+      <h3 class="text-center mb-4">Your Profile</h3>
 
-    <div class="card shadow-lg p-4" style="width: 450px; border-radius: 12px;">
+      <p><strong>Name:</strong><br>{{ name }}</p>
+      <p><strong>Email:</strong><br>{{ email }}</p>
+      <p><strong>Company:</strong><br>{{ company }}</p>
+      <p><strong>Role:</strong><br>{{ role }}</p>
 
-        <h3 class="text-center mb-4">Your Profile</h3>
-
-        <p><strong>Name:</strong><br>{{ name }}</p>
-        <p><strong>Email:</strong><br>{{ email }}</p>
-        <p><strong>Company:</strong><br>{{ company }}</p>
-        <p><strong>Role:</strong><br>{{ role }}</p>
-
-        <div class="d-flex justify-content-center gap-3 mt-4">
-            <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">Back</a>
-        </div>
-
+      <div class="d-flex justify-content-center gap-3 mt-4">
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">Back</a>
+      </div>
     </div>
-</div>
-
+  </div>
 {% endblock %}

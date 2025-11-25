@@ -1,93 +1,24 @@
 {% extends "base.html" %}
 
 {% block title %}Dashboard{% endblock %}
+{% block body_class %}dashboard-body{% endblock %}
 
 {% block content %}
+  <!-- LOGOUT BUTTON -->
+  <a href="{{ url_for('main.logout') }}" class="btn btn-danger logout-btn">Logout</a>
 
-<style>
-    body {
-        background-color: #e9f4ff;
-        margin: 0;
-        padding: 0;
-    }
-
-    .dashboard-wrapper {
-        height: 80vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-    }
-
-    h1 {
-        font-size: 2.3rem;
-        font-weight: 600;
-        margin-bottom: 25px;
-        color: #222;
-    }
-
-    .main-buttons {
-        display: flex;
-        gap: 30px;
-        margin-top: 20px;
-    }
-
-    .main-buttons .btn {
-        width: 190px;
-        height: 55px;
-        font-size: 17px;
-        border-radius: 10px;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: 0.2s ease-in-out;
-    }
-
-    .main-buttons .btn:hover {
-        transform: translateY(-3px);
-    }
-
-    /* Logout knop rechtsboven */
-    .logout-btn {
-        position: fixed;
-        top: 15px;
-        right: 20px;
-        z-index: 100;
-    }
-
-    /* Footer info */
-    .bottom-info {
-        position: fixed;
-        bottom: 15px;
-        right: 20px;
-        font-size: 14px;
-        color: #555;
-    }
-</style>
-
-
-<!-- LOGOUT BUTTON -->
-<a href="{{ url_for('main.logout') }}" class="btn btn-danger logout-btn">Logout</a>
-
-
-<div class="dashboard-wrapper">
-
+  <div class="dashboard-wrapper">
     <h1>Welcome to your Dashboard</h1>
 
     <div class="main-buttons">
-        <a href="{{ url_for('main.projects') }}" class="btn btn-primary">Go to Projects</a>
-        <a href="{{ url_for('main.add_project') }}" class="btn btn-primary">Add Project</a>
-        <a href="{{ url_for('main.profile') }}" class="btn btn-primary">Go to Profile</a>
+      <a href="{{ url_for('main.projects') }}" class="btn btn-primary">Go to Projects</a>
+      <a href="{{ url_for('main.add_project') }}" class="btn btn-primary">Add Project</a>
+      <a href="{{ url_for('main.profile') }}" class="btn btn-primary">Go to Profile</a>
     </div>
+  </div>
 
-</div>
-
-
-<!-- Logged-in info bottom right -->
-<div class="bottom-info">
+  <!-- Logged-in info bottom right -->
+  <div class="bottom-info">
     Logged in as: <strong>{{ name }}</strong> | Role: <strong>{{ role }}</strong>
-</div>
-
+  </div>
 {% endblock %}

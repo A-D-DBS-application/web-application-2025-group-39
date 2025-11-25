@@ -1,95 +1,38 @@
 {% extends "base.html" %}
 
 {% block title %}Login{% endblock %}
-
-{% block head %}
-<style>
-    body {
-        background-color: #f4f6f8 !important;
-    }
-    .login-container {
-        background-color: #ffffff;
-        padding: 30px 40px;
-        border-radius: 12px;
-        width: 380px;
-        box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
-        margin: 0 auto;
-        margin-top: 6%;
-    }
-    .login-title {
-        text-align: center;
-        margin-bottom: 25px;
-        font-weight: 700;
-        color: #333;
-    }
-    .form-group {
-        margin-bottom: 18px;
-    }
-    label {
-        font-weight: 500;
-        margin-bottom: 6px;
-        display: block;
-        color: #555;
-    }
-    input {
-        width: 100%;
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #cccccc;
-    }
-    input[type="submit"] {
-        margin-top: 10px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        font-weight: 600;
-        cursor: pointer;
-    }
-    input[type="submit"]:hover {
-        background-color: #0056b3;
-    }
-    .register-link {
-        text-align: center;
-        margin-top: 15px;
-        font-size: 14px;
-    }
-</style>
-{% endblock %}
+{% block body_class %}login-body{% endblock %}
 
 {% block content %}
-
 <div class="login-container">
-    <h1 class="login-title">Login</h1>
+  <h1 class="login-title">Login</h1>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="flash-messages">
-                {% for category, message in messages %}
-                    <div class="{{ category }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
-    {% endwith %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for category, message in messages %}
+          <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
 
-    <form method="post" action="{{ url_for('main.login') }}">
-
-        <div class="form-group">
-            <label for="name">Full Name:</label>
-            <input type="text" id="name" name="name" required>
-        </div>
-
-        <div class="form-group">
-            <label for="email">E-mail:</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-
-        <input type="submit" value="Login">
-
-    </form>
-
-    <div class="register-link">
-        Don't have an account? <a href="{{ url_for('main.register') }}">Register here</a>
+  <form method="post" action="{{ url_for('main.login') }}">
+    <div class="form-group">
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" name="name" required>
     </div>
-</div>
 
+    <div class="form-group">
+      <label for="email">E-mail:</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+
+    <input type="submit" value="Login">
+  </form>
+
+  <div class="register-link">
+    Don't have an account? <a href="{{ url_for('main.register') }}">Register here</a>
+  </div>
+</div>
 {% endblock %}

@@ -1,0 +1,340 @@
+/* ===========================
+   GLOBAL STYLING
+   =========================== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Flash messages */
+.success, .error, .info {
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.error   { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.info    { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+/* Buttons */
+.btn-sm {
+    min-width: 90px;
+}
+.btn-edit {
+    background-color: #c1429d;
+    color: white;
+}
+.btn-edit:hover {
+    background-color: #b33b91;
+    color: white;
+}
+.btn-feature {
+    background-color: #007bff;
+    color: white;
+}
+
+/* ===========================
+   DASHBOARD PAGE
+   =========================== */
+.dashboard-wrapper {
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.dashboard-wrapper h1 {
+    font-size: 2.3rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #222;
+}
+.main-buttons {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+.main-buttons .btn {
+    width: 190px;
+    height: 55px;
+    font-size: 17px;
+    border-radius: 10px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.2s ease-in-out;
+}
+.main-buttons .btn:hover {
+    transform: translateY(-3px);
+}
+.logout-btn {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    z-index: 100;
+}
+.bottom-info {
+    position: fixed;
+    bottom: 15px;
+    right: 20px;
+    font-size: 14px;
+    color: #555;
+}
+
+/* ===========================
+   INDEX PAGE
+   =========================== */
+.index-body {
+    background: linear-gradient(135deg, #e8f6ff 0%, #f3f9ff 100%) !important;
+    font-family: 'Inter', sans-serif;
+}
+.welcome-container {
+    max-width: 700px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    padding: 60px 40px;
+    margin: 80px auto;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    text-align: center;
+}
+.welcome-container h1 {
+    font-weight: 800;
+    font-size: 3.5rem;
+    margin-bottom: 10px;
+    color: #111;
+}
+.subtitle {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 40px;
+}
+.auth-box {
+    background: #fff;
+    border-radius: 12px;
+    display: inline-block;
+    padding: 25px 40px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+.auth-box p {
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+.btn-login, .btn-register {
+    padding: 8px 20px;
+    border-radius: 8px;
+    min-width: 120px;
+}
+.footer {
+    margin-top: 40px;
+    color: #444;
+    font-size: 0.9rem;
+}
+.brand {
+    font-weight: 700;
+}
+
+/* ===========================
+   LOGIN PAGE
+   =========================== */
+.login-body {
+    background-color: #f4f6f8 !important;
+}
+.login-container {
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    width: 380px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+    margin: 0 auto;
+    margin-top: 6%;
+}
+.login-title {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 700;
+    color: #333;
+}
+.form-group {
+    margin-bottom: 18px;
+}
+label {
+    font-weight: 500;
+    margin-bottom: 6px;
+    display: block;
+    color: #555;
+}
+input, select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #cccccc;
+    box-sizing: border-box;
+}
+input[type="submit"] {
+    margin-top: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+.register-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+/* ===========================
+   REGISTER PAGE
+   =========================== */
+.register-body {
+    background-color: #f4f6f8 !important;
+}
+.register-container {
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    width: 420px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+    margin: 0 auto;
+    margin-top: 5%;
+}
+.register-title {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 700;
+    color: #333;
+}
+.login-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+/* ===========================
+   PROJECTS PAGE
+   =========================== */
+.projects-body {
+    background-color: #eaf4ff;
+}
+.projects-wrapper {
+    width: 90%;
+    max-width: 1400px;
+    margin: 40px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+.projects-wrapper h2 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+.top-right-fixed {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    z-index: 999;
+}
+table {
+    text-align: center;
+}
+
+/* ===========================
+   ROADMAP OVERVIEW PAGE
+   =========================== */
+.roadmap-body {
+    background-color: #f4f6f8;
+    padding: 40px;
+    font-family: Arial, sans-serif;
+}
+.card {
+    border-radius: 12px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+.top-right {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}
+
+/* ===========================
+   PROFILE PAGE
+   =========================== */
+.profile-wrapper {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile-card {
+    width: 450px;
+    border-radius: 12px;
+}
+
+.top-right {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+/* ===========================
+   EDIT PROJECT PAGE
+   =========================== */
+.form-card {
+    max-width: 650px;
+    border-radius: 12px;
+    background: white;
+}
+
+/* ===========================
+   ADD ROADMAP PAGE
+   =========================== */
+.roadmap-form {
+    max-width: 550px;
+    border-radius: 12px;
+    background: #fff;
+}
+
+/* ===========================
+   ADD PROJECT PAGE
+   =========================== */
+.form-card {
+    max-width: 650px;
+    border-radius: 12px;
+    background: #fff;
+}
+
+/* ===========================
+   MILESTONE PAGE
+   =========================== */
+.milestone-form {
+    max-width: 550px;
+    border-radius: 12px;
+    background: #fff;
+}
+
+/* ===========================
+   ADD FEATURE PAGE
+   =========================== */
+.feature-form {
+    max-width: 1100px;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.top-right {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}

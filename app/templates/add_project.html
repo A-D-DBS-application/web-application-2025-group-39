@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
 {% block title %}Add New Project{% endblock %}
+{% block body_class %}projects-body{% endblock %}
 
 {% block content %}
-
-<!-- Right-top button -->
-<a href="{{ url_for('main.projects') }}" class="btn btn-dark btn-sm position-absolute top-0 end-0 m-3">
+  <!-- Right-top button -->
+  <a href="{{ url_for('main.projects') }}" 
+     class="btn btn-dark btn-sm position-absolute top-0 end-0 m-3">
     Go to Projects
-</a>
+  </a>
 
-<h2 class="mb-4 text-center">Add New Project</h2>
+  <h2 class="mb-4 text-center">Add New Project</h2>
 
-<div class="form-card shadow-sm p-4 mx-auto" style="max-width: 650px; border-radius: 12px; background: white;">
-
+  <div class="form-card shadow-sm p-4 mx-auto">
     <!-- Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
@@ -26,23 +26,20 @@
     {% endwith %}
 
     <form method="POST" action="{{ url_for('main.add_project') }}">
+      <h5 class="mb-3 fw-semibold">Project Info</h5>
 
-        <h5 class="mb-3 fw-semibold">Project Info</h5>
+      <div class="mb-3">
+        <label class="form-label">Project Name</label>
+        <input type="text" name="project_name" class="form-control" required>
+      </div>
 
-        <div class="mb-3">
-            <label class="form-label">Project Name</label>
-            <input type="text" name="project_name" class="form-control" required>
-        </div>
+      <div class="mb-3">
+        <label class="form-label">Company</label>
+        <input type="text" class="form-control" value="{{ company.company_name }}" readonly>
+        <input type="hidden" name="company_id" value="{{ company.id_company }}">
+      </div>
 
-        <div class="mb-3">
-            <label class="form-label">Company</label>
-            <input type="text" class="form-control" value="{{ company.company_name }}" readonly>
-            <input type="hidden" name="company_id" value="{{ company.id_company }}">
-        </div>
-
-        <button type="submit" class="btn btn-primary w-100 mt-3">Save Project</button>
-
+      <button type="submit" class="btn btn-primary w-100 mt-3">Save Project</button>
     </form>
-</div>
-
+  </div>
 {% endblock %}
