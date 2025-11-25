@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}VECTR Chart: {{ project.project_name }}{% endblock %}
+
+{% block content %}
+    <h2 class="text-center mb-4">VECTR Prioritization Chart for {{ project.project_name }}</h2>
+    <div class="card shadow p-4 mx-auto" style="max-width: 1200px;">
+        <canvas id="vectrChart"></canvas>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartData = {{ chart_data | tojson }}; // Flask data inlezen
+            const ctx = document.getElementById('vectrChart').getContext('2d');
+            
+            // Data voorbereiden voor Chart.js Bubble Chart
+            const datasets = [{
+                label: 'Features',
+                data: chartData.map(item => ({
+                    x: item.x, // TtV (weeks)
+                    y: item.y, // ROI (%)
+                    r: (item.confidence || 0.01) * 5, // Confidence bepaalt de grootte (schaal de score)
+                    name: item.name
+                })),
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }];
+
+            new Chart(ctx, {
+                type: 'bubble',
+                data: { datasets: datasets },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const item = context.raw;
+                                    return `${item.name}: TtV=${item.x} weken, ROI=${item.y}%`;
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'VECTR Prioritization (ROI vs. TtV)'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time-to-Value (TtV) in Weeks (Laag is Beter)'
+                            },
+                            reverse: true, // Lage TtV (goed) rechts zetten
+                            type: 'linear',
+                            position: 'bottom'
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Return on Investment (ROI) in % (Hoog is Beter)'
+                            },
+                            type: 'linear'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

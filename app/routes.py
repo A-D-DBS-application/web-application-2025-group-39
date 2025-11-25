@@ -184,8 +184,10 @@ def add_feature(project_id):
         # Helper to convert safely to int
         def to_int(field_name):
             raw = request.form.get(field_name, '').strip()
+            if not raw:
+                return None
             try:
-                return int(raw)
+                return float(raw) if is_float else int(raw)
             except ValueError:
                 return None
 
@@ -246,6 +248,27 @@ def add_feature(project_id):
         # Create a unique ID for the feature
         new_id = str(uuid.uuid4())
 
+        # BEREKEN ROI WAARDEN
+        total_gains = (extra_revenue or 0) + (churn_reduction or 0) + (cost_savings or 0)
+        total_costs = (investment_hours or 0) + (opex_hours or 0) + (other_costs or 0)
+
+        # Bereken Expected Profit (Net Gains)
+        expected_profit = total_gains - total_costs
+
+        # Bereken ROI in percentage: (Netto Winst / Totale Kosten) * 100
+        # Alleen berekenen als de kosten > 0 zijn om delen door nul te voorkomen
+        if total_costs > 0:
+            roi_percent = ((total_gains / total_costs) - 1) * 100
+            # Afkappen op 2 decimalen
+            roi_percent = round(roi_percent, 2)
+        else:
+            # Als er geen kosten zijn, is de ROI oneindig hoog; stel een hoge (of NULL) waarde in
+            roi_percent = None if total_gains == 0 else 9999.0 
+            
+        # BEREKEN TTV WAARDEN
+        ttv_weeks = (ttm_weeks or 0) + (ttbv_weeks or 0)
+        ttv_weeks = float(ttv_weeks) # Zet om naar float voor de database
+
         try:
             feature = Features_ideas(
                 id_feature=new_id,              # primary key
@@ -260,9 +283,11 @@ def add_feature(project_id):
                 opex_hours=opex_hours,
                 other_costs=other_costs,
                 horizon=horizon,
+                expected_profit=expected_profit, # Berekende waarde opslaan
+                roi_percent=roi_percent,         # Berekende waarde opslaan
                 ttm_weeks=ttm_weeks,
                 ttbv_weeks=ttbv_weeks,
-                ttv_weeks=ttv_weeks,
+                ttv_weeks=ttv_weeks,             # Berekende waarde opslaan
                 quality_score=quality_score
             )
             db.session.add(feature)
@@ -279,6 +304,84 @@ def add_feature(project_id):
 
     # GET
     return render_template('add_feature.html', project=project, company=company)
+
+
+# ==============================
+# VECTR CHART OVERZICHT ROUTE
+# ==============================
+@main.route('/projects/<int:project_id>/vectr-chart', methods=['GET'])
+def vectr_chart(project_id):
+    if 'user_id' not in session:
+        flash("You must log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    user = Profile.query.get(session['user_id'])
+    project = Project.query.get_or_404(project_id)
+
+    # Beveiliging: controleer of het project van het bedrijf van de gebruiker is
+    if project.id_company != user.id_company:
+        flash("You are not allowed to view this chart.", "danger")
+        return redirect(url_for('main.projects'))
+
+    # Alle features ophalen die de benodigde data hebben
+    features = Features_ideas.query.filter_by(
+        id_project=project_id
+    ).all()
+
+    # Data transformeren naar een formaat dat geschikt is voor de grafiek (JSON)
+    chart_data = []
+    for f in features:
+        # TtV (weeks) is de X-as (Laag TtV is goed, dus lagere X)
+        # ROI (%) is de Y-as (Hoge ROI is goed, dus hogere Y)
+        # Confidence (quality_score) bepaalt de grootte/kleur van de bubble
+        
+        # Zorg ervoor dat we alleen features met geldige data plotten
+        if f.ttv_weeks is not None and f.roi_percent is not None:
+            chart_data.append({
+                'name': f.name_feature,
+                'x': f.ttv_weeks,
+                'y': f.roi_percent,
+                'confidence': f.quality_score, # Gebruik voor bubble size/kleur
+                'id': f.id_feature
+            })
+
+    # Geef de data door aan de template
+    return render_template('vectr_chart.html', project=project, chart_data=chart_data)
+
+
+
+# ==============================
+# VIEW FEATURES ROUTE
+# ==============================
+@main.route('/projects/<int:project_id>/features', methods=['GET'])
+def view_features(project_id):
+    if 'user_id' not in session:
+        flash("U moet eerst inloggen.", "danger")
+        return redirect(url_for('main.login'))
+
+    user = Profile.query.get(session['user_id'])
+    project = Project.query.get_or_404(project_id)
+    company = Company.query.get_or_404(user.id_company)
+
+    # Beveiliging: controleer of het project van het bedrijf van de gebruiker is
+    if project.id_company != user.id_company:
+        flash("U mag dit project niet bekijken.", "danger")
+        return redirect(url_for('main.projects'))
+
+    # Haal alle features op voor dit project
+    # Sorteer op de berekende ROI (hoogste eerst)
+    features = Features_ideas.query.filter_by(
+        id_project=project_id
+    ).order_by(Features_ideas.roi_percent.desc()).all()
+
+    return render_template(
+        'view_features.html',
+        project=project,
+        features=features,
+        company=company
+    )
+
+
 
 # ==============================
 # PROJECTS OVERVIEW ROUTE

@@ -37,7 +37,7 @@
                 <div class="d-flex justify-content-center gap-2">
                   <a href="{{ url_for('main.edit_project', project_id=project.id_project) }}" class="btn btn-edit btn-sm">Edit</a>
                   <a href="{{ url_for('main.delete_project', project_id=project.id_project) }}" class="btn btn-danger btn-sm">Delete</a>
-                  <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}" class="btn btn-primary btn-sm">Add Feature</a>
+                  <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" class="btn btn-primary btn-sm">View Features</a>
                 </div>
               </td>
 

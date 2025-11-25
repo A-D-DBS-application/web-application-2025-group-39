@@ -122,10 +122,14 @@ class Features_ideas(db.Model):
     # TTV fields
     ttm_weeks = db.Column(db.Integer)
     ttbv_weeks = db.Column(db.Integer)
-    ttv_weeks = db.Column(db.Float)
 
     # Confidence
     quality_score = db.Column(db.Float)
+
+    #berekende values:
+    expected_profit = db.Column(db.Integer)
+    roi_percent = db.Column(db.Float)
+    ttv_weeks = db.Column(db.Float)
 
     # Metadata
     createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)

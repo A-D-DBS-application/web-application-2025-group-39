@@ -5,10 +5,18 @@
 
 {% block content %}
   <!-- Right-top button -->
-  <a href="{{ url_for('main.projects') }}" 
-     class="btn btn-dark btn-sm top-right">
-    Go to Projects
-  </a>
+  <div class="btn-group top-right" role="group" aria-label="Project Actions">
+    
+    <a href="{{ url_for('main.vectr_chart', project_id=project.id_project) }}" 
+       class="btn btn-info btn-sm">
+      📈 VECTR Chart
+    </a>
+
+    <a href="{{ url_for('main.projects') }}" 
+       class="btn btn-dark btn-sm ms-2">
+      Go to Projects
+    </a>
+  </div>
 
   <h2 class="text-center mb-4">Add New Feature</h2>
 
