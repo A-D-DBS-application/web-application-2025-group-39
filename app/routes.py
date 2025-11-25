@@ -182,32 +182,34 @@ def add_feature(project_id):
 
     if request.method == 'POST':
         # Helper to convert safely to int
-        def to_int(field_name):
+        # routes.py (Gecorrigeerde helperfunctie, noem hem to_numeric of to_int)
+
+        def to_numeric(field_name, is_float=False): # <-- Zorg dat dit argument aanwezig is!
             raw = request.form.get(field_name, '').strip()
             if not raw:
                 return None
             try:
                 return float(raw) if is_float else int(raw)
             except ValueError:
-                return None
+                return None # Zorgt ervoor dat ongeldige input None (NULL) wordt
 
         # Basic info
         name_feature = request.form.get('name_feature', '').strip()
         description = request.form.get('description', '').strip()
 
         # ROI fields
-        extra_revenue = to_int('extra_revenue') # Was 'revenue', nu 'extra_revenue'
-        churn_reduction = to_int('churn_reduction') # Veld toevoegen voor Churn
-        cost_savings = to_int('cost_savings')
-        investment_hours = to_int('investment_hours')
-        opex_hours = to_int('opex_hours')
-        other_costs = to_int('other_costs')
-        horizon = to_int('horizon')
+        extra_revenue = to_numeric('extra_revenue') # Was 'revenue', nu 'extra_revenue'
+        churn_reduction = to_numeric('churn_reduction') # Veld toevoegen voor Churn
+        cost_savings = to_numeric('cost_savings')
+        investment_hours = to_numeric('investment_hours')
+        opex_hours = to_numeric('opex_hours')
+        other_costs = to_numeric('other_costs')
+        horizon = to_numeric('horizon')
         #roi_percent = request.form.get('roi_percent')  # readonly, string/float
 
         # TTV fields
-        ttm_weeks = to_int('ttm_weeks')
-        ttbv_weeks = to_int('ttbv_weeks')
+        ttm_weeks = to_numeric('ttm_weeks')
+        ttbv_weeks = to_numeric('ttbv_weeks')
         ttv_weeks_raw = request.form.get('ttv_weeks', '').strip()
         try:
             ttv_weeks = float(ttv_weeks_raw) if ttv_weeks_raw else None
@@ -336,12 +338,15 @@ def vectr_chart(project_id):
         # Confidence (quality_score) bepaalt de grootte/kleur van de bubble
         
         # Zorg ervoor dat we alleen features met geldige data plotten
-        if f.ttv_weeks is not None and f.roi_percent is not None:
+        if f.roi_percent is not None and f.quality_score is not None and f.ttv_weeks is not None:
             chart_data.append({
                 'name': f.name_feature,
-                'x': f.ttv_weeks,
-                'y': f.roi_percent,
-                'confidence': f.quality_score, # Gebruik voor bubble size/kleur
+                # X-as: Confidence
+                'confidence': float(f.quality_score), 
+                # Y-as: ROI (%)
+                'roi': float(f.roi_percent),
+                # Grootte (Bubble Size): TtV (weeks)
+                'ttv': float(f.ttv_weeks),
                 'id': f.id_feature
             })
 
