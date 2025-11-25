@@ -194,19 +194,25 @@ def add_feature(project_id):
         description = request.form.get('description', '').strip()
 
         # ROI fields
-        revenue = to_int('revenue')
+        extra_revenue = to_int('extra_revenue') # Was 'revenue', nu 'extra_revenue'
+        churn_reduction = to_int('churn_reduction') # Veld toevoegen voor Churn
         cost_savings = to_int('cost_savings')
         investment_hours = to_int('investment_hours')
         opex_hours = to_int('opex_hours')
         other_costs = to_int('other_costs')
         horizon = to_int('horizon')
-        expected_profit = to_int('expected_profit')
-        roi_percent = request.form.get('roi_percent')  # readonly, string/float
+        #roi_percent = request.form.get('roi_percent')  # readonly, string/float
 
         # TTV fields
         ttm_weeks = to_int('ttm_weeks')
         ttbv_weeks = to_int('ttbv_weeks')
-        ttv_weeks = request.form.get('ttv_weeks')  # readonly
+        ttv_weeks_raw = request.form.get('ttv_weeks', '').strip()
+        try:
+            ttv_weeks = float(ttv_weeks_raw) if ttv_weeks_raw else None
+        except ValueError:
+            # Als het een lege string is, zal het al None zijn. Als het een ongeldige string is, 
+            # moet je misschien valideren of None retourneren.
+            ttv_weeks = None
 
         # Confidence
         quality_score = request.form.get('quality_score')
@@ -217,13 +223,14 @@ def add_feature(project_id):
             errors.append("Title is required.")
 
         numeric_fields = {
-            'Revenue': revenue,
+            'Title': name_feature, # De title check blijft
+            'Extra Revenue': extra_revenue, 
+            'Churn Reduction': churn_reduction, 
             'Cost savings': cost_savings,
             'Investment hours': investment_hours,
             'OPEX hours': opex_hours,
             'Other costs': other_costs,
             'Horizon': horizon,
-            'Expected profit': expected_profit,
             'TTM weeks': ttm_weeks,
             'TTBV weeks': ttbv_weeks
         }
@@ -246,14 +253,13 @@ def add_feature(project_id):
                 id_project=project.id_project,
                 name_feature=name_feature,
                 description=description,
-                revenue=revenue,
+                extra_revenue=extra_revenue,
+                churn_reduction=churn_reduction,
                 cost_savings=cost_savings,
                 investment_hours=investment_hours,
                 opex_hours=opex_hours,
                 other_costs=other_costs,
                 horizon=horizon,
-                expected_profit=expected_profit,
-                roi_percent=roi_percent,
                 ttm_weeks=ttm_weeks,
                 ttbv_weeks=ttbv_weeks,
                 ttv_weeks=ttv_weeks,
