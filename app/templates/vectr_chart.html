@@ -30,7 +30,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const chartData = {{ chart_data | tojson }}; 
+            const chartData = JSON.parse(document.getElementById("chartData").textContent);
             const ctx = document.getElementById('vectrChart').getContext('2d');
             
             // ====================================================
