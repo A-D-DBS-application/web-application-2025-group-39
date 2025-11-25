@@ -110,14 +110,14 @@ class Features_ideas(db.Model):
     description = db.Column(db.Text)
 
     # ROI fields
-    revenue = db.Column(db.Integer)
+    horizon = db.Column(db.Integer)
+    extra_revenue = db.Column(db.Integer)
+    churn_reduction = db.Column(db.Integer)
     cost_savings = db.Column(db.Integer)
     investment_hours = db.Column(db.Integer)
     opex_hours = db.Column(db.Integer)
     other_costs = db.Column(db.Integer)
-    horizon = db.Column(db.Integer)
-    expected_profit = db.Column(db.Integer)
-    roi_percent = db.Column(db.Float)
+    
 
     # TTV fields
     ttm_weeks = db.Column(db.Integer)
