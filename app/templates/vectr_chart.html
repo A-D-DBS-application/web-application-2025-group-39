@@ -4,9 +4,24 @@
 
 {% block content %}
     <h2 class="text-center mb-4">VECTR Prioritization Chart for {{ project.project_name }}</h2>
-    <div class="card shadow p-4 mx-auto" style="max-width: 1200px;">
+    
+    <div class="mb-3 d-flex justify-content-center">
+        <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" 
+           class="btn btn-secondary me-2">
+            Alle Features
+        </a>
+        <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}" 
+           class="btn btn-primary">
+            + Feature Toevoegen
+        </a>
+    </div>
+
+    <div class="card shadow p-4 mx-auto" style="max-width: 800px; height: 800px;">
         <canvas id="vectrChart"></canvas>
-        <p class="text-center mt-3 text-muted">Bubble Size: Time-to-Value (Lagere TtV = Kleinere, betere bubbel)</p>
+        <p class="text-center mt-3 text-muted">
+            X-as: Confidence | Y-as: TtV | 
+            **Bubble Grootte: ROI (Hoe groter de bubbel, hoe hoger de ROI)**
+        </p>
     </div>
 {% endblock %}
 
@@ -19,7 +34,7 @@
             const ctx = document.getElementById('vectrChart').getContext('2d');
             
             // ====================================================
-            // 1. Custom Plugin: VECTR Quadranten (Confidence vs. ROI)
+            // 1. Custom Plugin: VECTR Quadranten (Confidence vs. TtV)
             // ====================================================
             const quadrantPlugin = {
                 id: 'quadrants',
@@ -27,29 +42,29 @@
                     const { ctx, chartArea: { left, top, right, bottom }, scales: { x, y } } = chart;
                     ctx.save();
                     
-                    // Grenswaarden voor de 4 kwadranten
+                    // --- GRENZWAARDEN ---
                     const conf_middle_value = 1.0;  // Confidence 1.0 als grens
-                    const roi_middle_value = 100;   // ROI 100% als grens
+                    const ttv_middle_value = 8;     // TtV 8 weken als grens
 
                     // Vertaal de waarden naar pixelcoördinaten
                     const xCenter = x.getPixelForValue(conf_middle_value);
-                    const yCenter = y.getPixelForValue(roi_middle_value);
+                    const yCenter = y.getPixelForValue(ttv_middle_value);
 
                     const drawQuadrant = (color, x1, y1, x2, y2) => {
                         ctx.fillStyle = color;
                         ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
                     };
                     
-                    // 1. Groen (Rechtsboven): Hoge ROI, Hoge Confidence (IDEALE FEATURES)
+                    // 1. Groen (Rechtsboven): Hoge Confidence, Lage TtV (IDEALE FEATURES)
                     drawQuadrant('rgba(0, 150, 0, 0.15)', xCenter, top, right, yCenter);
 
-                    // 2. Geel (Linksboven): Hoge ROI, Lage Confidence (VALIDATIE NODIG)
+                    // 2. Geel (Linksboven): Lage Confidence, Lage TtV (SNEL MAAR ONZEKER)
                     drawQuadrant('rgba(255, 255, 0, 0.15)', left, top, xCenter, yCenter);
 
-                    // 3. Oranje (Rechtsonder): Lage ROI, Hoge Confidence (LAGERE PRIORITEIT)
+                    // 3. Oranje (Rechtsonder): Hoge Confidence, Hoge TtV (GROTE PROJECTEN/LAGERE PRIORITEIT)
                     drawQuadrant('rgba(255, 165, 0, 0.15)', xCenter, yCenter, right, bottom);
 
-                    // 4. Rood (Linksonder): Lage ROI, Lage Confidence (TE VERMIJDEN)
+                    // 4. Rood (Linksonder): Lage Confidence, Hoge TtV (TE VERMIJDEN)
                     drawQuadrant('rgba(255, 0, 0, 0.15)', left, yCenter, xCenter, bottom);
 
                     ctx.restore();
@@ -63,20 +78,17 @@
                 label: 'Features',
                 data: chartData.map(item => {
                     
-                    // Bubble Grootte (r): TtV (weeks). Hoe hoger TtV, hoe groter de bubbel.
-                    const ttvValue = item.ttv; 
-                    // Schaal: bij TtV 10 is de grootte 10. Max 30.
-                    const radius = Math.max(5, Math.min(30, ttvValue)); 
+                    const roiValue = item.roi; 
+                    const radius = Math.max(5, Math.min(40, (Math.max(0, roiValue) / 10))); 
                     
-                    // Bubble Kleur (Optioneel): Kleur op basis van Confidence
                     const confidenceValue = item.confidence;
-                    const colorIntensity = Math.min(255, 100 + confidenceValue * 40); 
+                    const colorIntensity = Math.min(255, 50 + confidenceValue * 60); 
                     const backgroundColor = `rgba(50, ${colorIntensity}, 50, 0.8)`; 
 
                     return {
                         x: confidenceValue, // X-as: Confidence
-                        y: item.roi,        // Y-as: ROI (%)
-                        r: radius,          // Grootte: TtV
+                        y: item.ttv,        // Y-as: TtV (weeks)
+                        r: radius,          // Grootte: ROI
                         name: item.name,
                         ttv: item.ttv,
                         roi: item.roi,
@@ -98,7 +110,7 @@
                 plugins: [quadrantPlugin], // Registreer de quadrant plugin
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true, 
+                    maintainAspectRatio: false, 
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -106,32 +118,31 @@
                                 label: function(context) {
                                     const item = context.raw;
                                     
-                                    // Tooltip toont alle VECTR-waarden
+                                    // DE SYNTAX FOUTEN ZATEN HIER (ONTBREKENDE KOMMA'S)
                                     return [
                                         item.name, 
-                                        `ROI: ${item.roi.toFixed(1)}%`,
-                                        `Confidence: ${item.confidence.toFixed(2)}`, 
-                                        `TtV: ${item.ttv.toFixed(0)} weken (Grootte)`
+                                        `Confidence (X): ${item.confidence.toFixed(2)}`, 
+                                        `TtV (Y): ${item.ttv.toFixed(0)} weken`, // <-- Komma toegevoegd
+                                        `ROI (Grootte): ${item.roi.toFixed(1)}%` // <-- Komma was nodig voor de volgende regel (nu laatste item)
                                     ];
                                 }
                             }
                         },
                         title: {
                             display: true,
-                            text: 'VECTR Prioritization: Confidence vs. ROI'
+                            text: 'VECTR Prioritization: Confidence vs. Time-to-Value'
                         }
                     },
                     scales: {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Confidence (Kwaliteit van Bewijs)'
+                                text: 'Confidence (Kwaliteit van Bewijs - Hoger is Beter)'
                             },
-                            // Confidence: Hogere waarden rechts (standaard)
                             type: 'linear',
                             position: 'bottom',
                             min: 0, 
-                            max: 3.0, // Aanname: max score is 3.0
+                            max: 10.0, 
                             grid: {
                                 drawOnChartArea: false 
                             }
@@ -139,10 +150,10 @@
                         y: {
                             title: {
                                 display: true,
-                                text: 'Return on Investment (ROI) in %'
+                                text: 'Time-to-Value (TtV) in Weken (Lager is Beter)'
                             },
                             type: 'linear',
-                            min: -50, // Laat toe om negatieve ROI te tonen
+                            reverse: true, 
                             grid: {
                                 drawOnChartArea: false 
                             }

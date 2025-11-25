@@ -333,23 +333,18 @@ def vectr_chart(project_id):
     # Data transformeren naar een formaat dat geschikt is voor de grafiek (JSON)
     chart_data = []
     for f in features:
-        # TtV (weeks) is de X-as (Laag TtV is goed, dus lagere X)
-        # ROI (%) is de Y-as (Hoge ROI is goed, dus hogere Y)
-        # Confidence (quality_score) bepaalt de grootte/kleur van de bubble
-        
         # Zorg ervoor dat we alleen features met geldige data plotten
         if f.roi_percent is not None and f.quality_score is not None and f.ttv_weeks is not None:
             chart_data.append({
                 'name': f.name_feature,
                 # X-as: Confidence
                 'confidence': float(f.quality_score), 
-                # Y-as: ROI (%)
-                'roi': float(f.roi_percent),
-                # Grootte (Bubble Size): TtV (weeks)
+                # Y-as: TtV (weeks)
                 'ttv': float(f.ttv_weeks),
+                # Grootte (Bubble Size): ROI (%)
+                'roi': float(f.roi_percent),
                 'id': f.id_feature
             })
-
     # Geef de data door aan de template
     return render_template('vectr_chart.html', project=project, chart_data=chart_data)
 
