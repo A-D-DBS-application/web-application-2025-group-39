@@ -1,150 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
+{% extends "base.html" %}
 
-    <!-- STYLING: Algemene opmaak van de pagina -->
-    <style>
-        /* Hele pagina centreren en achtergrondkleur geven */
-        body {
-            font-family: 'Segoe UI', sans-serif;       /* Lettertype van de hele pagina */
-            background-color: #f4f6f8;               /* Lichtgrijze achtergrondkleur */
-            margin: 0;                                 /* Geen buitenruimte rond de pagina */
-            padding: 0;                                /* Geen binnenruimte in de body */
-            display: flex;                             /* Flexbox gebruiken voor layout */
-            justify-content: center;                   /* Horizontaal centreren van inhoud */
-            align-items: center;                       /* Verticaal centreren van inhoud */
-            height: 100vh;                             /* Hoogte van de body = 100% van het scherm */
-        }
+{% block title %}Login{% endblock %}
 
-        /* Container voor het loginformulier */
-        .login-container {
-            background-color: #ffffff;
-            padding: 30px 40px;                                 /* Binnenruimte: 30px boven/onder, 40px links/rechts */
-            border-radius: 10px;                                /* Afgeronde hoeken van 10px */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);        /* Zachte schaduw onder het formulier */
-            width: 350px;                                       /* Vaste breedte van het formulier */
-        }
+{% block head %}
+<style>
+    body {
+        background-color: #f4f6f8 !important;
+    }
+    .login-container {
+        background-color: #ffffff;
+        padding: 30px 40px;
+        border-radius: 12px;
+        width: 380px;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+        margin: 0 auto;
+        margin-top: 6%;
+    }
+    .login-title {
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: 700;
+        color: #333;
+    }
+    .form-group {
+        margin-bottom: 18px;
+    }
+    label {
+        font-weight: 500;
+        margin-bottom: 6px;
+        display: block;
+        color: #555;
+    }
+    input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #cccccc;
+    }
+    input[type="submit"] {
+        margin-top: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    input[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+    .register-link {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
 
-        /* Titel boven het formulier */
-        h1 {
-            text-align: center;
-            margin-bottom: 25px;                                /* Ruimte onder de titel */
-            color: #333;
-        }
+{% block content %}
 
-        /* Afstand tussen formuliervelden */
-        .form-group {
-            margin-bottom: 20px;
-        }
+<div class="login-container">
+    <h1 class="login-title">Login</h1>
 
-        /* Labels boven de invoervelden */
-        label {
-            display: block;                                     /* Zorgt dat het label op een aparte regel staat */
-            margin-bottom: 6px;
-            font-weight: 500;                                   /* Iets dikkere tekst dan normaal (tussen normaal en bold) */
-            color: #555;
-        }
-
-        /* Invoervelden zelf */
-        input[type="text"],
-        input[type="email"] {
-            width: 100%;                                        /* Vult de volledige breedte van de container */
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;                             /* Zorgt dat padding en border binnen de breedte vallen */
-        }
-
-        /* Stijl van de login-knop */
-        input[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;                                    /* Cursor verandert in handje bij hover */
-            font-weight: bold;
-        }
-
-        /* Hover-effect voor de knop (kleur verandert wanneer je met je muis over de knop beweegt)*/
-        input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-
-        /* Flash-meldingen (bijv. fout of succes) */
-        .flash-messages {
-            margin-bottom: 15px;
-        }
-
-        /* Kleuren voor verschillende soorten meldingen */
-        .success, .error, .info {
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-
-        /* Link naar registratiepagina onderaan */
-        .register-link {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        .register-link a {
-            color: #007bff;
-            text-decoration: none;                                /* Verwijdert standaard onderstreping van de link */
-        }
-
-        .register-link a:hover {
-            text-decoration: underline;                           /* Onderstreept de link bij hover voor visuele feedback */
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Loginformulier in een nette container -->
-    <div class="login-container">
-        <h1>Login</h1>
-
-        <!-- Flash-meldingen tonen (bijv. fout bij login) -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-
-        <!-- Het eigenlijke loginformulier -->
-        <form method="post">
-            <div class="form-group">
-                <label for="name">Full Name:</label>
-                <input type="text" id="name" name="name" required>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="{{ category }}">{{ message }}</div>
+                {% endfor %}
             </div>
+        {% endif %}
+    {% endwith %}
 
-            <div class="form-group">
-                <label for="email">E-mail:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
+    <form method="post" action="{{ url_for('main.login') }}">
 
-            <input type="submit" value="Login">
-        </form>
-
-        <!-- Link naar registratiepagina -->
-        <div class="register-link">
-            <p>Don't have an account? <a href="{{ url_for('main.register') }}">Register here</a></p>
+        <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" required>
         </div>
-    </div>
 
-</body>
-</html>
+        <div class="form-group">
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <input type="submit" value="Login">
+
+    </form>
+
+    <div class="register-link">
+        Don't have an account? <a href="{{ url_for('main.register') }}">Register here</a>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,161 +1,109 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Register</title>
-    <style>
-        /* Algemene pagina-opmaak */
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f4f6f8;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+{% extends "base.html" %}
 
-        /* Container voor het formulier */
-        .register-container {
-            background-color: #ffffff;
-            padding: 30px 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            width: 400px;
-        }
+{% block title %}Register{% endblock %}
 
-        /* Titel boven het formulier */
-        h1 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #333;
-        }
+{% block head %}
+<style>
+    body {
+        background-color: #f4f6f8 !important;
+    }
+    .register-container {
+        background-color: #ffffff;
+        padding: 30px 40px;
+        border-radius: 12px;
+        width: 420px;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+        margin: 0 auto;
+        margin-top: 5%;
+    }
+    .register-title {
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: 700;
+        color: #333;
+    }
+    .form-group {
+        margin-bottom: 18px;
+    }
+    label {
+        font-weight: 500;
+        margin-bottom: 6px;
+        display: block;
+        color: #555;
+    }
+    input, select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #cccccc;
+        box-sizing: border-box;
+    }
 
-        /* Flash-meldingen */
-        .flash-messages {
-            margin-bottom: 15px;
-        }
+    input[type="submit"] {
+        margin-top: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+    }
 
-        .success, .error, .info {
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
+    input[type="submit"]:hover {
+        background-color: #0056b3;
+    }
 
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    .login-link {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
 
-        /* Formuliervelden en labels */
-        .form-group {
-            margin-bottom: 20px;
-        }
+{% block top_right %}
+<!-- GEEN dashboardknop op register — dus leeg -->
+{% endblock %}
 
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            color: #555;
-        }
+{% block content %}
 
-        input[type="text"],
-        input[type="email"],
-        input[type="submit"],
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            color: #555;
-        }
+<div class="register-container">
+    <h1 class="register-title">Register</h1>
 
-        /* Stijl voor de eerste (lege) optie */
-        select option:first-child {
-            color: #aaa;                     /* Lichtgrijze kleur voor "Choose a role" */
-        }
+    <form method="post" action="{{ url_for('main.register') }}">
 
-        input[type="submit"] {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-
-        /* Link naar loginpagina */
-        .login-link {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        .login-link a {
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
-    <!-- Registratieformulier in een nette container -->
-    <div class="register-container">
-        <h1>Register</h1>
-
-    <!-- Flash-meldingen tonen (bijv. fout of succes) -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-
-        <!-- Het eigenlijke registratieformulier -->
-        <form method="post">
-            <div class="form-group">
-                <label for="name">Full Name:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-
-            <div class="form-group">
-                <label for="email">E-mail:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-
-            <div class="form-group">
-                <label for="role">Role:</label>
-                <select id="role" name="role" required>
-                    <option value="" disabled selected>Choose a role</option>
-                    <option value="user">User</option>
-                    <option value="founder">Founder</option>
-                    <option value="PM">PM</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="company_name">Company Name:</label>
-                <input type="text" id="company_name" name="company_name" required>
-            </div>
-
-            <input type="submit" value="Register">
-        </form>
-
-        <!-- Link naar loginpagina -->
-        <div class="login-link">
-            <p>Already have an account? <a href="{{ url_for('main.login') }}">Login here</a></p>
+        <div class="form-group">
+            <label for="name">Full Name:</label>
+            <input type="text" id="name" name="name" required>
         </div>
+
+        <div class="form-group">
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="role">Role:</label>
+            <select id="role" name="role" required>
+                <option value="" disabled selected>Choose a role</option>
+                <option value="user">User</option>
+                <option value="founder">Founder</option>
+                <option value="PM">PM</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="company_name">Company name:</label>
+            <input type="text" id="company_name" name="company_name" required>
+        </div>
+
+        <input type="submit" value="Register">
+
+    </form>
+
+    <div class="login-link">
+        Already have an account?
+        <a href="{{ url_for('main.login') }}">Login here</a>
     </div>
-</body>
-</html>
+</div>
+
+{% endblock %}
