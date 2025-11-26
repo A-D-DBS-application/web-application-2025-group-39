@@ -382,6 +382,48 @@ def view_features(project_id):
     )
 
 
+# ==============================
+# EDIT FEATURE ROUTE
+# ==============================
+
+@main.route('/feature/<uuid:feature_id>/edit', methods=['GET', 'POST'])
+def edit_feature(feature_id):
+    feature = Features_ideas.query.get_or_404(str(feature_id))
+    project = Project.query.get_or_404(feature.id_project)   # haal project op via foreign key
+    company = Company.query.get_or_404(project.id_company) # indien nodig
+
+    if request.method == 'POST':
+        # update fields from form
+        feature.name_feature = request.form['name_feature']
+        feature.roi_percent = request.form['roi_percent']
+        feature.ttv_weeks = request.form['ttv_weeks']
+        feature.quality_score = request.form['quality_score']
+        feature.horizon = request.form['horizon']
+        db.session.commit()
+        flash('Feature updated successfully!', 'success')
+        return redirect(url_for('main.view_features', project_id=feature.id_project))
+
+    return render_template(
+        'edit_feature.html',
+        feature=feature,
+        project=project,
+        company=company
+    )
+
+# ==============================
+# DELETE FEATURE ROUTE
+# ==============================
+
+@main.route('/feature/<uuid:feature_id>/delete', methods=['POST'])
+def delete_feature(feature_id):
+    feature = Features_ideas.query.get_or_404(str(feature_id))
+    project_id = feature.id_project
+    db.session.delete(feature)
+    db.session.commit()
+    flash('Feature deleted successfully!', 'success')
+    return redirect(url_for('main.view_features', project_id=project_id))
+
+
 
 # ==============================
 # PROJECTS OVERVIEW ROUTE

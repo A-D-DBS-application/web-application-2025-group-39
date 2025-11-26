@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Feature{% endblock %}
+{% block body_class %}features-body{% endblock %}
+
+{% block content %}
+  <!-- Right-top button -->
+  <div class="btn-group top-right" role="group" aria-label="Project Actions">
+    <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-nav btn-sm">Go to Projects</a>
+    <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" class="btn btn-base btn-secondary-custom btn-sm">Back to Features</a>
+  </div>
+
+  <h2 class="text-center mb-4">Edit Feature: {{ feature.name_feature }}</h2>
+
+  <div class="feature-form card shadow p-4 mx-auto">
+    <form method="post" action="{{ url_for('main.edit_feature', feature_id=feature.id_feature) }}">
+      <!-- BASIC INFO -->
+      <div class="mb-4">
+        <h4 class="mb-3">Basic Info</h4>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-control" name="name_feature" value="{{ feature.name_feature }}" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Project</label>
+            <input type="text" class="form-control" value="{{ project.project_name }}" disabled>
+            <input type="hidden" name="id_project" value="{{ project.id_project }}">
+            <input type="hidden" name="id_company" value="{{ company.id_company }}">
+          </div>
+        </div>
+        <div class="mt-3">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" name="description" rows="3">{{ feature.description }}</textarea>
+        </div>
+      </div>
+
+      <!-- ROI -->
+      <div class="mb-4">
+        <h4 class="mb-3">Return on Investment (ROI)</h4>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Horizon (months)</label>
+            <input type="number" class="form-control" name="horizon" value="{{ feature.horizon }}" min="0">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Extra Revenue</label>
+            <input type="number" class="form-control" name="extra_revenue" value="{{ feature.extra_revenue }}" min="0">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Churn Reduction Savings</label>
+            <input type="number" class="form-control" name="churn_reduction" value="{{ feature.churn_reduction }}" min="0">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Cost Savings</label>
+            <input type="number" class="form-control" name="cost_savings" value="{{ feature.cost_savings }}" min="0">
+          </div>
+        </div>
+        <h5 class="mt-4">Investment Cost</h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Development Effort (hours)</label>
+            <input type="number" class="form-control" name="investment_hours" value="{{ feature.investment_hours }}" min="0">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">OPEX (operational costs)</label>
+            <input type="number" class="form-control" name="opex_hours" value="{{ feature.opex_hours }}" min="0">
+          </div>
+          <div class="col-md-12">
+            <label class="form-label">Other Costs (optional)</label>
+            <input type="number" class="form-control" name="other_costs" value="{{ feature.other_costs }}" min="0">
+          </div>
+        </div>
+        <div class="mt-3">
+          <label class="form-label">ROI (%)</label>
+          <input type="text" class="form-control" name="roi_percent" value="{{ feature.roi_percent }}" readonly>
+        </div>
+      </div>
+
+      <!-- TTV -->
+      <div class="mb-4">
+        <h4 class="mb-3">Time to Value (TTV)</h4>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Time-to-Market (weeks)</label>
+            <input type="number" class="form-control" name="ttm_weeks" value="{{ feature.ttm_weeks }}" min="0">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Time-to-Business-Value (weeks)</label>
+            <input type="number" class="form-control" name="ttbv_weeks" value="{{ feature.ttbv_weeks }}" min="0">
+          </div>
+          <div class="col-12">
+            <label class="form-label">TTV (weeks)</label>
+            <input type="text" class="form-control" name="ttv_weeks" value="{{ feature.ttv_weeks }}" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONFIDENCE -->
+      <div class="mb-4">
+        <h4 class="mb-3">Evidence & Confidence Level</h4>
+        <label class="form-label">Confidence Level</label>
+        <select class="form-select" name="quality_score" required>
+          <option value="">Select score</option>
+          <option value="0.01" {% if feature.quality_score == 0.01 %}selected{% endif %}>Self Conviction — 0.01</option>
+          <option value="0.03" {% if feature.quality_score == 0.03 %}selected{% endif %}>Pitch Deck — 0.03</option>
+          <option value="0.1" {% if feature.quality_score == 0.1 %}selected{% endif %}>Thematic Support — 0.1</option>
+          <option value="0.2" {% if feature.quality_score == 0.2 %}selected{% endif %}>Other’s Opinion — 0.2</option>
+          <option value="0.5" {% if feature.quality_score == 0.5 %}selected{% endif %}>Estimates & Plans — 0.5</option>
+          <option value="1" {% if feature.quality_score == 1 %}selected{% endif %}>Anecdotal Evidence — 1.0</option>
+          <option value="2" {% if feature.quality_score == 2 %}selected{% endif %}>Market Data — 2.0</option>
+          <option value="3" {% if feature.quality_score == 3 %}selected{% endif %}>User/Customer Evidence — 3.0</option>
+          <option value="7" {% if feature.quality_score == 7 %}selected{% endif %}>Test Results — 7.0</option>
+          <option value="10" {% if feature.quality_score == 10 %}selected{% endif %}>Launch Data — 10.0</option>
+        </select>
+      </div>
+
+      <div class="text-end">
+        <button class="btn btn-base btn-primary-custom">Update Feature</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

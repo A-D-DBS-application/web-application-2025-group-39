@@ -1,87 +1,89 @@
 {% extends "base.html" %}
 
-{% block title %}Features voor {{ project.project_name }}{% endblock %}
+{% block title %}Features for {{ project.project_name }}{% endblock %}
+{% block body_class %}projects-body{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+  <!-- FIXED PROJECTS BUTTON -->
+  <div class="top-right-fixed">
+    <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-nav btn-sm">Go to Projects</a>
+  </div>
 
-    <h2 class="mb-4">Feature Overzicht: {{ project.project_name }}</h2>
-    
-    <div class="mb-3 d-flex justify-content-start">
-        <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}" 
-           class="btn btn-primary me-2">
-            + Nieuwe Feature Toevoegen
-        </a>
-        <a href="{{ url_for('main.vectr_chart', project_id=project.id_project) }}" 
-           class="btn btn-info me-2">
-            📈 VECTR Chart
-        </a>
-        <a href="{{ url_for('main.projects') }}" 
-           class="btn btn-secondary">
-            Terug naar Projecten
-        </a>
-    </div>
+  <h2 class="mb-4 text-center">Features Overview: {{ project.project_name }}</h2>
 
-    {% if features %}
-    <div class="card shadow p-4">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Titel</th>
-                        <th>ROI (%)</th>
-                        <th>TtV (Weken)</th>
-                        <th>Confidence</th>
-                        <th>Horizon</th>
-                        <th>Acties</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for feature in features %}
-                    <tr>
-                        <td>{{ feature.name_feature }}</td>
-                        
-                        <td>
-                            {% if feature.roi_percent is not none %}
-                                {{ "{:.1f}".format(feature.roi_percent) }}%
-                            {% else %}
-                                N/A
-                            {% endif %}
-                        </td>
-                        
-                        <td>
-                            {% if feature.ttv_weeks is not none %}
-                                {{ "{:.0f}".format(feature.ttv_weeks) }}
-                            {% else %}
-                                N/A
-                            {% endif %}
-                        </td>
-                        
-                        <td>
-                            {% if feature.quality_score is not none %}
-                                {{ "{:.2f}".format(feature.quality_score) }}
-                            {% else %}
-                                N/A
-                            {% endif %}
-                        </td>
-                        
-                        <td>Q{{ feature.horizon }}</td>
-                        
-                        <td>
-                            <a href="#" class="btn btn-sm btn-edit">Bewerken</a>
-                            <a href="#" class="btn btn-sm btn-danger">Verwijderen</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+  <div class="mb-3 d-flex justify-content-center gap-2 flex-wrap">
+    <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}" 
+       class="btn btn-base btn-primary-custom">
+       + Add New Feature
+    </a>
+    <a href="{{ url_for('main.vectr_chart', project_id=project.id_project) }}" 
+       class="btn btn-base btn-info">
+       📈 VECTR Chart
+    </a>
+  </div>
+
+  <div class="projects-wrapper">
+    {% if features|length == 0 %}
+      <table class="table table-striped table-bordered align-middle">
+        <tbody>
+          <tr>
+            <td colspan="6" class="text-muted py-4">No features yet — add one soon!</td>
+          </tr>
+        </tbody>
+      </table>
     {% else %}
-    <div class="alert alert-warning" role="alert">
-        Er zijn nog geen feature-ideeën toegevoegd aan dit project.
-    </div>
+      <table class="table table-striped table-bordered align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Title</th>
+            <th>ROI (%)</th>
+            <th>TtV (Weeks)</th>
+            <th>Confidence</th>
+            <th>Horizon</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for feature in features %}
+          <tr>
+            <td>{{ feature.name_feature }}</td>
+            <td>
+              {% if feature.roi_percent is not none %}
+                {{ "{:.1f}".format(feature.roi_percent) }}%
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+            <td>
+              {% if feature.ttv_weeks is not none %}
+                {{ "{:.0f}".format(feature.ttv_weeks) }}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+            <td>
+              {% if feature.quality_score is not none %}
+                {{ "{:.2f}".format(feature.quality_score) }}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+            <td>Q{{ feature.horizon }}</td>
+            <td>
+              <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <a href="{{ url_for('main.edit_feature', feature_id=feature.id_feature) }}" class="btn btn-base btn-edit table-btn">Edit</a>
+                <form action="{{ url_for('main.delete_feature', feature_id=feature.id_feature) }}" method="post" class="form-inline">
+                  <button type="submit" class="btn btn-base btn-danger-custom table-btn"
+                          onclick="return confirm('Are you sure you want to delete this feature?');">
+                    Delete
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     {% endif %}
-
-</div>
+  </div>
 {% endblock %}

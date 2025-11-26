@@ -6,7 +6,7 @@
 {% block content %}
   <!-- Right-top button -->
   <a href="{{ url_for('main.projects') }}" 
-     class="btn btn-dark btn-sm position-absolute top-0 end-0 m-3">
+     class="btn btn-base btn-nav btn-sm">
     Go to Projects
   </a>
 
@@ -39,7 +39,7 @@
         <input type="hidden" name="company_id" value="{{ company.id_company }}">
       </div>
 
-      <button type="submit" class="btn btn-primary w-100 mt-3">Save Project</button>
+      <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">Save Project</button>
     </form>
   </div>
 {% endblock %}

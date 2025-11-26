@@ -7,24 +7,24 @@
     
     <div class="mb-3 d-flex justify-content-center">
         <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" 
-           class="btn btn-secondary me-2">
+           class="btn btn-base btn-secondary-custom me-2">
             All Features
         </a>
         <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}" 
-           class="btn btn-primary">
+           class="btn btn-base btn-primary-custom">
             + Add Feature
         </a>
     </div>
 
     <div id="chartData" style="display:none;">{{ chart_data | tojson }}</div>
 
-    <div class="card shadow p-4 mx-auto" style="max-width: 800px; height: 800px;">
+    <div class="card shadow p-4 mx-auto vectr-card">
         <canvas id="vectrChart"></canvas>
         <p class="text-center mt-3 text-muted">
-            X-as: Confidence | Y-as: TtV | 
-            **Bubble Size: ROI (The bigger the bubble, the higher the ROI)**
+            X-axis: Confidence | Y-axis: TtV | Bubble Size: ROI (The bigger the bubble, the higher the ROI)
         </p>
     </div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -32,12 +32,12 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Dit werkt nu omdat de div met ID 'chartData' bestaat.
+            // This works now because the div with ID 'chartData' exists.
             const chartData = JSON.parse(document.getElementById("chartData").textContent);
             const ctx = document.getElementById('vectrChart').getContext('2d');
             
             // ====================================================
-            // 1. Custom Plugin: VECTR Quadranten (Confidence vs. TtV)
+            // 1. Custom Plugin: VECTR Quadrants (Confidence vs. TtV)
             // ====================================================
             const quadrantPlugin = {
                 id: 'quadrants',
@@ -45,11 +45,11 @@
                     const { ctx, chartArea: { left, top, right, bottom }, scales: { x, y } } = chart;
                     ctx.save();
                     
-                    // --- GRENZWAARDEN ---
+                    // --- THRESHOLDS ---
                     const conf_middle_value = 1.0; 
                     const ttv_middle_value = 8;     
 
-                    // Vertaal de waarden naar pixelcoördinaten
+                    // Translate values to pixel coordinates
                     const xCenter = x.getPixelForValue(conf_middle_value);
                     const yCenter = y.getPixelForValue(ttv_middle_value);
 
@@ -58,29 +58,29 @@
                         ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
                     };
                     
-                    // Teken de 4 kwadranten
-                    drawQuadrant('rgba(0, 150, 0, 0.15)', xCenter, top, right, yCenter);      // Groen
-                    drawQuadrant('rgba(255, 255, 0, 0.15)', left, top, xCenter, yCenter);    // Geel
-                    drawQuadrant('rgba(255, 165, 0, 0.15)', xCenter, yCenter, right, bottom);// Oranje
-                    drawQuadrant('rgba(255, 0, 0, 0.15)', left, yCenter, xCenter, bottom);  // Rood
+                    // Draw the 4 quadrants
+                    drawQuadrant('rgba(0, 150, 0, 0.15)', xCenter, top, right, yCenter);      // Green
+                    drawQuadrant('rgba(255, 255, 0, 0.15)', left, top, xCenter, yCenter);    // Yellow
+                    drawQuadrant('rgba(255, 165, 0, 0.15)', xCenter, yCenter, right, bottom);// Orange
+                    drawQuadrant('rgba(255, 0, 0, 0.15)', left, yCenter, xCenter, bottom);  // Red
 
                     ctx.restore();
                 }
             };
             
             // ====================================================
-            // 2. Data voorbereiden: Toewijzen van VECTR-waarden
+            // 2. Data preparation: Assign VECTR values
             // ====================================================
             const datasets = [{
                 label: 'Features',
                 data: chartData.map(item => {
                     
                     const roiValue = item.roi; 
-                    // Bepaal de grootte (r) op basis van ROI, geschaald tussen 5 en 40
+                    // Determine bubble size (r) based on ROI, scaled between 5 and 40
                     const radius = Math.max(5, Math.min(40, (Math.max(0, roiValue) / 10))); 
                     
                     const confidenceValue = item.confidence;
-                    // Bepaal de kleur op basis van Confidence
+                    // Determine color based on Confidence
                     const colorIntensity = Math.min(255, 50 + confidenceValue * 60); 
                     const backgroundColor = `rgba(50, ${colorIntensity}, 50, 0.8)`; 
 
@@ -101,7 +101,7 @@
             }];
 
             // ====================================================
-            // 3. Chart.js Initialisatie
+            // 3. Chart.js Initialization
             // ====================================================
             new Chart(ctx, {
                 type: 'bubble',
@@ -109,7 +109,7 @@
                 plugins: [quadrantPlugin],
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false, 
+                    maintainAspectRatio: true, 
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -120,8 +120,8 @@
                                     return [
                                         item.name, 
                                         `Confidence (X): ${item.confidence.toFixed(2)}`, 
-                                        `TtV (Y): ${item.ttv.toFixed(0)} weken`, 
-                                        `ROI (Grootte): ${item.roi.toFixed(1)}%` 
+                                        `TtV (Y): ${item.ttv.toFixed(0)} weeks`, 
+                                        `ROI (Size): ${item.roi.toFixed(1)}%` 
                                     ];
                                 }
                             }
@@ -135,12 +135,12 @@
                         x: {
                             title: {
                                 display: true,
-                                text: 'Confidence (Kwaliteit van Bewijs - Hoger is Beter)'
+                                text: 'Confidence (Quality of Evidence - Higher is Better)'
                             },
                             type: 'linear',
                             position: 'bottom',
                             min: 0, 
-                            max: 10.0, // Vaste schaal voor Confidence
+                            max: 10.0, // Fixed scale for Confidence
                             grid: {
                                 drawOnChartArea: false 
                             }
@@ -148,10 +148,10 @@
                         y: {
                             title: {
                                 display: true,
-                                text: 'Time-to-Value (TtV) in Weken (Lager is Beter)'
+                                text: 'Time-to-Value (TtV) in Weeks (Lower is Better)'
                             },
                             type: 'linear',
-                            reverse: true, // Lage TtV (goed) bovenaan
+                            reverse: true, // Lower TtV (good) at the top
                             grid: {
                                 drawOnChartArea: false 
                             }

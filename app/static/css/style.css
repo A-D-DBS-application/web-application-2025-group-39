@@ -37,23 +37,96 @@ body {
 }
 
 /* ===========================
+   BUTTON STYLING
+   =========================== */
+
+/* Basis voor alle knoppen */
+.btn-base {
+  min-width: 90px;
+  font-weight: 500;
+  border-radius: 6px;    
+}
+
+/* Top-right navigatieknoppen */
+.btn-nav {
+  background-color: #343a40; /* donkergrijs */
+  color: #fff;
+}
+.btn-nav:hover {
+  background-color: #23272b;
+  color: #fff;
+}
+
+/* Logout & Delete knoppen */
+.btn-danger-custom {
+  background-color: #dc3545;
+  color: #fff;
+}
+.btn-danger-custom:hover {
+  background-color: #c82333;
+  color: #fff;
+}
+
+/* Edit knoppen */
+.btn-edit {
+  background-color: #c1429d;
+  color: #fff;
+}
+.btn-edit:hover {
+  background-color: #b33b91;
+  color: #fff;
+}
+
+/* Primary acties (Add, Save, View) */
+.btn-primary-custom {
+  background-color: #007bff;
+  color: #fff;
+}
+.btn-primary-custom:hover {
+  background-color: #0056b3;
+  color: #fff;
+}
+
+/* Secondary acties (Terug, All Features) */
+.btn-secondary-custom {
+  background-color: #6c757d;
+  color: #fff;
+}
+.btn-secondary-custom:hover {
+  background-color: #5a6268;
+  color: #fff;
+}
+
+/* Zorgt dat alle knoppen in tabellen dezelfde grootte hebben */
+.table-btn {
+  min-width: 100px;       /* vaste breedte voor uniformiteit */
+  height: 36px;           /* vaste hoogte */
+  display: flex;          /* flexbox voor centreren */
+  justify-content: center;/* horizontaal centreren */
+  align-items: center;    /* verticaal centreren */
+  font-size: 14px;        /* consistente tekstgrootte */
+  border-radius: 6px;     /* afgeronde hoeken */
+  padding: 0;             /* padding weg, flexbox doet het werk */
+}
+
+
+/* ===========================
    FLASH MESSAGES POSITIONING
    =========================== */
 .flash-container {
-    margin-top: 60px;   /* zet de meldingen lager */
+    margin-top: 60px;
     width: 90%;
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
 }
 .flash-container .alert {
-    text-align: center; /* optioneel: centreren van tekst */
+    text-align: center;
 }
 
 /* ===========================
    INDEX PAGE
    =========================== */
-
 .welcome-container {
     max-width: 700px;
     background: rgba(255, 255, 255, 0.7);
@@ -103,7 +176,6 @@ body {
 /* ===========================
    LOGIN PAGE
    =========================== */
-
 .login-container {
     background-color: #ffffff;
     padding: 30px 40px;
@@ -226,7 +298,6 @@ input[type="submit"]:hover {
     color: #555;
 }
 
-
 /* ===========================
    PROJECTS PAGE
    =========================== */
@@ -263,12 +334,10 @@ table {
     justify-content: center;
     align-items: center;
 }
-
 .profile-card {
     width: 450px;
     border-radius: 12px;
 }
-
 .top-right {
     position: absolute;
     top: 20px;
@@ -276,16 +345,7 @@ table {
 }
 
 /* ===========================
-   EDIT PROJECT PAGE
-   =========================== */
-.form-card {
-    max-width: 650px;
-    border-radius: 12px;
-    background: white;
-}
-
-/* ===========================
-   ADD PROJECT PAGE
+   EDIT/ADD PROJECT PAGE
    =========================== */
 .form-card {
     max-width: 650px;
@@ -300,12 +360,6 @@ table {
     max-width: 1100px;
     border-radius: 12px;
     background: #fff;
-}
-
-.top-right {
-    position: absolute;
-    top: 20px;
-    right: 20px;
 }
 
 /* ===========================
@@ -339,3 +393,45 @@ table {
     background: #fff;
 }
 
+/* ===========================
+   VECTR Chart Styling
+   =========================== */
+
+/* Card container for the chart */
+.vectr-card {
+    max-width: 800px;
+    max-height: 800px;
+    margin: 0 auto;          /* center horizontally */
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+/* Canvas sizing */
+#vectrChart {
+    width: 100%;
+    height: 800px;           /* fixed height for consistent layout */
+    display: block;
+}
+
+/* Description text under the chart */
+.vectr-card p {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #6c757d;          /* Bootstrap muted color */
+    text-align: center;
+}
+
+
+/* ===========================
+   Table Styling
+   =========================== */
+.col-actions {
+    width: 260px;  
+} 
+.col-roadmap {
+    width: 220px;
+}
+.form-inline {
+    display: inline;
+}
