@@ -5,15 +5,14 @@
 
 {% block content %}
   <!-- Right-top button -->
-  <div class="btn-group top-right" role="group" aria-label="Project Actions">
-    
+  <div class="top-right">
     <a href="{{ url_for('main.vectr_chart', project_id=project.id_project) }}" 
-       class="btn btn-info btn-sm">
+      class="btn btn-base btn-sm btn-vectr me-2">
       📈 VECTR Chart
     </a>
 
     <a href="{{ url_for('main.projects') }}" 
-       class="btn btn-dark btn-sm ms-2">
+      class="btn btn-base btn-nav btn-sm">
       Go to Projects
     </a>
   </div>
@@ -133,4 +132,7 @@
       </div>
     </form>
   </div>
+
+  <!--Verwijzing naar berekening ROI en TtV in js-bestand-->
+<script src="{{ url_for('static', filename='js/feature_calculations.js') }}"></script>
 {% endblock %}

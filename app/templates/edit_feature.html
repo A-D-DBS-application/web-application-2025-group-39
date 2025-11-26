@@ -5,9 +5,11 @@
 
 {% block content %}
   <!-- Right-top button -->
-  <div class="btn-group top-right" role="group" aria-label="Project Actions">
-    <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-nav btn-sm">Go to Projects</a>
-    <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" class="btn btn-base btn-secondary-custom btn-sm">Back to Features</a>
+  <div class="top-right">
+    <a href="{{ url_for('main.view_features', project_id=project.id_project) }}"
+      class="btn btn-base btn-nav btn-sm">
+      Features Overview
+    </a>
   </div>
 
   <h2 class="text-center mb-4">Edit Feature: {{ feature.name_feature }}</h2>
@@ -115,9 +117,17 @@
         </select>
       </div>
 
-      <div class="text-end">
-        <button class="btn btn-base btn-primary-custom">Update Feature</button>
-      </div>
+      <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">
+        Save
+      </button>
+
+      <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" 
+        class="btn btn-base btn-secondary-custom w-100 mt-2">
+        Cancel
+      </a>
     </form>
   </div>
+
+<!--Verwijzing naar berekening ROI en TtV in js-bestand-->
+<script src="{{ url_for('static', filename='js/feature_calculations.js') }}"></script>
 {% endblock %}

@@ -5,7 +5,9 @@
 
 {% block content %}
   <!-- LOGOUT BUTTON -->
-  <a href="{{ url_for('main.logout') }}" class="btn btn-base btn-danger-custom logout-btn">Logout</a>
+  <div class="top-right">
+    <a href="{{ url_for('main.logout') }}" class="btn btn-base btn-danger-custom">Logout</a>
+  </div>
 
   <div class="dashboard-wrapper">
     <h1>Welcome to your Dashboard</h1>

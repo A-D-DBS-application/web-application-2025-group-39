@@ -5,10 +5,12 @@
 
 {% block content %}
   <!-- Right-top button -->
-  <a href="{{ url_for('main.projects') }}" 
-     class="btn btn-dark btn-sm position-absolute top-0 end-0 m-3">
-    Go to Projects
-  </a>
+  <div class="top-right">
+    <a href="{{ url_for('main.projects') }}" 
+      class="btn btn-base btn-nav btn-sm">
+      Projects Overview
+    </a>
+  </div>
 
   <h2>Add Roadmap for Project: {{ project.project_name }}</h2>
 

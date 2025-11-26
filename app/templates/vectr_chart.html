@@ -5,11 +5,14 @@
 {% block content %}
     <h2 class="text-center mb-4">VECTR Prioritization Chart for {{ project.project_name }}</h2>
     
-    <div class="mb-3 d-flex justify-content-center">
+    <div class="top-right">
         <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" 
-           class="btn btn-base btn-secondary-custom me-2">
-            All Features
+        class="btn btn-base btn-nav btn-sm">
+        Features Overview
         </a>
+    </div>
+
+    <div class="text-center">
         <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}" 
            class="btn btn-base btn-primary-custom">
             + Add Feature

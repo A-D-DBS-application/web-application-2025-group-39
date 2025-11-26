@@ -388,20 +388,25 @@ def view_features(project_id):
 
 @main.route('/feature/<uuid:feature_id>/edit', methods=['GET', 'POST'])
 def edit_feature(feature_id):
+    # UUID als string opslaan
     feature = Features_ideas.query.get_or_404(str(feature_id))
-    project = Project.query.get_or_404(feature.id_project)   # haal project op via foreign key
-    company = Company.query.get_or_404(project.id_company) # indien nodig
+    project = Project.query.get_or_404(feature.id_project)
+    company = Company.query.get_or_404(project.id_company)
 
     if request.method == 'POST':
-        # update fields from form
-        feature.name_feature = request.form['name_feature']
-        feature.roi_percent = request.form['roi_percent']
-        feature.ttv_weeks = request.form['ttv_weeks']
-        feature.quality_score = request.form['quality_score']
-        feature.horizon = request.form['horizon']
-        db.session.commit()
-        flash('Feature updated successfully!', 'success')
-        return redirect(url_for('main.view_features', project_id=feature.id_project))
+        try:
+            feature.name_feature = request.form.get('name_feature')
+            feature.roi_percent = float(request.form.get('roi_percent') or 0)
+            feature.ttv_weeks = float(request.form.get('ttv_weeks') or 0)
+            feature.quality_score = float(request.form.get('quality_score') or 0)
+            feature.horizon = float(request.form.get('horizon') or 0)
+
+            db.session.commit()
+            flash('Feature updated successfully!', 'success')
+            return redirect(url_for('main.view_features', project_id=feature.id_project))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating feature: {e}', 'danger')
 
     return render_template(
         'edit_feature.html',
@@ -521,7 +526,7 @@ def edit_project(project_id):
 # ==============================
 # DELETE PROJECT
 # ==============================
-@main.route('/projects/delete/<int:project_id>')
+@main.route('/projects/delete/<int:project_id>', methods=['POST'])
 def delete_project(project_id):
     if 'user_id' not in session:
         flash("You must log in first.", "danger")
@@ -536,7 +541,7 @@ def delete_project(project_id):
         return redirect(url_for('main.projects'))
 
     try:
-        db.session.delete(project)   # cascade deletes features_ideas too
+        db.session.delete(project)
         db.session.commit()
         flash("Project deleted successfully.", "success")
     except Exception as e:

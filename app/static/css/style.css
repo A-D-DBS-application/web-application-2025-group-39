@@ -77,6 +77,23 @@ body {
   color: #fff;
 }
 
+/* Specifieke styling voor de VECTR Chart knop */
+.btn-vectr {
+  background-color: #00b5ad;   /* appelblauwzeegroen basis */
+  border-color: #008c85;       /* donkerder randkleur */
+  color: #fff;                 /* tekstkleur */
+  font-weight: 600;            /* iets dikker font */
+  padding: 0.4rem 1rem;        /* ruimte binnenin */
+  border-radius: 6px;          /* afgeronde hoeken */
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-vectr:hover {
+  background-color: #009c95;   /* donkerder bij hover */
+  border-color: #007a74;       /* nog donkerder rand */
+  color: #fff
+}
+
 /* Primary acties (Add, Save, View) */
 .btn-primary-custom {
   background-color: #007bff;
@@ -284,12 +301,6 @@ input[type="submit"]:hover {
 .main-buttons .btn:hover {
     transform: translateY(-3px);
 }
-.logout-btn {
-    position: fixed;
-    top: 15px;
-    right: 20px;
-    z-index: 100;
-}
 .bottom-info {
     position: fixed;
     bottom: 15px;
@@ -302,13 +313,12 @@ input[type="submit"]:hover {
    PROJECTS PAGE
    =========================== */
 .projects-wrapper {
-    width: 90%;
-    max-width: 1400px;
-    margin: 40px auto;
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    max-width: 1000px;       /* of 800px, afhankelijk van je layout */
+    margin: 0 auto;          /* centreer horizontaal */
+    padding: 1rem;
+    background-color: #fff;  /* wit vlak */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 8px;
 }
 .projects-wrapper h2 {
     margin-top: 20px;
@@ -402,6 +412,7 @@ table {
     max-width: 800px;
     max-height: 800px;
     margin: 0 auto;          /* center horizontally */
+    margin-top: 2rem ;
     padding: 1rem;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     border-radius: 8px;

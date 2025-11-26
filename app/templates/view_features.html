@@ -6,7 +6,7 @@
 {% block content %}
   <!-- FIXED PROJECTS BUTTON -->
   <div class="top-right-fixed">
-    <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-nav btn-sm">Go to Projects</a>
+    <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-nav btn-sm">Projects Overview</a>
   </div>
 
   <h2 class="mb-4 text-center">Features Overview: {{ project.project_name }}</h2>
@@ -17,7 +17,7 @@
        + Add New Feature
     </a>
     <a href="{{ url_for('main.vectr_chart', project_id=project.id_project) }}" 
-       class="btn btn-base btn-info">
+       class="btn btn-sm btn-vectr">
        📈 VECTR Chart
     </a>
   </div>

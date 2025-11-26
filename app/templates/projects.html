@@ -6,7 +6,7 @@
 {% block content %}
   <!-- FIXED DASHBOARD BUTTON -->
   <div class="top-right-fixed">
-    <a href="{{ url_for('main.dashboard') }}" class="btn btn-base btn-nav btn-sm">Go to Dashboard</a>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-base btn-nav btn-sm">Dashboard</a>
   </div>
 
   <!-- Titel + Add Project knop gecentreerd -->
@@ -22,20 +22,37 @@
         <tr>
           <th>Project Name</th>
           <th>Company</th>
-          <th class="col-actions">Actions</th>
+          <th class="col-features">Features</th>
           <th class="col-roadmap">Roadmap</th>
+          <th class="col-actions">Actions</th>
         </tr>
       </thead>
       <tbody>
         {% if projects|length == 0 %}
           <tr>
-            <td colspan="4" class="text-muted py-4">No projects yet — add one soon!</td>
+            <td colspan="5" class="text-muted py-4">No projects yet — add one soon!</td>
           </tr>
         {% else %}
           {% for project, company_name in projects %}
             <tr>
               <td>{{ project.project_name }}</td>
               <td>{{ company_name }}</td>
+
+              <!-- FEATURES BUTTONS -->
+              <td>
+                <div class="d-flex justify-content-center gap-2">
+                  <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">Add</a>
+                  <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">View</a>
+                </div>
+              </td>
+
+              <!-- ROADMAP BUTTONS -->
+              <td>
+                <div class="d-flex justify-content-center gap-2">
+                  <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">Add</a>
+                  <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">View</a>
+                </div>
+              </td>
 
               <!-- ACTION BUTTONS -->
               <td>
@@ -47,15 +64,6 @@
                       Delete
                     </button>
                   </form>
-                  <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">View Features</a>
-                </div>
-              </td>
-
-              <!-- ROADMAP BUTTONS -->
-              <td>
-                <div class="d-flex justify-content-center gap-2">
-                  <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">View</a>
-                  <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">Add</a>
                 </div>
               </td>
             </tr>
