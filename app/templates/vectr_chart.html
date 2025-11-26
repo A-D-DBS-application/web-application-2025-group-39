@@ -1,13 +1,10 @@
-<!-- vraag basis lauout template-->
 {% extends "base.html" %}
 
 {% block title %}VECTR Prioritization: {{ project.project_name }}{% endblock %}
-<!--start hoofinhoud-->
+
 {% block content %}
-    <!--hoofdtitel graph-->
     <h2 class="text-center mb-4">VECTR Prioritization Chart for {{ project.project_name }}</h2>
     
-    <!--container voor navigatie knoppen-->
     <div class="mb-3 d-flex justify-content-center">
         <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" 
            class="btn btn-secondary me-2">
@@ -19,9 +16,10 @@
         </a>
     </div>
 
+    <div id="chartData" style="display:none;">{{ chart_data | tojson }}</div>
+
     <div class="card shadow p-4 mx-auto" style="max-width: 800px; height: 800px;">
         <canvas id="vectrChart"></canvas>
-        <!--legende betekenis assen en bubbelgrote-->
         <p class="text-center mt-3 text-muted">
             X-as: Confidence | Y-as: TtV | 
             **Bubble Size: ROI (The bigger the bubble, the higher the ROI)**
@@ -34,6 +32,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Dit werkt nu omdat de div met ID 'chartData' bestaat.
             const chartData = JSON.parse(document.getElementById("chartData").textContent);
             const ctx = document.getElementById('vectrChart').getContext('2d');
             
@@ -47,8 +46,8 @@
                     ctx.save();
                     
                     // --- GRENZWAARDEN ---
-                    const conf_middle_value = 1.0;  // Confidence 1.0 als grens
-                    const ttv_middle_value = 8;     // TtV 8 weken als grens
+                    const conf_middle_value = 1.0; 
+                    const ttv_middle_value = 8;     
 
                     // Vertaal de waarden naar pixelcoördinaten
                     const xCenter = x.getPixelForValue(conf_middle_value);
@@ -59,17 +58,11 @@
                         ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
                     };
                     
-                    // 1. Groen (Rechtsboven): Hoge Confidence, Lage TtV (IDEALE FEATURES)
-                    drawQuadrant('rgba(0, 150, 0, 0.15)', xCenter, top, right, yCenter);
-
-                    // 2. Geel (Linksboven): Lage Confidence, Lage TtV (SNEL MAAR ONZEKER)
-                    drawQuadrant('rgba(255, 255, 0, 0.15)', left, top, xCenter, yCenter);
-
-                    // 3. Oranje (Rechtsonder): Hoge Confidence, Hoge TtV (GROTE PROJECTEN/LAGERE PRIORITEIT)
-                    drawQuadrant('rgba(255, 165, 0, 0.15)', xCenter, yCenter, right, bottom);
-
-                    // 4. Rood (Linksonder): Lage Confidence, Hoge TtV (TE VERMIJDEN)
-                    drawQuadrant('rgba(255, 0, 0, 0.15)', left, yCenter, xCenter, bottom);
+                    // Teken de 4 kwadranten
+                    drawQuadrant('rgba(0, 150, 0, 0.15)', xCenter, top, right, yCenter);      // Groen
+                    drawQuadrant('rgba(255, 255, 0, 0.15)', left, top, xCenter, yCenter);    // Geel
+                    drawQuadrant('rgba(255, 165, 0, 0.15)', xCenter, yCenter, right, bottom);// Oranje
+                    drawQuadrant('rgba(255, 0, 0, 0.15)', left, yCenter, xCenter, bottom);  // Rood
 
                     ctx.restore();
                 }
@@ -83,16 +76,18 @@
                 data: chartData.map(item => {
                     
                     const roiValue = item.roi; 
+                    // Bepaal de grootte (r) op basis van ROI, geschaald tussen 5 en 40
                     const radius = Math.max(5, Math.min(40, (Math.max(0, roiValue) / 10))); 
                     
                     const confidenceValue = item.confidence;
+                    // Bepaal de kleur op basis van Confidence
                     const colorIntensity = Math.min(255, 50 + confidenceValue * 60); 
                     const backgroundColor = `rgba(50, ${colorIntensity}, 50, 0.8)`; 
 
                     return {
-                        x: confidenceValue, // X-as: Confidence
-                        y: item.ttv,        // Y-as: TtV (weeks)
-                        r: radius,          // Grootte: ROI
+                        x: confidenceValue, 
+                        y: item.ttv, 
+                        r: radius, 
                         name: item.name,
                         ttv: item.ttv,
                         roi: item.roi,
@@ -111,7 +106,7 @@
             new Chart(ctx, {
                 type: 'bubble',
                 data: { datasets: datasets },
-                plugins: [quadrantPlugin], // Registreer de quadrant plugin
+                plugins: [quadrantPlugin],
                 options: {
                     responsive: true,
                     maintainAspectRatio: false, 
@@ -145,7 +140,7 @@
                             type: 'linear',
                             position: 'bottom',
                             min: 0, 
-                            max: 10.0, 
+                            max: 10.0, // Vaste schaal voor Confidence
                             grid: {
                                 drawOnChartArea: false 
                             }
@@ -156,7 +151,7 @@
                                 text: 'Time-to-Value (TtV) in Weken (Lager is Beter)'
                             },
                             type: 'linear',
-                            reverse: true, 
+                            reverse: true, // Lage TtV (goed) bovenaan
                             grid: {
                                 drawOnChartArea: false 
                             }
