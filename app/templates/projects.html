@@ -21,10 +21,9 @@
       <thead class="table-light">
         <tr>
           <th>Project Name</th>
-          <th>Company</th>
           <th class="col-features">Features</th>
           <th class="col-roadmap">Roadmap</th>
-          <th class="col-actions">Actions</th>
+          <th class="col-actions">Projects Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -36,7 +35,6 @@
           {% for project, company_name in projects %}
             <tr>
               <td>{{ project.project_name }}</td>
-              <td>{{ company_name }}</td>
 
               <!-- FEATURES BUTTONS -->
               <td>
