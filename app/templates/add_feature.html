@@ -51,39 +51,96 @@
         </p>
         <div class="row g-3">
           <div class="col-md-6">
-            <label class="form-label">Horizon (months)</label>
+            <label class="form-label">
+              Horizon (months) 
+              <!--aanmaken van het i icoontje -->
+              <i class="bi bi-info-circle" data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-placement="top" 
+                data-bs-content="The time window over which expected revenue, churn reduction and cost savings are estimated.">
+              </i>
+            </label>
             <input type="number" class="form-control" name="horizon" min="0">
           </div>
           <div class="col-md-6">
-            <label class="form-label">Extra Revenue</label>
+            <label class="form-label">
+              Extra Revenue
+              <i class="bi bi-info-circle" data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-placement="top" 
+                data-bs-content="Estimated additional revenue over horizon H caused by this feature. Use realistic benchmarks or past release data.">
+              </i>
+            </label>
             <input type="number" class="form-control" name="extra_revenue" min="0">
           </div>
           <div class="col-md-6">
-            <label class="form-label">Churn Reduction Savings</label>
+            <label class="form-label">
+              Churn Reduction Savings
+              <i class="bi bi-info-circle" data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-placement="top" 
+                data-bs-content="Estimated savings due to lower churn over horizon H. Use customer lifetime value or retention metrics if available.">
+              </i>
+            </label>
             <input type="number" class="form-control" name="churn_reduction" min="0">
           </div>
           <div class="col-md-6">
-            <label class="form-label">Cost Savings</label>
+            <label class="form-label">
+              Cost Savings
+              <i class="bi bi-info-circle" data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-placement="top" 
+                data-bs-content="Direct cost reductions caused by this feature. Examples include: lower support load, automation, reduced operational overhead.">
+              </i>
+            </label>
             <input type="number" class="form-control" name="cost_savings" min="0">
           </div>
         </div>
         <h5 class="mt-4">Investment Cost</h5>
         <div class="row g-3">
           <div class="col-md-6">
-            <label class="form-label">Development Effort (hours)</label>
+            <label class="form-label">
+              Development Effort (hours)
+              <i class="bi bi-info-circle" data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-placement="top" 
+                data-bs-content="Estimated implementation effort expressed in hours or person-days. Used to calculate investment cost. Keep it realistic and comparable.">
+              </i>
+            </label>
             <input type="number" class="form-control" name="investment_hours" min="0">
           </div>
           <div class="col-md-6">
-            <label class="form-label">OPEX (operational costs)</label>
+            <label class="form-label">
+              OPEX (operational costs)
+              <i class="bi bi-info-circle" data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-placement="top" 
+                data-bs-content="Operational costs: hosting, subscriptions, monitoring, maintenance. Include only the incremental costs caused by this feature.">
+              </i>
+            </label>
             <input type="number" class="form-control" name="opex_hours" min="0">
           </div>
           <div class="col-md-12">
-            <label class="form-label">Other Costs (optional)</label>
+            <label class="form-label">
+              Other Costs (optional)
+              <i class="bi bi-info-circle" data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-placement="top" 
+                data-bs-content="Optional category for licensing, integration or opportunity cost that does not fit other fields.">
+              </i>
+            </label>
             <input type="number" class="form-control" name="other_costs" min="0">
           </div>
         </div>
         <div class="mt-3">
-          <label class="form-label">ROI (%)</label>
+          <label class="form-label">
+            ROI (%)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" 
+              data-bs-trigger="hover focus" 
+              data-bs-placement="top" 
+              data-bs-content="ROI = ((Total Gains - Total Costs) / Total Costs) × 100. Displayed as a percentage and used to determine bubble size in VECTR.">
+            </i>
+          </label>
           <input type="text" class="form-control" name="roi_percent" placeholder="Calculated automatically" readonly>
         </div>
       </div>
@@ -94,11 +151,25 @@
         <p class="text-muted fst-italic">TTV = Time-to-Market + Time-to-Business-Value</p>
         <div class="row g-3">
           <div class="col-md-6">
-            <label class="form-label">Time-to-Market (weeks)</label>
+            <label class="form-label">
+              Time-to-Market (weeks)
+              <i class="bi bi-info-circle" data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-placement="top" 
+                data-bs-content="Time-to-Market: The time (in weeks) required to build and release the first working version. Includes design, development, testing and deployment.">
+              </i>
+            </label>
             <input type="number" class="form-control" name="ttm_weeks" min="0">
           </div>
           <div class="col-md-6">
-            <label class="form-label">Time-to-Business-Value (weeks)</label>
+            <label class="form-label">
+              Time-to-Business-Value (weeks)
+              <i class="bi bi-info-circle" data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-placement="top" 
+                data-bs-content="Time-to-Business-Value: The time (in weeks) required after launch, before measurable business value appears. Example: first paying customers, KPI improvement, adoption.">
+              </i>
+            </label>
             <input type="number" class="form-control" name="ttbv_weeks" min="0">
           </div>
           <div class="col-12">
@@ -111,7 +182,16 @@
       <!-- CONFIDENCE -->
       <div class="mb-4">
         <h4 class="mb-3">Evidence & Confidence Level</h4>
-        <label class="form-label">Confidence Level</label>
+        <label class="form-label mb-2">
+            Confidence Score
+            <i class="bi bi-info-circle" 
+                data-bs-toggle="popover" 
+                data-bs-trigger="hover focus" 
+                data-bs-html="true"
+                data-bs-placement="top" 
+                data-bs-content="Confidence is based on the strongest available evidence. Score range: 0.01 (very weak) &rarr; 10 (strong launch data). Used for the X-axis position in the VECTR graph.">
+            </i>
+        </label>
         <select class="form-select" name="quality_score" required>
           <option value="">Select score</option>
           <option value="0.01">Self Conviction — 0.01</option>
@@ -132,6 +212,17 @@
       </div>
     </form>
   </div>
+
+<script>
+  // Initialiseer alle Popovers op de pagina
+  document.addEventListener('DOMContentLoaded', function () {
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+      // Gebruik de 'html: true' optie als je HTML in de Popover content wilt, maar hier niet nodig
+      return new bootstrap.Popover(popoverTriggerEl)
+    })
+  });
+</script>
 
   <!--Verwijzing naar berekening ROI en TtV in js-bestand-->
 <script src="{{ url_for('static', filename='js/feature_calculations.js') }}"></script>
