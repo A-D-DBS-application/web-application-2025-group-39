@@ -4,49 +4,53 @@
 {% block body_class %}roadmap-body{% endblock %}
 
 {% block content %}
-  <!-- DASHBOARD BUTTON -->
   <div class="top-right">
     <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-nav btn-sm">Projects Overview</a>
   </div>
 
-  <h2>Roadmaps for Project: {{ project.project_name }}</h2>
+  <h2>Roadmap for {{ project.project_name }}</h2>
   <p class="text-muted">{{ project.company.company_name }}</p>
 
-  <div class="mt-4">
-    {% if roadmaps|length == 0 %}
-      <div class="alert alert-info mt-4">
-        No roadmaps yet for this project.
-      </div>
-
-      {% if session['role'] == 'founder' %}
-        <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}"
-           class="btn btn-primary mt-3">Add First Roadmap</a>
-      {% endif %}
-    {% else %}
-      <div class="row g-4">
-        {% for r in roadmaps %}
-          <div class="col-md-4">
-            <div class="card p-3">
-              <h5 class="mb-1">{{ r.quarter }}</h5>
-              <p class="text-muted small mb-2">Created: {{ r.createdat.strftime("%d %b %Y") }}</p>
-
-              <ul class="list-group small mb-3">
-                <li class="list-group-item">Team Size: <strong>{{ r.team_size }}</strong></li>
-                <li class="list-group-item">Sprint Capacity: <strong>{{ r.sprint_capacity }}</strong></li>
-                <li class="list-group-item">Budget Allocation: <strong>{{ r.budget_allocation }}</strong></li>
-              </ul>
-
-              <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}"
-                 class="btn btn-primary btn-sm w-100">View Milestones</a>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-
-      {% if session['role'] == 'founder' %}
-        <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}"
-           class="btn btn-primary mt-4">Add Another Roadmap</a>
-      {% endif %}
+  {% if roadmap is none %}
+    <div class="alert alert-info mt-4">
+      No roadmap has been created for this project yet.
+    </div>
+    {% if session['role'] == 'founder' %}
+      <a href="{{ url_for('main.create_roadmap', project_id=project.id_project) }}" class="btn btn-primary mt-3">Create Roadmap</a>
     {% endif %}
-  </div>
+  {% else %}
+    <div class="roadmap-card card shadow-sm p-4 mt-3">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          <p class="text-uppercase text-muted mb-1">Quarter</p>
+          <h4 class="mb-0">{{ roadmap.quarter }}</h4>
+          <p class="small text-secondary">Created {{ roadmap.createdat.strftime('%d %b %Y') }}</p>
+        </div>
+        {% if session['role'] == 'founder' %}
+          <a href="{{ url_for('main.edit_roadmap', project_id=project.id_project) }}" class="btn btn-edit">Edit Roadmap</a>
+        {% endif %}
+      </div>
+
+      <div class="row g-3 mt-2">
+        <div class="col-md-4">
+          <div class="roadmap-metric">
+            <p class="label">Team Size</p>
+            <p class="value">{{ roadmap.team_size }}</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="roadmap-metric">
+            <p class="label">Sprint Capacity</p>
+            <p class="value">{{ roadmap.sprint_capacity }}</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="roadmap-metric">
+            <p class="label">Budget Allocation</p>
+            <p class="value">{{ roadmap.budget_allocation }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
 {% endblock %}

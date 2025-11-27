@@ -373,21 +373,42 @@ table {
 }
 
 /* ===========================
-   ADD ROADMAP PAGE
+   ROADMAP PAGES
    =========================== */
-.roadmap-form {
-    max-width: 550px;
+.form-wrapper {
+    max-width: 720px;
     border-radius: 12px;
     background: #fff;
+    margin: 0 auto;
 }
 
-/* ===========================
-   ROADMAP OVERVIEW PAGE
-   =========================== */
-.card {
+.roadmap-card {
+    background: #fff;
     border-radius: 12px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
 }
+
+.roadmap-metric {
+    background: #f6f9fc;
+    border-radius: 10px;
+    padding: 16px;
+    height: 100%;
+}
+
+.roadmap-metric .label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+.roadmap-metric .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1b1f24;
+    margin: 0;
+}
+
 .top-right {
     position: absolute;
     top: 15px;

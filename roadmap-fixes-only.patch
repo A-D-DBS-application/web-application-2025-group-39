@@ -1,0 +1,427 @@
+From 08d912c6d451d5edbc53216c7a8eac0485e8d979 Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Thu, 27 Nov 2025 16:53:05 +0000
+Subject: [PATCH] Roadmap fixes after blank-page feedback
+
+## Summary
+- apply after the initial roadmap update to fix the blank-page create/edit bug
+- add roadmap form validation helper and rollback protection
+- keep the form in edit/create modes with friendly errors and preserved values
+
+## Testing
+- not run (not requested)
+---
+ app/routes.py                       | 138 +++++++++++++++++++++-------
+ app/static/css/style.css            |  37 ++++++--
+ app/templates/projects.html         |  10 +-
+ app/templates/roadmap_form.html     |  53 +++++++++++
+ app/templates/roadmap_overview.html |  76 +++++++--------
+ 5 files changed, 233 insertions(+), 81 deletions(-)
+ create mode 100644 app/templates/roadmap_form.html
+
+diff --git a/app/routes.py b/app/routes.py
+index b98143f..6ce8e9c 100644
+--- a/app/routes.py
++++ b/app/routes.py
+@@ -556,8 +556,31 @@ def delete_project(project_id):
+ # ==============================
+ 
+ 
+-@main.route('/roadmap/add/<int:project_id>', methods=['GET', 'POST'])
+-def add_roadmap(project_id):
++def _parse_roadmap_form():
++    """Validate roadmap form fields and return typed values."""
++
++    def parse_int(field, label):
++        raw = request.form.get(field, "").strip()
++        if raw == "":
++            raise ValueError(f"{label} is required.")
++        try:
++            return int(raw)
++        except ValueError:
++            raise ValueError(f"{label} must be a number.")
++
++    quarter = request.form.get("quarter", "").strip()
++    if not quarter:
++        raise ValueError("Please select a quarter.")
++
++    team_size = parse_int("team_size", "Team size")
++    sprint_capacity = parse_int("sprint_capacity", "Sprint capacity")
++    budget_allocation = parse_int("budget_allocation", "Budget allocation")
++
++    return quarter, team_size, sprint_capacity, budget_allocation
++
++
++@main.route('/projects/<int:project_id>/roadmap/new', methods=['GET', 'POST'])
++def create_roadmap(project_id):
+     if 'user_id' not in session:
+         flash("You must log in first.", "danger")
+         return redirect(url_for('main.login'))
+@@ -575,42 +598,88 @@ def add_roadmap(project_id):
+         flash("You are not allowed to add a roadmap to this project.", "danger")
+         return redirect(url_for('main.projects'))
+ 
++    existing_roadmap = Roadmap.query.filter_by(id_project=project_id).first()
++    if existing_roadmap:
++        flash("This project already has a roadmap. You can edit it instead.", "info")
++        return redirect(url_for('main.roadmap_overview', project_id=project_id))
++
+     if request.method == 'POST':
+-        quarter = request.form.get("quarter")
+-        team_size = request.form.get("team_size")
+-        sprint_capacity = request.form.get("sprint_capacity")
+-        budget_allocation = request.form.get("budget_allocation")
+-
+-        # Check if this quarter already has a roadmap
+-        existing = Roadmap.query.filter_by(
+-            id_project=project_id,
+-            quarter=quarter
+-        ).first()
+-
+-        if existing:
+-            flash("This project already has a roadmap for that quarter.", "danger")
+-            return render_template('add_roadmap.html', project=project)
+-
+-
+-        # Create roadmap
+-        roadmap = Roadmap(
+-            id_project=project_id,
+-            quarter=quarter,
+-            team_size=int(team_size),
+-            sprint_capacity=int(sprint_capacity),
+-            budget_allocation=int(budget_allocation)
+-        )
++        try:
++            quarter, team_size, sprint_capacity, budget_allocation = _parse_roadmap_form()
++
++            roadmap = Roadmap(
++                id_project=project_id,
++                quarter=quarter,
++                team_size=team_size,
++                sprint_capacity=sprint_capacity,
++                budget_allocation=budget_allocation
++            )
+ 
+-        db.session.add(roadmap)
+-        db.session.commit()
++            db.session.add(roadmap)
++            db.session.commit()
+ 
+-        flash("Roadmap created successfully!", "success")
+-        return redirect(url_for('main.roadmap_overview', project_id=project_id))
++            flash("Roadmap created successfully!", "success")
++            return redirect(url_for('main.roadmap_overview', project_id=project_id))
++        except ValueError as err:
++            flash(str(err), "danger")
++            return render_template('roadmap_form.html', project=project, roadmap=None, is_edit=False)
++        except Exception as err:
++            db.session.rollback()
++            print(f"Error creating roadmap: {err}")
++            flash("An unexpected error occurred while creating the roadmap.", "danger")
++            return render_template('roadmap_form.html', project=project, roadmap=None, is_edit=False)
++
++    return render_template('roadmap_form.html', project=project, roadmap=None, is_edit=False)
++
++
++@main.route('/projects/<int:project_id>/roadmap/edit', methods=['GET', 'POST'])
++def edit_roadmap(project_id):
++    if 'user_id' not in session:
++        flash("You must log in first.", "danger")
++        return redirect(url_for('main.login'))
++
++    if session.get('role') != 'founder':
++        flash("Only Founders can edit roadmaps.", "danger")
++        return redirect(url_for('main.projects'))
++
++    user = Profile.query.get(session['user_id'])
++    project = Project.query.get_or_404(project_id)
++    roadmap = Roadmap.query.filter_by(id_project=project_id).first()
++
++    if project.id_company != user.id_company:
++        flash("You are not allowed to edit this roadmap.", "danger")
++        return redirect(url_for('main.projects'))
++
++    if not roadmap:
++        flash("This project does not have a roadmap yet.", "info")
++        return redirect(url_for('main.create_roadmap', project_id=project_id))
++
++    if request.method == 'POST':
++        try:
++            quarter, team_size, sprint_capacity, budget_allocation = _parse_roadmap_form()
++
++            roadmap.quarter = quarter
++            roadmap.team_size = team_size
++            roadmap.sprint_capacity = sprint_capacity
++            roadmap.budget_allocation = budget_allocation
++
++            db.session.commit()
++
++            flash("Roadmap updated successfully!", "success")
++            return redirect(url_for('main.roadmap_overview', project_id=project_id))
++        except ValueError as err:
++            flash(str(err), "danger")
++            return render_template('roadmap_form.html', project=project, roadmap=roadmap, is_edit=True)
++        except Exception as err:
++            db.session.rollback()
++            print(f"Error updating roadmap: {err}")
++            flash("An unexpected error occurred while updating the roadmap.", "danger")
++            return render_template('roadmap_form.html', project=project, roadmap=roadmap, is_edit=True)
+ 
+-    return render_template('add_roadmap.html', project=project)
++    return render_template('roadmap_form.html', project=project, roadmap=roadmap, is_edit=True)
+ 
+ 
+-@main.route('/roadmap/<int:project_id>')
++@main.route('/projects/<int:project_id>/roadmap')
+ def roadmap_overview(project_id):
+     if 'user_id' not in session:
+         flash("You must log in first.", "danger")
+@@ -624,12 +693,11 @@ def roadmap_overview(project_id):
+         flash("You are not allowed to view this roadmap.", "danger")
+         return redirect(url_for('main.projects'))
+ 
+-    # Alle roadmaps van dit project ophalen
+-    roadmaps = project.roadmaps
++    roadmap = Roadmap.query.filter_by(id_project=project_id).first()
+ 
+     return render_template(
+         "roadmap_overview.html",
+         project=project,
+-        roadmaps=roadmaps
++        roadmap=roadmap
+     )
+ 
+diff --git a/app/static/css/style.css b/app/static/css/style.css
+index 9e10bbc..d880228 100644
+--- a/app/static/css/style.css
++++ b/app/static/css/style.css
+@@ -373,21 +373,42 @@ table {
+ }
+ 
+ /* ===========================
+-   ADD ROADMAP PAGE
++   ROADMAP PAGES
+    =========================== */
+-.roadmap-form {
+-    max-width: 550px;
++.form-wrapper {
++    max-width: 720px;
+     border-radius: 12px;
+     background: #fff;
++    margin: 0 auto;
+ }
+ 
+-/* ===========================
+-   ROADMAP OVERVIEW PAGE
+-   =========================== */
+-.card {
++.roadmap-card {
++    background: #fff;
+     border-radius: 12px;
+-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+ }
++
++.roadmap-metric {
++    background: #f6f9fc;
++    border-radius: 10px;
++    padding: 16px;
++    height: 100%;
++}
++
++.roadmap-metric .label {
++    text-transform: uppercase;
++    letter-spacing: 0.08em;
++    font-size: 12px;
++    color: #6c757d;
++    margin-bottom: 4px;
++}
++
++.roadmap-metric .value {
++    font-size: 24px;
++    font-weight: 700;
++    color: #1b1f24;
++    margin: 0;
++}
++
+ .top-right {
+     position: absolute;
+     top: 15px;
+diff --git a/app/templates/projects.html b/app/templates/projects.html
+index ffb9c80..a3c0231 100644
+--- a/app/templates/projects.html
++++ b/app/templates/projects.html
+@@ -46,9 +46,15 @@
+ 
+               <!-- ROADMAP BUTTONS -->
+               <td>
++                {% set has_roadmap = project.roadmaps|length > 0 %}
+                 <div class="d-flex justify-content-center gap-2">
+-                  <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">Add</a>
+-                  <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">View</a>
++                  {% if has_roadmap %}
++                    <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">View</a>
++                  {% elif session['role'] == 'founder' %}
++                    <a href="{{ url_for('main.create_roadmap', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">Create</a>
++                  {% else %}
++                    <span class="badge bg-secondary align-self-center">No roadmap</span>
++                  {% endif %}
+                 </div>
+               </td>
+ 
+diff --git a/app/templates/roadmap_form.html b/app/templates/roadmap_form.html
+new file mode 100644
+index 0000000..dc241b2
+--- /dev/null
++++ b/app/templates/roadmap_form.html
+@@ -0,0 +1,53 @@
++{% extends "base.html" %}
++
++{% block title %}{{ 'Edit Roadmap' if is_edit else 'Create Roadmap' }}{% endblock %}
++{% block body_class %}roadmap-body{% endblock %}
++
++{% block content %}
++  <div class="top-right">
++    <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-nav btn-sm">Projects Overview</a>
++  </div>
++
++  <div class="form-wrapper card shadow-sm p-4">
++    <h2 class="mb-1">{{ 'Edit Roadmap' if is_edit else 'Create Roadmap' }}</h2>
++    <p class="text-muted">Project: {{ project.project_name }}</p>
++
++    <form method="POST" class="mt-3">
++      <div class="row g-3">
++        <div class="col-md-6">
++          <label class="form-label">Quarter</label>
++          <select name="quarter" class="form-select" required>
++            {% set selected_quarter = request.form.get('quarter') or (roadmap.quarter if roadmap else '') %}
++            <option value="" disabled {% if not selected_quarter %}selected{% endif %}>Select a quarter</option>
++            {% for option in ['Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025'] %}
++              <option value="{{ option }}" {% if option == selected_quarter %}selected{% endif %}>{{ option }}</option>
++            {% endfor %}
++          </select>
++        </div>
++
++        <div class="col-md-6">
++          <label class="form-label">Team Size</label>
++          <input type="number" name="team_size" class="form-control" min="1" required
++                 value="{{ request.form.get('team_size') or (roadmap.team_size if roadmap else '') }}">
++        </div>
++
++        <div class="col-md-6">
++          <label class="form-label">Sprint Capacity</label>
++          <input type="number" name="sprint_capacity" class="form-control" min="1" required
++                 value="{{ request.form.get('sprint_capacity') or (roadmap.sprint_capacity if roadmap else '') }}">
++        </div>
++
++        <div class="col-md-6">
++          <label class="form-label">Budget Allocation</label>
++          <input type="number" name="budget_allocation" class="form-control" min="0" required
++                 value="{{ request.form.get('budget_allocation') or (roadmap.budget_allocation if roadmap else '') }}">
++        </div>
++      </div>
++
++      <div class="d-flex gap-2 mt-4">
++        <button class="btn btn-primary">{{ 'Save Changes' if is_edit else 'Create Roadmap' }}</button>
++        <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}" class="btn btn-secondary">Cancel</a>
++      </div>
++    </form>
++  </div>
++{% endblock %}
+diff --git a/app/templates/roadmap_overview.html b/app/templates/roadmap_overview.html
+index fc25fee..9342b75 100644
+--- a/app/templates/roadmap_overview.html
++++ b/app/templates/roadmap_overview.html
+@@ -4,49 +4,53 @@
+ {% block body_class %}roadmap-body{% endblock %}
+ 
+ {% block content %}
+-  <!-- DASHBOARD BUTTON -->
+   <div class="top-right">
+     <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-nav btn-sm">Projects Overview</a>
+   </div>
+ 
+-  <h2>Roadmaps for Project: {{ project.project_name }}</h2>
++  <h2>Roadmap for {{ project.project_name }}</h2>
+   <p class="text-muted">{{ project.company.company_name }}</p>
+ 
+-  <div class="mt-4">
+-    {% if roadmaps|length == 0 %}
+-      <div class="alert alert-info mt-4">
+-        No roadmaps yet for this project.
++  {% if roadmap is none %}
++    <div class="alert alert-info mt-4">
++      No roadmap has been created for this project yet.
++    </div>
++    {% if session['role'] == 'founder' %}
++      <a href="{{ url_for('main.create_roadmap', project_id=project.id_project) }}" class="btn btn-primary mt-3">Create Roadmap</a>
++    {% endif %}
++  {% else %}
++    <div class="roadmap-card card shadow-sm p-4 mt-3">
++      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
++        <div>
++          <p class="text-uppercase text-muted mb-1">Quarter</p>
++          <h4 class="mb-0">{{ roadmap.quarter }}</h4>
++          <p class="small text-secondary">Created {{ roadmap.createdat.strftime('%d %b %Y') }}</p>
++        </div>
++        {% if session['role'] == 'founder' %}
++          <a href="{{ url_for('main.edit_roadmap', project_id=project.id_project) }}" class="btn btn-edit">Edit Roadmap</a>
++        {% endif %}
+       </div>
+ 
+-      {% if session['role'] == 'founder' %}
+-        <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}"
+-           class="btn btn-primary mt-3">Add First Roadmap</a>
+-      {% endif %}
+-    {% else %}
+-      <div class="row g-4">
+-        {% for r in roadmaps %}
+-          <div class="col-md-4">
+-            <div class="card p-3">
+-              <h5 class="mb-1">{{ r.quarter }}</h5>
+-              <p class="text-muted small mb-2">Created: {{ r.createdat.strftime("%d %b %Y") }}</p>
+-
+-              <ul class="list-group small mb-3">
+-                <li class="list-group-item">Team Size: <strong>{{ r.team_size }}</strong></li>
+-                <li class="list-group-item">Sprint Capacity: <strong>{{ r.sprint_capacity }}</strong></li>
+-                <li class="list-group-item">Budget Allocation: <strong>{{ r.budget_allocation }}</strong></li>
+-              </ul>
+-
+-              <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}"
+-                 class="btn btn-primary btn-sm w-100">View Milestones</a>
+-            </div>
++      <div class="row g-3 mt-2">
++        <div class="col-md-4">
++          <div class="roadmap-metric">
++            <p class="label">Team Size</p>
++            <p class="value">{{ roadmap.team_size }}</p>
++          </div>
++        </div>
++        <div class="col-md-4">
++          <div class="roadmap-metric">
++            <p class="label">Sprint Capacity</p>
++            <p class="value">{{ roadmap.sprint_capacity }}</p>
+           </div>
+-        {% endfor %}
++        </div>
++        <div class="col-md-4">
++          <div class="roadmap-metric">
++            <p class="label">Budget Allocation</p>
++            <p class="value">{{ roadmap.budget_allocation }}</p>
++          </div>
++        </div>
+       </div>
+-
+-      {% if session['role'] == 'founder' %}
+-        <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}"
+-           class="btn btn-primary mt-4">Add Another Roadmap</a>
+-      {% endif %}
+-    {% endif %}
+-  </div>
+-{% endblock %}
+\ No newline at end of file
++    </div>
++  {% endif %}
++{% endblock %}
+-- 
+2.43.0
+

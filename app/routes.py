@@ -556,8 +556,31 @@ def delete_project(project_id):
 # ==============================
 
 
-@main.route('/roadmap/add/<int:project_id>', methods=['GET', 'POST'])
-def add_roadmap(project_id):
+def _parse_roadmap_form():
+    """Validate roadmap form fields and return typed values."""
+
+    def parse_int(field, label):
+        raw = request.form.get(field, "").strip()
+        if raw == "":
+            raise ValueError(f"{label} is required.")
+        try:
+            return int(raw)
+        except ValueError:
+            raise ValueError(f"{label} must be a number.")
+
+    quarter = request.form.get("quarter", "").strip()
+    if not quarter:
+        raise ValueError("Please select a quarter.")
+
+    team_size = parse_int("team_size", "Team size")
+    sprint_capacity = parse_int("sprint_capacity", "Sprint capacity")
+    budget_allocation = parse_int("budget_allocation", "Budget allocation")
+
+    return quarter, team_size, sprint_capacity, budget_allocation
+
+
+@main.route('/projects/<int:project_id>/roadmap/new', methods=['GET', 'POST'])
+def create_roadmap(project_id):
     if 'user_id' not in session:
         flash("You must log in first.", "danger")
         return redirect(url_for('main.login'))
@@ -575,42 +598,88 @@ def add_roadmap(project_id):
         flash("You are not allowed to add a roadmap to this project.", "danger")
         return redirect(url_for('main.projects'))
 
-    if request.method == 'POST':
-        quarter = request.form.get("quarter")
-        team_size = request.form.get("team_size")
-        sprint_capacity = request.form.get("sprint_capacity")
-        budget_allocation = request.form.get("budget_allocation")
-
-        # Check if this quarter already has a roadmap
-        existing = Roadmap.query.filter_by(
-            id_project=project_id,
-            quarter=quarter
-        ).first()
-
-        if existing:
-            flash("This project already has a roadmap for that quarter.", "danger")
-            return render_template('add_roadmap.html', project=project)
-
-
-        # Create roadmap
-        roadmap = Roadmap(
-            id_project=project_id,
-            quarter=quarter,
-            team_size=int(team_size),
-            sprint_capacity=int(sprint_capacity),
-            budget_allocation=int(budget_allocation)
-        )
-
-        db.session.add(roadmap)
-        db.session.commit()
-
-        flash("Roadmap created successfully!", "success")
+    existing_roadmap = Roadmap.query.filter_by(id_project=project_id).first()
+    if existing_roadmap:
+        flash("This project already has a roadmap. You can edit it instead.", "info")
         return redirect(url_for('main.roadmap_overview', project_id=project_id))
 
-    return render_template('add_roadmap.html', project=project)
+    if request.method == 'POST':
+        try:
+            quarter, team_size, sprint_capacity, budget_allocation = _parse_roadmap_form()
+
+            roadmap = Roadmap(
+                id_project=project_id,
+                quarter=quarter,
+                team_size=team_size,
+                sprint_capacity=sprint_capacity,
+                budget_allocation=budget_allocation
+            )
+
+            db.session.add(roadmap)
+            db.session.commit()
+
+            flash("Roadmap created successfully!", "success")
+            return redirect(url_for('main.roadmap_overview', project_id=project_id))
+        except ValueError as err:
+            flash(str(err), "danger")
+            return render_template('roadmap_form.html', project=project, roadmap=None, is_edit=False)
+        except Exception as err:
+            db.session.rollback()
+            print(f"Error creating roadmap: {err}")
+            flash("An unexpected error occurred while creating the roadmap.", "danger")
+            return render_template('roadmap_form.html', project=project, roadmap=None, is_edit=False)
+
+    return render_template('roadmap_form.html', project=project, roadmap=None, is_edit=False)
 
 
-@main.route('/roadmap/<int:project_id>')
+@main.route('/projects/<int:project_id>/roadmap/edit', methods=['GET', 'POST'])
+def edit_roadmap(project_id):
+    if 'user_id' not in session:
+        flash("You must log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    if session.get('role') != 'founder':
+        flash("Only Founders can edit roadmaps.", "danger")
+        return redirect(url_for('main.projects'))
+
+    user = Profile.query.get(session['user_id'])
+    project = Project.query.get_or_404(project_id)
+    roadmap = Roadmap.query.filter_by(id_project=project_id).first()
+
+    if project.id_company != user.id_company:
+        flash("You are not allowed to edit this roadmap.", "danger")
+        return redirect(url_for('main.projects'))
+
+    if not roadmap:
+        flash("This project does not have a roadmap yet.", "info")
+        return redirect(url_for('main.create_roadmap', project_id=project_id))
+
+    if request.method == 'POST':
+        try:
+            quarter, team_size, sprint_capacity, budget_allocation = _parse_roadmap_form()
+
+            roadmap.quarter = quarter
+            roadmap.team_size = team_size
+            roadmap.sprint_capacity = sprint_capacity
+            roadmap.budget_allocation = budget_allocation
+
+            db.session.commit()
+
+            flash("Roadmap updated successfully!", "success")
+            return redirect(url_for('main.roadmap_overview', project_id=project_id))
+        except ValueError as err:
+            flash(str(err), "danger")
+            return render_template('roadmap_form.html', project=project, roadmap=roadmap, is_edit=True)
+        except Exception as err:
+            db.session.rollback()
+            print(f"Error updating roadmap: {err}")
+            flash("An unexpected error occurred while updating the roadmap.", "danger")
+            return render_template('roadmap_form.html', project=project, roadmap=roadmap, is_edit=True)
+
+    return render_template('roadmap_form.html', project=project, roadmap=roadmap, is_edit=True)
+
+
+@main.route('/projects/<int:project_id>/roadmap')
 def roadmap_overview(project_id):
     if 'user_id' not in session:
         flash("You must log in first.", "danger")
@@ -624,12 +693,11 @@ def roadmap_overview(project_id):
         flash("You are not allowed to view this roadmap.", "danger")
         return redirect(url_for('main.projects'))
 
-    # Alle roadmaps van dit project ophalen
-    roadmaps = project.roadmaps
+    roadmap = Roadmap.query.filter_by(id_project=project_id).first()
 
     return render_template(
         "roadmap_overview.html",
         project=project,
-        roadmaps=roadmaps
+        roadmap=roadmap
     )
 

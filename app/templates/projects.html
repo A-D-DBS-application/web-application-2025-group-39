@@ -46,9 +46,15 @@
 
               <!-- ROADMAP BUTTONS -->
               <td>
+                {% set has_roadmap = project.roadmaps|length > 0 %}
                 <div class="d-flex justify-content-center gap-2">
-                  <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">Add</a>
-                  <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">View</a>
+                  {% if has_roadmap %}
+                    <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">View</a>
+                  {% elif session['role'] == 'founder' %}
+                    <a href="{{ url_for('main.create_roadmap', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom table-btn">Create</a>
+                  {% else %}
+                    <span class="badge bg-secondary align-self-center">No roadmap</span>
+                  {% endif %}
                 </div>
               </td>
 
