@@ -28,6 +28,7 @@ class Profile(db.Model):
     name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=True)
     role = db.Column(db.String, nullable=True)
+    password = db.Column(db.String, nullable=False)
 
     # Foreign keys
     id_company = db.Column(

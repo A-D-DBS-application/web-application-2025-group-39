@@ -26,13 +26,13 @@ def index():
 def login():
     print("🟢 Login route started")
     if request.method == 'POST':
-        name = request.form.get('name')
         email = request.form.get('email')
+        password = request.form.get('password')
 
-        print(f"📨 Login attempt received: name={name}, email={email}")
+        print(f"📨 Login attempt received: email={email}")
 
         # Search for user in profile with ORM
-        user = Profile.query.filter_by(name=name, email=email).first()
+        user = Profile.query.filter_by(email=email, password=password).first()
 
         if user:
             session['user_id'] = user.id_profile
@@ -43,7 +43,7 @@ def login():
             print("Login successful")
             return redirect(url_for('main.dashboard'))
         else:
-            flash("Invalid name or email.", "error")
+            flash("Invalid email or password.", "error")
             print("Invalid credentials")
 
     return render_template('login.html')
@@ -59,6 +59,7 @@ def register():
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
+        password = request.form.get('password')
         role = request.form.get('role')
         company_name = request.form.get('company_name')
 
@@ -94,12 +95,13 @@ def register():
             # Insert new profile in Supabase
             db.session.execute(
                 db.text("""
-                    INSERT INTO public.profile (name, email, role, id_company)
-                    VALUES (:name, :email, :role, :id_company)
+                    INSERT INTO public.profile (name, email, password, role, id_company)
+                    VALUES (:name, :email, :password, :role, :id_company)
                 """),
                 {
                     'name': name,
                     'email': email,
+                    'password': password,
                     'role': role,
                     'id_company': company.id_company
                 }
