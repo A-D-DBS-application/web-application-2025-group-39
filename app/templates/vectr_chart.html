@@ -19,6 +19,7 @@
         </a>
     </div>
 
+    <!--De chart_data variabele wordt door uw Flask-route (Python backend) geleverd.-->
     <div id="chartData" style="display:none;">{{ chart_data | tojson }}</div>
 
     <div class="card shadow p-4 mx-auto vectr-card">
@@ -31,7 +32,8 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+      <!--Verwijzing naar berekening ROI en TtV in js-bestand-->
+    <script src="{{ url_for('static', filename='js/feature_calculations.js') }}"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -39,16 +41,15 @@
             const chartData = JSON.parse(document.getElementById("chartData").textContent);
             const ctx = document.getElementById('vectrChart').getContext('2d');
             
-            // ====================================================
             // 1. Custom Plugin: VECTR Quadrants (Confidence vs. TtV)
-            // ====================================================
+            // kern van de VECTR-visualisatie, die de grafiek in vier gekleurde zones verdeelt
             const quadrantPlugin = {
                 id: 'quadrants',
                 beforeDraw(chart, args, options) {
                     const { ctx, chartArea: { left, top, right, bottom }, scales: { x, y } } = chart;
                     ctx.save();
                     
-                    // --- THRESHOLDS ---
+                    // Drempel waarden
                     const conf_middle_value = 1.0; 
                     const ttv_middle_value = 8;     
 
