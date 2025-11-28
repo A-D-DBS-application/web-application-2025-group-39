@@ -671,4 +671,91 @@ def edit_roadmap(roadmap_id):
 
     # GET → show form
     return render_template('edit_roadmap.html', roadmap=roadmap, project=project)
+# ==============================
+# MILESTONES ROUTES 
+# ==============================
+@main.route('/milestone/add/<int:roadmap_id>', methods=['GET', 'POST'])
+def add_milestone(roadmap_id):
+    if 'user_id' not in session:
+        flash("You must log in first.", "danger")
+        return redirect(url_for('main.login'))
 
+    user = Profile.query.get(session['user_id'])
+    roadmap = Roadmap.query.get_or_404(roadmap_id)
+
+    # Only founders can add
+    if user.role != "founder":
+        flash("Only founders can add milestones.", "danger")
+        return redirect(url_for('main.roadmap_overview', project_id=roadmap.id_project))
+
+    if request.method == 'POST':
+        name = request.form.get("name")
+        start_date = request.form.get("start_date")
+        end_date = request.form.get("end_date")
+        goal = request.form.get("goal")
+        status = request.form.get("status")
+
+        milestone = Milestone(
+            id_roadmap=roadmap_id,
+            name=name,
+            start_date=start_date,
+            end_date=end_date,
+            goal=goal,
+            status=status
+        )
+
+        db.session.add(milestone)
+        db.session.commit()
+        flash("Milestone added!", "success")
+
+        return redirect(url_for('main.roadmap_overview', project_id=roadmap.id_project))
+
+    return render_template("add_milestone.html", roadmap=roadmap)
+
+@main.route('/milestone/edit/<int:milestone_id>', methods=['GET', 'POST'])
+def edit_milestone(milestone_id):
+    if 'user_id' not in session:
+        flash("You must log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    user = Profile.query.get(session['user_id'])
+    milestone = Milestone.query.get_or_404(milestone_id)
+    roadmap = Roadmap.query.get_or_404(milestone.id_roadmap)
+
+    if user.role != "founder":
+        flash("Only founders can edit milestones.", "danger")
+        return redirect(url_for('main.roadmap_overview', project_id=roadmap.id_project))
+
+    if request.method == 'POST':
+        milestone.name = request.form.get("name")
+        milestone.start_date = request.form.get("start_date")
+        milestone.end_date = request.form.get("end_date")
+        milestone.goal = request.form.get("goal")
+        milestone.status = request.form.get("status")
+
+        db.session.commit()
+        flash("Milestone updated!", "success")
+        return redirect(url_for('main.roadmap_overview', project_id=roadmap.id_project))
+
+    return render_template("edit_milestone.html", milestone=milestone)
+
+
+@main.route('/milestone/delete/<int:milestone_id>', methods=['POST'])
+def delete_milestone(milestone_id):
+    if 'user_id' not in session:
+        flash("You must log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    user = Profile.query.get(session['user_id'])
+    milestone = Milestone.query.get_or_404(milestone_id)
+    roadmap = Roadmap.query.get_or_404(milestone.id_roadmap)
+
+    if user.role != "founder":
+        flash("Only founders can delete milestones.", "danger")
+        return redirect(url_for('main.roadmap_overview', project_id=roadmap.id_project))
+
+    db.session.delete(milestone)
+    db.session.commit()
+    flash("Milestone deleted!", "success")
+
+    return redirect(url_for('main.roadmap_overview', project_id=roadmap.id_project))

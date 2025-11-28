@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Milestone{% endblock %}
+
+{% block content %}
+
+<div class="top-right">
+    <a href="{{ url_for('main.roadmap_overview', project_id=milestone.roadmap.id_project) }}"
+       class="btn btn-base btn-nav btn-sm">Back</a>
+</div>
+
+<h2>Edit Milestone</h2>
+<p class="text-muted">Roadmap: {{ milestone.roadmap.quarter }}</p>
+
+<div class="milestone-form card p-4 shadow mt-3 mx-auto">
+    <form method="POST">
+
+        <!-- Name -->
+        <div class="mb-3">
+            <label class="form-label">Milestone Name</label>
+            <input type="text" name="name" class="form-control" 
+                   value="{{ milestone.name }}" required>
+        </div>
+
+        <!-- Start date -->
+        <div class="mb-3">
+            <label class="form-label">Start Date</label>
+            <input type="date" name="start_date" class="form-control"
+                   value="{{ milestone.start_date }}" required>
+        </div>
+
+        <!-- End date -->
+        <div class="mb-3">
+            <label class="form-label">End Date</label>
+            <input type="date" name="end_date" class="form-control"
+                   value="{{ milestone.end_date }}" required>
+        </div>
+
+        <!-- Goal -->
+        <div class="mb-3">
+            <label class="form-label">Goal</label>
+            <input type="text" name="goal" class="form-control"
+                   value="{{ milestone.goal }}">
+        </div>
+
+        <!-- Status -->
+        <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select">
+                <option value="Planned" {% if milestone.status == "Planned" %}selected{% endif %}>Planned</option>
+                <option value="In progress" {% if milestone.status == "In progress" %}selected{% endif %}>In progress</option>
+                <option value="Done" {% if milestone.status == "Done" %}selected{% endif %}>Done</option>
+            </select>
+        </div>
+
+        <!-- Buttons -->
+        <button class="btn btn-primary-custom">Update Milestone</button>
+
+        <a href="{{ url_for('main.roadmap_overview', project_id=milestone.roadmap.id_project) }}"
+           class="btn btn-secondary-custom">
+            Cancel
+        </a>
+
+    </form>
+</div>
+
+{% endblock %}
