@@ -1,6 +1,6 @@
 from . import db  # haal db uit __init__.py
 import datetime  # datetime importeren
-
+from .security import hash_password, verify_password, needs_rehash
 
 class Company(db.Model):
     __tablename__ = 'company'
@@ -28,7 +28,7 @@ class Profile(db.Model):
     name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=True)
     role = db.Column(db.String, nullable=True)
-    password = db.Column(db.String, nullable=False)
+    password_hash = db.Column(db.String, nullable=False)
 
     # Foreign keys
     id_company = db.Column(
@@ -46,6 +46,18 @@ class Profile(db.Model):
     def __repr__(self):
         return f"<Profile {self.name}>"
 
+   # Helpers voor wachtwoordbeheer
+    def set_password(self, plain_password: str):
+        self.password_hash = hash_password(plain_password)
+
+    def check_password(self, plain_password: str) -> bool:
+        return verify_password(self.password_hash, plain_password)
+
+    def maybe_upgrade_hash(self, plain_password: str) -> bool:
+        if needs_rehash(self.password_hash):
+            self.set_password(plain_password)
+            return True
+        return False
 
 class Project(db.Model):
     __tablename__ = 'project'

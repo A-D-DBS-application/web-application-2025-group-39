@@ -31,10 +31,11 @@ def login():
 
         print(f"📨 Login attempt received: email={email}")
 
-        # Search for user in profile with ORM
-        user = Profile.query.filter_by(email=email, password=password).first()
+        # Zoek user op email
+        user = Profile.query.filter_by(email=email).first()
 
-        if user:
+        # Controleer wachtwoord via Argon2
+        if user and user.check_password(password):
             session['user_id'] = user.id_profile
             session['name'] = user.name
             session['role'] = user.role
@@ -47,7 +48,6 @@ def login():
             print("Invalid credentials")
 
     return render_template('login.html')
-
 
 # ==============================
 # REGISTER ROUTE (WORKS WITH SUPABASE STRUCTURE)
@@ -67,7 +67,7 @@ def register():
         print(f"Data received: {name} {email} {role} {company_name}")
 
         try:
-            # Search for company (or create) with raw SQL
+            # Zoek of company bestaat
             company = db.session.execute(
                 db.text("""
                     SELECT * FROM public.company WHERE company_name = :company_name LIMIT 1
@@ -92,20 +92,16 @@ def register():
                     {'company_name': company_name}
                 ).fetchone()
 
-            # Insert new profile in Supabase
-            db.session.execute(
-                db.text("""
-                    INSERT INTO public.profile (name, email, password, role, id_company)
-                    VALUES (:name, :email, :password, :role, :id_company)
-                """),
-                {
-                    'name': name,
-                    'email': email,
-                    'password': password,
-                    'role': role,
-                    'id_company': company.id_company
-                }
+            # Maak nieuw Profile object via ORM
+            new_user = Profile(
+                name=name,
+                email=email,
+                role=role,
+                id_company=company.id_company
             )
+            new_user.set_password(password)  # Argon2 hash wordt hier gezet
+
+            db.session.add(new_user)
             db.session.commit()
 
             flash("Registration successful! You can now log in.", "success")
