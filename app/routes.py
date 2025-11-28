@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app import db
 from app.models import Profile, Company, Project, Features_ideas, Roadmap, Milestone
 import uuid  # mag blijven staan als je het later nodig hebt
-
+from flask import request, render_template, session, flash, redirect, url_for
 
 # Blueprint aanmaken
 main = Blueprint('main', __name__)
@@ -353,6 +353,7 @@ def vectr_chart(project_id):
 # ==============================
 @main.route('/projects/<int:project_id>/features', methods=['GET'])
 def view_features(project_id):
+    # 1. Beveiliging en Gebruikersgegevens ophalen
     if 'user_id' not in session:
         flash("U moet eerst inloggen.", "danger")
         return redirect(url_for('main.login'))
@@ -365,19 +366,54 @@ def view_features(project_id):
     if project.id_company != user.id_company:
         flash("U mag dit project niet bekijken.", "danger")
         return redirect(url_for('main.projects'))
+        
+    # 2. Bepaal de rol en sorteerpermissie
+    user_role = session.get('role')
+    can_sort = (user_role == 'PM')
+    
+    # 3. Parameters Bepalen op basis van de Rol
+    if can_sort:
+        # PM: Haal parameters uit URL, standaard op 'roi' desc
+        sort_by = request.args.get('sort_by', 'roi')       
+        direction = request.args.get('direction', 'desc') 
+    else:
+        # Andere Rollen: Forceer standaard sortering op naam/ID (niet-dynamisch)
+        sort_by = 'name' # of 'id'
+        direction = 'asc'
 
-    # Haal alle features op voor dit project
-    # Sorteer op de berekende ROI (hoogste eerst)
-    features = Features_ideas.query.filter_by(
-        id_project=project_id
-    ).order_by(Features_ideas.roi_percent.desc()).all()
+    # 4. Bepaal de SQLAlchemy-kolom voor sortering
+    
+    # Standaard query om alle features voor dit project op te halen
+    features_query = Features_ideas.query.filter_by(id_project=project_id)
+    
+    if sort_by == 'roi':
+        column = Features_ideas.roi_percent
+    elif sort_by == 'ttv':
+        # Sorteer op TTM (Time-to-Market) als proxy voor TTV, omdat TTV berekend is
+        column = Features_ideas.ttm_weeks 
+    elif sort_by == 'confidence':
+        column = Features_ideas.quality_score 
+    else:
+        # Fallback op naam/ID
+        column = Features_ideas.name_feature
+        
+    # 5. Voer de Sortering uit
+    if direction == 'desc':
+        features = features_query.order_by(column.desc()).all()
+    else:
+        features = features_query.order_by(column.asc()).all()
 
+    # 6. Template Renderen (LET OP: komma's en alle benodigde variabelen)
     return render_template(
         'view_features.html',
         project=project,
         features=features,
-        company=company
+        company=company,
+        current_sort=sort_by,
+        current_direction=direction,
+        can_sort=can_sort
     )
+    
 
 
 # ==============================

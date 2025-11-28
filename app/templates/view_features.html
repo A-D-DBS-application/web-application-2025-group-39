@@ -33,12 +33,72 @@
       </table>
     {% else %}
       <table class="table table-striped table-bordered align-middle">
+        <!--sorteren door ROI, TTV, en cofidance-->
         <thead class="table-light">
           <tr>
             <th>Title</th>
-            <th>ROI (%)</th>
-            <th>TtV (Weeks)</th>
-            <th>Confidence</th>
+            
+            <th>
+              <div class="d-flex align-items-center justify-content-start">
+                <div class="me-2">
+                    {% if can_sort %}
+                        <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='roi', direction='asc') }}" 
+                          class="sort-icon {% if current_sort == 'roi' and current_direction == 'asc' %}active{% endif %}">
+                            &#9650; </a>
+                        <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='roi', direction='desc') }}" 
+                          class="sort-icon {% if current_sort == 'roi' and current_direction == 'desc' %}active{% endif %}">
+                            &#9660; </a>
+                    {% else %}
+                        <span class="sort-icon-placeholder">&#9650;</span>
+                        <span class="sort-icon-placeholder">&#9660;</span>
+                    {% endif %}
+                </div>
+                <strong>ROI (%)</strong> 
+              </div>
+            </th>
+            
+            <th>
+              <div class="d-flex align-items-center justify-content-start">
+                <div class="me-2">
+                    {% if can_sort %}
+                        <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='ttv', direction='asc') }}" 
+                          class="sort-icon {% if current_sort == 'ttv' and current_direction == 'asc' %}active{% endif %}">
+                            &#9650;
+                        </a>
+                        <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='ttv', direction='desc') }}" 
+                          class="sort-icon {% if current_sort == 'ttv' and current_direction == 'desc' %}active{% endif %}">
+                            &#9660;
+                        </a>
+                    {% else %}
+                        <span class="sort-icon-placeholder">&#9650;</span>
+                        <span class="sort-icon-placeholder">&#9660;</span>
+                    {% endif %}
+                </div>
+                <strong>TtV (Weeks)</strong>
+              </div>
+            </th>
+            
+            <th>
+              <div class="d-flex align-items-center justify-content-start">
+                <div class="me-2">
+                    {% if can_sort %}
+                        <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='confidence', direction='asc') }}" 
+                          class="sort-icon {% if current_sort == 'confidence' and current_direction == 'asc' %}active{% endif %}">
+                            &#9650;
+                        </a>
+                        <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='confidence', direction='desc') }}" 
+                          class="sort-icon {% if current_sort == 'confidence' and current_direction == 'desc' %}active{% endif %}">
+                            &#9660;
+                        </a>
+                    {% else %}
+                        <span class="sort-icon-placeholder">&#9650;</span>
+                        <span class="sort-icon-placeholder">&#9660;</span>
+                    {% endif %}
+                </div>
+                <strong>Confidence</strong>
+              </div>
+            </th>
+            
             <th>Horizon</th>
             <th class="col-actions">Actions</th>
           </tr>

@@ -446,3 +446,44 @@ table {
 .form-inline {
     display: inline;
 }
+
+
+/* 1. Algemene Verbeteringen voor de Koptekstcel */
+.table thead th {
+    /* Zorg voor meer padding links en rechts voor een luchtiger gevoel */
+    padding: 0.75rem 1rem; 
+}
+
+/* 2. Verbeterde Sorteer Iconen (Pijlen) */
+.sort-icon,
+.sort-icon-placeholder {
+    /* Gebruik een iets donkerder grijs voor de niet-actieve toestand, zodat ze niet wegvallen */
+    color: #a0a0a0; /* Zacht grijs */
+    font-size: 13px; /* Iets kleiner voor subtiliteit */
+    line-height: 0.5; 
+    display: block;
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+    padding: 1px 0; /* Minimalen padding om klikgebied te verbeteren */
+}
+
+/* 3. De Actieve Sorteerpijl */
+.sort-icon.active {
+    /* Gebruik de primaire tekstkleur voor scherpte */
+    color: #343a40; /* Zeer donkergrijs/bijna zwart */
+}
+
+/* 4. Verbeterde Afstand en Uitlijning */
+.d-flex {
+    /* Zorg dat de tekst op de basislijn van de cel blijft */
+    align-items: center; 
+}
+.me-2 {
+    /* Ruimte tussen de pijlenstapel en de tekst */
+    margin-right: 0.6rem; 
+}
+
+/* Zorg dat de tekst zelf duidelijk is */
+.table thead th strong {
+    font-weight: 600; /* Iets minder hard dan bold */
+}
