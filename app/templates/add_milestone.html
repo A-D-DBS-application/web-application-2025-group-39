@@ -1,35 +1,62 @@
 {% extends "base.html" %}
 
 {% block title %}Add Milestone{% endblock %}
-{% block body_class %}roadmap-body{% endblock %}
 
 {% block content %}
-  <h2 class="mb-4 text-center">Add Milestone</h2>
 
-  <div class="milestone-form card p-4 shadow-sm mx-auto">
+<div class="top-right">
+    <a href="{{ url_for('main.roadmap_overview', project_id=roadmap.id_project) }}"
+       class="btn btn-base btn-nav btn-sm">Back</a>
+</div>
+
+<h2 class="mb-4 text-center">Add Milestone</h2>
+
+<div class="milestone-form card p-4 shadow mt-3 mx-auto">
     <form method="POST">
-      <div class="mb-3">
-        <label class="form-label">Name</label>
-        <input type="text" name="name" class="form-control" required>
-      </div>
 
-      <div class="mb-3">
-        <label class="form-label">Start Date</label>
-        <input type="date" name="start_date" class="form-control" required>
-      </div>
+        <!-- Name -->
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
 
-      <div class="mb-3">
-        <label class="form-label">End Date</label>
-        <input type="date" name="end_date" class="form-control" required>
-      </div>
+        <!-- Start Date -->
+        <div class="mb-3">
+            <label class="form-label">Start Date</label>
+            <input type="date" name="start_date" class="form-control" required>
+        </div>
 
-      <div class="mb-3">
-        <label class="form-label">Goal</label>
-        <textarea name="goal" class="form-control" required></textarea>
-      </div>
+        <!-- End Date -->
+        <div class="mb-3">
+            <label class="form-label">End Date</label>
+            <input type="date" name="end_date" class="form-control" required>
+        </div>
 
-      <button class="btn btn-primary w-100 mt-3">Add Milestone</button>
-      <a href="{{ url_for('main.projects') }}" class="btn btn-secondary w-100 mt-2">Cancel</a>
+        <!-- Goal -->
+        <div class="mb-3">
+            <label class="form-label">Goal</label>
+            <textarea name="goal" class="form-control" rows="2"></textarea>
+        </div>
+
+        <!-- Status -->
+        <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-select" required>
+                <option value="Planned">Planned</option>
+                <option value="In progress">In progress</option>
+                <option value="Done">Done</option>
+            </select>
+        </div>
+
+        <!-- Buttons -->
+        <button class="btn btn-primary-custom w-100 mt-3">Add Milestone</button>
+
+        <a href="{{ url_for('main.roadmap_overview', project_id=roadmap.id_project) }}"
+           class="btn btn-secondary-custom w-100 mt-2">
+            Cancel
+        </a>
+
     </form>
-  </div>
+</div>
+
 {% endblock %}
