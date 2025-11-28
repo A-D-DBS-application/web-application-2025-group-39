@@ -57,7 +57,7 @@
               <i class="bi bi-info-circle" data-bs-toggle="popover" 
                 data-bs-trigger="hover focus" 
                 data-bs-placement="top" 
-                data-bs-content="The time window over which expected revenue, churn reduction and cost savings are estimated.">
+                data-bs-content="The number of months we look ahead to estimate the impact of this feature. During this period, we calculate expected revenue, churn reduction, and cost savings.">
               </i>
             </label>
             <input type="number" class="form-control" name="horizon" min="0">
@@ -68,7 +68,7 @@
               <i class="bi bi-info-circle" data-bs-toggle="popover" 
                 data-bs-trigger="hover focus" 
                 data-bs-placement="top" 
-                data-bs-content="Estimated additional revenue over horizon H caused by this feature. Use realistic benchmarks or past release data.">
+                data-bs-content="The additional money this feature is expected to bring in during the selected time period. Use realistic estimates based on benchmarks or results from previous releases.">
               </i>
             </label>
             <input type="number" class="form-control" name="extra_revenue" min="0">
@@ -79,7 +79,7 @@
               <i class="bi bi-info-circle" data-bs-toggle="popover" 
                 data-bs-trigger="hover focus" 
                 data-bs-placement="top" 
-                data-bs-content="Estimated savings due to lower churn over horizon H. Use customer lifetime value or retention metrics if available.">
+                data-bs-content="The amount of money saved because fewer customers leave.If possible, use metrics like customer lifetime value or retention rates to estimate this.">
               </i>
             </label>
             <input type="number" class="form-control" name="churn_reduction" min="0">
@@ -90,7 +90,7 @@
               <i class="bi bi-info-circle" data-bs-toggle="popover" 
                 data-bs-trigger="hover focus" 
                 data-bs-placement="top" 
-                data-bs-content="Direct cost reductions caused by this feature. Examples include: lower support load, automation, reduced operational overhead.">
+                data-bs-content="The direct costs that go down thanks to this feature. Examples include fewer support tickets, automation that replaces manual work, or lower operational overhead.">
               </i>
             </label>
             <input type="number" class="form-control" name="cost_savings" min="0">
@@ -104,7 +104,7 @@
               <i class="bi bi-info-circle" data-bs-toggle="popover" 
                 data-bs-trigger="hover focus" 
                 data-bs-placement="top" 
-                data-bs-content="Estimated implementation effort expressed in hours or person-days. Used to calculate investment cost. Keep it realistic and comparable.">
+                data-bs-content="How much time the team needs to build this feature, expressed in hours or person-days. This number is used to calculate the investment cost — keep it honest and consistent.">
               </i>
             </label>
             <input type="number" class="form-control" name="investment_hours" min="0">
@@ -115,7 +115,7 @@
               <i class="bi bi-info-circle" data-bs-toggle="popover" 
                 data-bs-trigger="hover focus" 
                 data-bs-placement="top" 
-                data-bs-content="Operational costs: hosting, subscriptions, monitoring, maintenance. Include only the incremental costs caused by this feature.">
+                data-bs-content="The ongoing costs required after the feature is launched. This could be hosting, subscriptions, monitoring, or maintenance. Only include the extra costs specifically caused by this feature.">
               </i>
             </label>
             <input type="number" class="form-control" name="opex_hours" min="0">
@@ -126,7 +126,7 @@
               <i class="bi bi-info-circle" data-bs-toggle="popover" 
                 data-bs-trigger="hover focus" 
                 data-bs-placement="top" 
-                data-bs-content="Optional category for licensing, integration or opportunity cost that does not fit other fields.">
+                data-bs-content="A category for any costs that do not fit elsewhere.This could include licensing fees, integration costs or opportunity costs.">
               </i>
             </label>
             <input type="number" class="form-control" name="other_costs" min="0">
@@ -138,7 +138,7 @@
             <i class="bi bi-info-circle" data-bs-toggle="popover" 
               data-bs-trigger="hover focus" 
               data-bs-placement="top" 
-              data-bs-content="ROI = ((Total Gains - Total Costs) / Total Costs) × 100. Displayed as a percentage and used to determine bubble size in VECTR.">
+              data-bs-content="ROI shows how much return we get from the investment. The formula: ROI = (Expected Profit over the chosen period / Total Investment Cost) times 100 It is shown as a percentage and used to determine bubble size in VECTR.">
             </i>
           </label>
           <input type="text" class="form-control" name="roi_percent" placeholder="Calculated automatically" readonly>
@@ -156,7 +156,7 @@
               <i class="bi bi-info-circle" data-bs-toggle="popover" 
                 data-bs-trigger="hover focus" 
                 data-bs-placement="top" 
-                data-bs-content="Time-to-Market: The time (in weeks) required to build and release the first working version. Includes design, development, testing and deployment.">
+                data-bs-content="The number of weeks needed to build and release the first usable version of the feature. This includes everything: design, development, testing and deployment.">
               </i>
             </label>
             <input type="number" class="form-control" name="ttm_weeks" min="0">
@@ -167,7 +167,7 @@
               <i class="bi bi-info-circle" data-bs-toggle="popover" 
                 data-bs-trigger="hover focus" 
                 data-bs-placement="top" 
-                data-bs-content="Time-to-Business-Value: The time (in weeks) required after launch, before measurable business value appears. Example: first paying customers, KPI improvement, adoption.">
+                data-bs-content="The number of weeks after launch before the feature starts delivering measurable value. Examples include the first paying users, an improvement in key metrics, or visible customer adoption.">
               </i>
             </label>
             <input type="number" class="form-control" name="ttbv_weeks" min="0">
