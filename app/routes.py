@@ -2,7 +2,12 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app import db
 from app.models import Profile, Company, Project, Features_ideas, Roadmap, Milestone
 import uuid  # mag blijven staan als je het later nodig hebt
-from flask import request, render_template, session, flash, redirect, url_for
+from flask import send_file   # send_file laat je een bestand terugsturen als HTTP response (voor PDF knop)
+from io import BytesIO        # BytesIO is een buffer in geheugen (geen fysiek bestand) (voor PDF knop)
+
+import matplotlib
+matplotlib.use("Agg")         # gebruik een non-GUI backend (belangrijk op macOS servers)
+import matplotlib.pyplot as plt  # Matplotlib gebruiken we om de grafiek te tekenen (voor PDF knop)
 
 # Blueprint aanmaken
 main = Blueprint('main', __name__)
@@ -791,3 +796,81 @@ def delete_milestone(milestone_id):
     flash("Milestone deleted!", "success")
 
     return redirect(url_for('main.roadmap_overview', project_id=roadmap.id_project))
+
+# ==============================
+# PDF knop ROUTE
+# ==============================
+@main.route('/projects/<int:project_id>/vectr-chart/pdf')
+def vectr_chart_pdf(project_id):
+    if 'user_id' not in session:
+        flash("You must log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    user = Profile.query.get(session['user_id'])
+    project = Project.query.get_or_404(project_id)
+    if project.id_company != user.id_company:
+        flash("You are not allowed to view this chart.", "danger")
+        return redirect(url_for('main.projects'))
+
+    features = Features_ideas.query.filter_by(id_project=project_id).all()
+
+    # Chart scale to match frontend (Chart.js)
+    conf_min, conf_max = 0.0, 10.0     # X: Confidence 0–10
+    ttv_min, ttv_max = 0.0, 20.0       # Y: TtV weeks (example upper bound)
+    conf_middle_value = 1.0            # Same threshold as your JS plugin
+    ttv_middle_value = 8.0
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Set axis limits first
+    ax.set_xlim(conf_min, conf_max)
+    ax.set_ylim(ttv_min, ttv_max)
+
+    # Invert Y to place lower TtV at the top (like Chart.js reverse: true)
+    ax.invert_yaxis()
+
+    # Draw quadrants: split by confidence (vertical) and TtV (horizontal)
+    # Top quadrants (good: lower TtV at the top due to inverted Y)
+    ax.axvspan(conf_middle_value, conf_max, ymin=0, ymax=ttv_middle_value/ttv_max,
+               facecolor='green', alpha=0.15)   # Top-right: high confidence, low TtV
+    ax.axvspan(conf_min, conf_middle_value, ymin=0, ymax=ttv_middle_value/ttv_max,
+               facecolor='yellow', alpha=0.15)  # Top-left: low confidence, low TtV
+
+    # Bottom quadrants (worse: higher TtV)
+    ax.axvspan(conf_middle_value, conf_max, ymin=ttv_middle_value/ttv_max, ymax=1,
+               facecolor='orange', alpha=0.15)  # Bottom-right: high confidence, high TtV
+    ax.axvspan(conf_min, conf_middle_value, ymin=ttv_middle_value/ttv_max, ymax=1,
+               facecolor='red', alpha=0.15)     # Bottom-left: low confidence, high TtV
+
+    # Plot features
+    for f in features:
+        if f.roi_percent is not None and f.quality_score is not None and f.ttv_weeks is not None:
+            # Bubble size scaled similar to frontend (adjust multiplier as needed)
+            size = max(20, float(f.roi_percent) * 5)
+
+            # Bubble color based on confidence (similar green ramp)
+            conf = float(f.quality_score)
+            color_intensity = min(255, 50 + conf * 20)
+            bubble_color = (50/255, color_intensity/255, 50/255, 0.8)
+
+            ax.scatter(
+                float(f.quality_score),
+                float(f.ttv_weeks),
+                s=size,
+                c=[bubble_color],
+                edgecolors='black',
+                linewidths=0.5,
+                label=f.name_feature
+            )
+
+    ax.set_xlabel("Confidence (Quality of Evidence - Higher is Better)")
+    ax.set_ylabel("Time-to-Value (TtV) in Weeks (Lower is Better)")
+    ax.set_title(f"Vectr Chart for {project.project_name}")
+
+    # Optional: limit legend size
+    ax.legend(loc='upper right', fontsize=8)
+
+    buf = BytesIO()
+    plt.savefig(buf, format="pdf")
+    buf.seek(0)
+    return send_file(buf, as_attachment=True, download_name="vectr_chart.pdf")

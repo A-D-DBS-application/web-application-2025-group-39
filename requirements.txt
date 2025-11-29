@@ -2,5 +2,6 @@ Flask
 gunicorn
 Flask-SQLAlchemy
 Flask-Migrate
-psycopg2-binary
-argon2-cffi
+psycopg2-binary      # voor PostgreSQL connectie
+argon2-cffi          # voor veilige wachtwoord hashing
+matplotlib           # voor PDF export van de Vectr Chart
