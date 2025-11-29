@@ -7,16 +7,6 @@
 <div class="login-container">
   <h1 class="login-title">Login</h1>
 
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="flash-messages">
-        {% for category, message in messages %}
-          <div class="{{ category }}">{{ message }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-
   <form method="post" action="{{ url_for('main.login') }}">
 
     <div class="form-group">
@@ -26,7 +16,12 @@
 
     <div class="form-group">
       <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
+      <div class="input-group">
+        <input type="password" id="password" name="password" class="form-control" required>
+        <span class="input-group-text">
+          <i class="bi bi-eye" id="togglePassword" style="cursor: pointer;"></i>
+        </span>
+      </div>
     </div>
 
     <input type="submit" value="Login">

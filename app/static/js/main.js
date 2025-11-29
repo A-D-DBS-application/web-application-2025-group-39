@@ -1,8 +1,9 @@
 console.log("Feature calculations script loaded");
 
-
 document.addEventListener("DOMContentLoaded", function () {
+  // =========================
   // ROI berekening
+  // =========================
   const revenueInput = document.querySelector("[name='extra_revenue']");
   const churnInput = document.querySelector("[name='churn_reduction']");
   const savingsInput = document.querySelector("[name='cost_savings']");
@@ -30,11 +31,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  [revenueInput, churnInput, savingsInput, devInput, opexInput, otherInput].forEach((el) =>
-    el.addEventListener("input", calculateROI)
-  );
+[revenueInput, churnInput, savingsInput, devInput, opexInput, otherInput].forEach((el) => {
+  if (el) {
+    el.addEventListener("input", calculateROI);
+  }
+});
 
+  // =========================
   // TTV berekening
+  // =========================
   const ttmInput = document.querySelector("[name='ttm_weeks']");
   const ttbvInput = document.querySelector("[name='ttbv_weeks']");
   const ttvOutput = document.querySelector("[name='ttv_weeks']");
@@ -51,7 +56,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  [ttmInput, ttbvInput].forEach((el) =>
-    el.addEventListener("input", calculateTTV)
-  );
+[ttmInput, ttbvInput].forEach((el) => {
+  if (el) {
+    el.addEventListener("input", calculateTTV);
+  }
+});
+
+  // =========================
+  // Wachtwoord toggle (oogje)
+  // =========================
+  const togglePassword = document.querySelector('#togglePassword');
+  const password = document.querySelector('#password');
+
+  if (togglePassword && password) {
+    togglePassword.addEventListener('click', function () {
+      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+      password.setAttribute('type', type);
+
+      // wissel icoon
+      this.classList.toggle('bi-eye');
+      this.classList.toggle('bi-eye-slash');
+    });
+  }
 });

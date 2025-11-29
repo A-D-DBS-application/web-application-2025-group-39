@@ -24,12 +24,12 @@ def index():
 # ==============================
 @main.route('/login', methods=['GET', 'POST'])
 def login():
-    print("🟢 Login route started")
+    print("Login route started")
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
 
-        print(f"📨 Login attempt received: email={email}")
+        print(f"Login attempt received: email={email}")
 
         # Zoek user op email
         user = Profile.query.filter_by(email=email).first()
