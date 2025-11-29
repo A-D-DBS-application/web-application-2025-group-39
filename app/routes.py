@@ -44,7 +44,7 @@ def login():
             print("Login successful")
             return redirect(url_for('main.dashboard'))
         else:
-            flash("Invalid email or password.", "error")
+            flash("Invalid email or password.", "danger")
             print("Invalid credentials")
 
     return render_template('login.html')
@@ -122,7 +122,7 @@ def register():
 @main.route('/dashboard', methods=['GET'])
 def dashboard():
     if 'user_id' not in session:
-        flash("You must log in first.", "error")
+        flash("You must log in first.", "danger")
         return redirect(url_for('main.login'))
 
     name = session.get('name')
@@ -145,7 +145,7 @@ def logout():
 @main.route('/profile')
 def profile():
     if 'user_id' not in session:
-        flash("You must log in first.", "error")
+        flash("You must log in first.", "danger")
         return redirect(url_for('main.login'))
 
     # Get current user
@@ -166,7 +166,7 @@ def profile():
 def add_feature(project_id):
     # Require login
     if 'user_id' not in session:
-        flash("You must log in first.", "error")
+        flash("You must log in first.", "danger")
         return redirect(url_for('main.login'))
     
     # Role control: Founder OR PM
