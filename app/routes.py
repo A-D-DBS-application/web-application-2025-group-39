@@ -621,14 +621,16 @@ def add_roadmap(project_id):
         return redirect(url_for('main.roadmap_overview', project_id=project_id))
 
     if request.method == 'POST':
-        quarter = request.form.get("quarter")
+        start_quarter = request.form.get("start_quarter")
+        end_quarter = request.form.get("end_quarter")
         team_size = request.form.get("team_size")
         sprint_capacity = request.form.get("sprint_capacity")
         budget_allocation = request.form.get("budget_allocation")
 
         roadmap = Roadmap(
             id_project=project_id,
-            quarter=quarter,
+            start_quarter=start_quarter,
+            end_quarter=end_quarter,
             team_size=int(team_size),
             sprint_capacity=int(sprint_capacity),
             budget_allocation=int(budget_allocation)
@@ -658,13 +660,20 @@ def roadmap_overview(project_id):
         flash("You are not allowed to view this roadmap.", "danger")
         return redirect(url_for('main.projects'))
 
-    # Alle roadmaps van dit project ophalen
-    roadmaps = project.roadmaps
+    # Alle roadmaps van dit project ophalen, en SORTEER ZE:
+    # Dit sorteert op de string, wat werkt als het format "Qx YYYY" is.
+    roadmaps = Roadmap.query.filter_by(id_project=project_id).order_by(Roadmap.start_quarter.asc()).all()
+    # Binnen elke roadmap moeten we ook de milestones sorteren (bijv. op start_date)
+
+    for roadmap in roadmaps:
+        # Sorteer milestones op start_date binnen elke roadmap
+        roadmap.milestones.sort(key=lambda m: m.start_date if m.start_date else datetime.date.max)
+
 
     return render_template(
         "roadmap_overview.html",
         project=project,
-        roadmaps=roadmaps
+        roadmaps=roadmaps # Nu gesorteerd
     )
 
 @main.route('/roadmap/edit/<int:roadmap_id>', methods=['GET', 'POST'])
@@ -695,7 +704,8 @@ def edit_roadmap(roadmap_id):
             except:
                 return None
 
-        roadmap.quarter = request.form.get("quarter")
+        roadmap.start_quarter = request.form.get("start_quarter")
+        roadmap.end_quarter = request.form.get("end_quarter")
         roadmap.team_size = to_int(request.form.get("team_size"))
         roadmap.sprint_capacity = to_int(request.form.get("sprint_capacity"))
         roadmap.budget_allocation = to_int(request.form.get("budget_allocation"))

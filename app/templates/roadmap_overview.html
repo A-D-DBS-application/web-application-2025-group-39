@@ -4,119 +4,137 @@
 {% block body_class %}roadmap-body{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/roadmap.css') }}">
 
-  <!-- TOP RIGHT BUTTON: BACK TO PROJECTS -->
+<div class="roadmap-header">
+  <h2>Roadmap Overview for Projects: {{ project.project_name }}</h2>
   <div class="top-right">
     <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-nav btn-sm">Projects Overview</a>
   </div>
+</div>
 
-  <!-- PAGE HEADER -->
-  <h2>Roadmap for {{ project.project_name }}</h2>
-  <p class="text-muted">{{ project.company.company_name }}</p>
-
-  <!-- NO ROADMAP YET -->
-  {% if roadmaps|length == 0 %}
-    <div class="alert alert-info mt-4">
-      No roadmap has been created for this project yet.
-    </div>
-
-    {% if session['role'] == 'founder' %}
-      <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}" class="btn btn-primary mt-3">Add Roadmap</a>
-    {% endif %}
-
-  {% else %}
-
-    {% set r = roadmaps[0] %} <!-- Because max 1 roadmap exists -->
-
-    <!-- ROADMAP CARD -->
-    <div class="roadmap-card card shadow-sm p-4 mt-3">
-      <h4 class="mb-1">{{ r.quarter }}</h4>
-      <p class="small text-secondary">Created {{ r.createdat.strftime('%d %b %Y') }}</p>
-
-      <div class="row g-3 mt-2">
-        <div class="col-md-4">
-          <div class="roadmap-metric">
-            <p class="label">Team Size</p>
-            <p class="value">{{ r.team_size }}</p>
-          </div>
-        </div>
-
-        <div class="col-md-4">
-          <div class="roadmap-metric">
-            <p class="label">Sprint Capacity</p>
-            <p class="value">{{ r.sprint_capacity }}</p>
-          </div>
-        </div>
-
-        <div class="col-md-4">
-          <div class="roadmap-metric">
-            <p class="label">Budget Allocation</p>
-            <p class="value">{{ '%.2f'|format(r.budget_allocation) }}</p>
-          </div>
-        </div>
-      </div>
-
-      {% if session['role'] == 'founder' %}
-        <a href="{{ url_for('main.edit_roadmap', roadmap_id=r.id_roadmap) }}"
-           class="btn btn-edit mt-3 w-100">Edit Roadmap</a>
-      {% endif %}
-    </div>
-
-    <!-- MILESTONES TABLE -->
-    <div class="card shadow-sm p-4 mt-4">
-      <h4 class="mb-3">Milestones</h4>
-
-      {% if r.milestones|length == 0 %}
-        <p class="text-muted">No milestones yet.</p>
-      {% else %}
-        <table class="table table-bordered">
-          <thead class="table-light">
-            <tr>
-              <th>Milestone</th>
-              <th>Start date</th>
-              <th>End date</th>
-              <th>Goals</th>
-              <th>Status</th>
-              {% if session['role'] == 'founder' %}
-                <th>Actions</th>
-              {% endif %}
-            </tr>
-          </thead>
-          <tbody>
-            {% for m in r.milestones %}
-              <tr>
-                <td>{{ m.name }}</td>
-                <td>{{ m.start_date.strftime("%d/%m/%Y") if m.start_date }}</td>
-                <td>{{ m.end_date.strftime("%d/%m/%Y") if m.end_date }}</td>
-                <td>{{ m.goal }}</td>
-                <td>{{ m.status }}</td>
-
-                {% if session['role'] == 'founder' %}
-                  <td>
-                    <a href="{{ url_for('main.edit_milestone', milestone_id=m.id_milestone) }}"
-                       class="btn btn-sm btn-primary">Edit</a>
-
-                    <form method="POST"
-                          action="{{ url_for('main.delete_milestone', milestone_id=m.id_milestone) }}"
-                          style="display:inline;"
-                          onsubmit="return confirm('Delete this milestone? ')">
-                      <button class="btn btn-sm btn-danger">Delete</button>
-                    </form>
-                  </td>
-                {% endif %}
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      {% endif %}
-
-      {% if session['role'] == 'founder' %}
-        <a href="{{ url_for('main.add_milestone', roadmap_id=r.id_roadmap) }}"
-           class="btn btn-primary mt-3 w-100">+ Add Milestone</a>
-      {% endif %}
-
-    </div>
-
+{% if roadmaps|length == 0 %}
+  <div class="alert alert-info mt-4">
+    No roadmap (Quarter) has been created for this project yet.
+  </div>
+  {% if session['role'] == 'founder' %}
+    <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}" class="btn btn-primary mt-3">
+      Add First Quarter/Roadmap
+    </a>
   {% endif %}
+{% else %}
 
+  <div class="roadmap-container">
+
+    <!-- Timeline: pijlen worden automatisch gegenereerd tussen start_quarter en end_quarter -->
+    <div class="roadmap-timeline">
+      {% for r in roadmaps %}
+        <div class="roadmap-quarter-range"
+             data-start-quarter="{{ r.start_quarter }}"
+             data-end-quarter="{{ r.end_quarter|default(r.start_quarter) }}">
+          <!-- JS zal hier arrow-blocks injecteren -->
+        </div>
+        
+      {% endfor %}
+    </div>
+
+    <!-- Milestones onder elke roadmap -->
+    <div class="milestones-row">
+      {% for r in roadmaps %}
+        <div class="milestone-group">
+          {% if r.milestones|length == 0 %}
+            <p class="text-muted-small">No milestones yet.</p>
+          {% endif %}
+
+          {% for m in r.milestones %}
+            <div class="milestone-card dark-card">
+              <div class="milestone-name"><strong>{{ m.name }}</strong></div>
+              <div class="milestone-info"><strong>Start Date:</strong> {{ m.start_date.strftime("%d/%m/%Y") if m.start_date else 'N/A' }}</div>
+              <div class="milestone-info"><strong>End Date:</strong> {{ m.end_date.strftime("%d/%m/%Y") if m.end_date else 'N/A' }}</div>
+              <div class="milestone-info"><strong>Goal:</strong> {{ m.goal | default('N/A') }}</div>
+              <div class="milestone-info"><strong>Status:</strong> <span class="status-{{ m.status | lower | replace(' ', '-') }}">{{ m.status | default('N/A') }}</span></div>
+
+              {% if session['role'] == 'founder' %}
+                <div class="milestone-actions">
+                  <a href="{{ url_for('main.edit_milestone', milestone_id=m.id_milestone) }}" class="edit-btn">Edit</a>
+                  <form method="POST"
+                        action="{{ url_for('main.delete_milestone', milestone_id=m.id_milestone) }}"
+                        onsubmit="return confirm('Weet je zeker dat je deze milestone wilt verwijderen?')"
+                        style="display:inline;">
+                    <button class="delete-btn" type="submit">Delete</button>
+                  </form>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          {% if session['role'] == 'founder' %}
+            <a href="{{ url_for('main.add_milestone', roadmap_id=r.id_roadmap) }}" class="btn btn-add-milestone-small">
+              + Add Milestone
+            </a>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+{% endif %}
+
+<!-- Logged-in info bottom right -->
+<div class="bottom-info">
+  Logged in as: <strong>{{ session['name'] }}</strong> | Role: <strong>{{ session['role'] }}</strong>
+</div>
+
+<!-- Quarter generator script -->
+<script>
+  // Parse quarter string "Qn YYYY" naar {q:1..4, y:int}
+  function parseQuarter(str) {
+    const m = str.match(/^Q([1-4])\s+(\d{4})$/);
+    if (!m) return null;
+    return { q: parseInt(m[1], 10), y: parseInt(m[2], 10) };
+  }
+
+  // Vergelijk twee quarters
+  function quarterLTE(a, b) {
+    return (a.y < b.y) || (a.y === b.y && a.q <= b.q);
+  }
+
+  // Volgende quarter
+  function nextQuarter(q) {
+    return q.q < 4 ? { q: q.q + 1, y: q.y } : { q: 1, y: q.y + 1 };
+  }
+
+  // Maak label "Qn YYYY"
+  function label(q) {
+    return `Q${q.q} ${q.y}`;
+  }
+
+  // Genereer pijlen tussen start en end en voeg toe in container
+  function renderQuarterRange(container, startStr, endStr) {
+    const start = parseQuarter(startStr);
+    const end = parseQuarter(endStr || startStr);
+    if (!start || !end) {
+      container.innerHTML = `<div class="quarter-error">Invalid quarter format</div>`;
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    let cur = start;
+    while (quarterLTE(cur, end)) {
+      const el = document.createElement('div');
+      el.className = 'arrow-block';
+      el.textContent = label(cur);
+      frag.appendChild(el);
+      cur = nextQuarter(cur);
+    }
+    container.appendChild(frag);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.roadmap-quarter-range').forEach(container => {
+      const start = container.dataset.startQuarter;
+      const end = container.dataset.endQuarter;
+      renderQuarterRange(container, start, end);
+    });
+  });
+</script>
 {% endblock %}

@@ -165,7 +165,8 @@ class Roadmap(db.Model):
     )
 
     # Roadmap velden
-    quarter = db.Column(db.String, nullable=False)  # bijv. "Q1 2025"
+    start_quarter = db.Column(db.String, nullable=False)  # bijv. "Q1 2025"
+    end_quarter = db.Column(db.String, nullable=False)
     team_size = db.Column(db.Integer, nullable=False)
     sprint_capacity = db.Column(db.Integer, nullable=False)
     budget_allocation = db.Column(db.Integer, nullable=False)

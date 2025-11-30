@@ -487,3 +487,109 @@ table {
 .table thead th strong {
     font-weight: 600; /* Iets minder hard dan bold */
 }
+
+
+/* ROADMAP CSS*/
+
+.roadmap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.top-right {
+    text-align: right;
+}
+
+.roadmap-timeline {
+    display: flex;
+    flex-wrap: nowrap;
+    /* Grote marge bovenaan zodat de milestones eronder passen */
+    margin-bottom: 25px; 
+    position: relative; 
+}
+
+.arrow-block {
+    display: inline-block;  /* naast elkaar */
+    background-color: #1e4974;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%);
+    min-width: 120px;
+    text-align: center;
+}
+
+
+.milestones-row {
+    display: flex;
+    color: white;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.milestone-group {
+    flex: 1;
+    min-width: 250px;
+}
+
+.milestone-card {
+    background-color: #1e4974;
+    border: 1px solid #444;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.dark-card {
+    background-color: #1e4974;
+}
+
+.milestone-info {
+    font-size: 0.9rem;
+    color:ivory;
+    margin: 5px 0;
+}
+
+.status-planned {
+    color: orange;
+}
+.status-in-progress {
+    color: #00bfff;
+}
+.status-done {
+    color: #00ff88;
+}
+
+.edit-btn, .delete-btn {
+    margin-right: 10px;
+    background-color: #444;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.edit-btn:hover, .delete-btn:hover {
+    background-color: #666;
+}
+
+.btn-add-quarter, .btn-add-milestone-small {
+    display: inline-block;
+    margin-top: 10px;
+    background-color: #007bff;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.bottom-info {
+    position: fixed;
+    bottom: 10px;
+    right: 20px;
+    font-size: 0.9rem;
+    color: #ccc;
+}
