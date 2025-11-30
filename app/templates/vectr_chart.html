@@ -3,6 +3,11 @@
 {% block title %}VECTR Prioritization: {{ project.project_name }}{% endblock %}
 
 {% block content %}
+<!-- Logged-in info bottom right -->
+<div class="bottom-info">
+  Logged in as: <strong>{{ session['name'] }}</strong> | Role: <strong>{{ session['role'] }}</strong>
+</div>
+
     <h2 class="text-center mb-4">VECTR Prioritization Chart for {{ project.project_name }}</h2>
     
     <div class="top-right">

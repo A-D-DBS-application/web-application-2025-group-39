@@ -306,7 +306,7 @@ input[type="submit"]:hover {
     bottom: 15px;
     right: 20px;
     font-size: 14px;
-    color: #555;
+    color: black;
 }
 
 /* ===========================
@@ -586,10 +586,4 @@ table {
     text-decoration: none;
 }
 
-.bottom-info {
-    position: fixed;
-    bottom: 10px;
-    right: 20px;
-    font-size: 0.9rem;
-    color: #ccc;
-}
+
