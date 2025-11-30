@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Evidence{% endblock %}
+
+{% block content %}
+<div class="top-right-fixed">
+  <a href="{{ url_for('main.view_evidence', feature_id=evidence.id_feature) }}"
+     class="btn btn-base btn-nav btn-sm">
+    ← Back
+  </a>
+</div>
+
+<h2 class="text-center mb-4">Edit Evidence for: {{ evidence.feature.name_feature }}</h2>
+
+<div class="card p-4 mx-auto" style="max-width: 700px;">
+    <form method="POST">
+
+        <!-- Title -->
+        <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input type="text" name="title" class="form-control"
+                   value="{{ evidence.title }}" required>
+        </div>
+
+        <!-- Evidence Type -->
+        <div class="mb-3">
+            <label class="form-label">Evidence Type</label>
+            <select id="evidence_type" name="type" class="form-select">
+                {% set default_types = [
+                    'Customer Feedback',
+                    'Pilot Result',
+                    'Paying Customer',
+                    'Market Data',
+                    'Other'
+                ] %}
+
+                {% for t in default_types %}
+                    <option value="{{ t }}"
+                        {% if evidence.type == t %}selected{% endif %}>
+                        {{ t }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Custom Evidence Type -->
+        <div class="mb-3" id="custom_type_group"
+             style="display: {% if evidence.type not in default_types %}block{% else %}none{% endif %};">
+            <label class="form-label">Custom Evidence Type</label>
+            <input type="text" name="custom_type" id="custom_type"
+                   class="form-control"
+                   value="{% if evidence.type not in default_types %}{{ evidence.type }}{% endif %}">
+        </div>
+
+        <!-- Source -->
+        <div class="mb-3">
+            <label class="form-label">Source</label>
+            <input type="text" name="source" class="form-control"
+                   value="{{ evidence.source }}" required>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="3" required>
+{{ evidence.description }}</textarea>
+        </div>
+
+        <!-- Attachment -->
+        <div class="mb-3">
+            <label class="form-label">Attachment URL</label>
+            <input type="text" name="attachment_url" class="form-control"
+                   value="{{ evidence.attachment_url }}">
+        </div>
+
+        <!-- Confidence Impact -->
+        <div class="mb-3">
+            <label class="form-label">Confidence Impact (e.g. 0.2)</label>
+            <input type="number" step="0.01" name="confidence_impact"
+                   class="form-control"
+                   value="{{ evidence.confidence_impact }}" required>
+        </div>
+
+        <button class="btn btn-primary w-100">Save Changes</button>
+
+    </form>
+</div>
+
+<script>
+const typeSelect = document.getElementById("evidence_type");
+const customGroup = document.getElementById("custom_type_group");
+const customInput = document.getElementById("custom_type");
+
+typeSelect.addEventListener("change", () => {
+    if (typeSelect.value === "Other") {
+        customGroup.style.display = "block";
+    } else {
+        customGroup.style.display = "none";
+        customInput.value = "";
+    }
+});
+</script>
+
+{% endblock %}

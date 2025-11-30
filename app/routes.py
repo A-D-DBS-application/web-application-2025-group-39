@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app import db
-from app.models import Profile, Company, Project, Features_ideas, Roadmap, Milestone
+from app.models import Profile, Company, Project, Features_ideas, Roadmap, Milestone, Evidence
 import uuid  # mag blijven staan als je het later nodig hebt
 from flask import send_file   # send_file laat je een bestand terugsturen als HTTP response (voor PDF knop)
 from io import BytesIO        # BytesIO is een buffer in geheugen (geen fysiek bestand) (voor PDF knop)
@@ -796,6 +796,152 @@ def delete_milestone(milestone_id):
     flash("Milestone deleted!", "success")
 
     return redirect(url_for('main.roadmap_overview', project_id=roadmap.id_project))
+
+@main.route('/feature/<feature_id>/add-evidence', methods=["GET", "POST"])
+def add_evidence(feature_id):
+    if 'user_id' not in session:
+        flash("You must log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    user = Profile.query.get(session['user_id'])
+    feature = Features_ideas.query.get_or_404(feature_id)
+
+    if feature.id_company != user.id_company:
+        flash("Not allowed.", "danger")
+        return redirect(url_for('main.projects'))
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        type_select = request.form.get("type_select", "").strip()
+        custom_type = request.form.get("custom_type", "").strip()
+        source = request.form.get("source", "").strip()
+        description = request.form.get("description", "").strip()
+        attachment_url = request.form.get("attachment_url", "").strip()
+        impact_raw = request.form.get("confidence_impact", "").strip()
+
+        # Type logic
+        final_type = custom_type if (type_select == "Other" and custom_type) else type_select
+
+        # Impact
+        try:
+            impact = float(impact_raw)
+        except:
+            impact = 0.0
+
+        ev = Evidence(
+            id_company=user.id_company,
+            id_feature=feature_id,
+            title=title,
+            type=final_type,
+            source=source,
+            description=description,
+            attachment_url=attachment_url,
+            confidence_impact=impact
+        )
+
+        # CONFIDENCE UP
+        feature.quality_score = (feature.quality_score or 0) + impact
+
+        db.session.add(ev)
+        db.session.commit()
+
+        flash("Evidence added!", "success")
+        return redirect(url_for('main.view_evidence', feature_id=feature_id))
+
+    return render_template("add_evidence.html", feature=feature)
+
+
+
+@main.route('/feature/<feature_id>/evidence')
+def view_evidence(feature_id):
+    if 'user_id' not in session:
+        flash("You must log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    feature = Features_ideas.query.get_or_404(feature_id)
+
+    evidence_list = Evidence.query.filter_by(id_feature=feature_id).all()
+
+    return render_template(
+        "view_evidence.html",
+        feature=feature,
+        evidence_list=evidence_list
+    )
+
+
+@main.route('/evidence/<int:evidence_id>/delete', methods=["POST"])
+def delete_evidence(evidence_id):
+    if 'user_id' not in session:
+        flash("You must log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    ev = Evidence.query.get_or_404(evidence_id)
+    feature = Features_ideas.query.get_or_404(ev.id_feature)
+
+    # CONFIDENCE DOWN
+    feature.quality_score = (feature.quality_score or 0) - (ev.confidence_impact or 0)
+
+    db.session.delete(ev)
+    db.session.commit()
+
+    flash("Evidence deleted!", "success")
+    return redirect(url_for('main.view_evidence', feature_id=feature.id_feature))
+
+
+@main.route('/evidence/<int:evidence_id>/edit', methods=["GET", "POST"])
+def edit_evidence(evidence_id):
+    if 'user_id' not in session:
+        flash("You must log in first.", "danger")
+        return redirect(url_for('main.login'))
+
+    user = Profile.query.get(session['user_id'])
+    ev = Evidence.query.get_or_404(evidence_id)
+    feature = Features_ideas.query.get_or_404(ev.id_feature)
+
+    if ev.id_company != user.id_company:
+        flash("Not allowed.", "danger")
+        return redirect(url_for('main.projects'))
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        type_select = request.form.get("type_select", "").strip()
+        custom_type = request.form.get("custom_type", "").strip()
+        source = request.form.get("source", "").strip()
+        description = request.form.get("description", "").strip()
+        attachment_url = request.form.get("attachment_url", "").strip()
+        impact_raw = request.form.get("confidence_impact", "").strip()
+
+        # Determine type
+        final_type = custom_type if (type_select == "Other" and custom_type) else type_select
+
+        # Convert impact
+        try:
+            new_impact = float(impact_raw)
+        except ValueError:
+            new_impact = 0.0
+
+        old_impact = ev.confidence_impact or 0.0
+        old_conf = feature.quality_score or 0.0
+
+        # NEW CONFIDENCE
+        feature.quality_score = old_conf - old_impact + new_impact
+
+        # Update evidence data
+        ev.title = title
+        ev.type = final_type
+        ev.source = source
+        ev.description = description
+        ev.attachment_url = attachment_url
+        ev.confidence_impact = new_impact
+
+        db.session.commit()
+        flash("Evidence updated!", "success")
+        return redirect(url_for('main.view_evidence', feature_id=feature.id_feature))
+
+    return render_template("edit_evidence.html", evidence=ev, feature=feature)
+
+
+
 
 # ==============================
 # PDF knop ROUTE

@@ -207,3 +207,32 @@ class Milestone(db.Model):
 
     roadmap = db.relationship("Roadmap", back_populates="milestones")
 
+class Evidence(db.Model):
+    __tablename__ = 'evidence'
+    __table_args__ = {'schema': 'public'}
+
+    id_evidence = db.Column(db.Integer, primary_key=True)
+
+    id_feature = db.Column(
+        db.String,
+        db.ForeignKey('public.features_ideas.id_feature'),
+        nullable=False
+    )
+
+    id_company = db.Column(
+        db.Integer,
+        db.ForeignKey('public.company.id_company'),
+        nullable=False
+    )
+
+    # Evidence metadata
+    title = db.Column(db.String)
+    type = db.Column(db.String)  # e.g., Feedback, Contract, Pilot, Data…
+    source = db.Column(db.String)
+    description = db.Column(db.Text)
+    attachment_url = db.Column(db.Text)
+    confidence_impact = db.Column(db.Float)  # e.g. +0.3
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    # Relationship
+    feature = db.relationship("Features_ideas", backref="evidence")

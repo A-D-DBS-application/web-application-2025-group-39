@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Evidence for {{ feature.name_feature }}{% endblock %}
+{% block body_class %}projects-body{% endblock %}
+
+{% block content %}
+
+<div class="top-right-fixed">
+  <a href="{{ url_for('main.view_features', project_id=feature.id_project) }}" 
+     class="btn btn-base btn-nav btn-sm">
+    ← Back to Features
+  </a>
+</div>
+
+<h2 class="mb-4 text-center">
+  Evidence for: {{ feature.name_feature }}
+</h2>
+
+<div class="projects-wrapper">
+
+  {% if evidence_list|length == 0 %}
+    <div class="text-center text-muted py-4">
+      No evidence added yet.
+    </div>
+
+  {% else %}
+
+    <table class="table table-striped table-bordered align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Title</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Attachment</th>
+          <th>Confidence Impact</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for ev in evidence_list %}
+        <tr>
+          <td>{{ ev.title }}</td>
+
+          <td>{{ ev.type }}</td>
+
+          <td style="max-width: 300px; white-space: normal;">
+            {{ ev.description }}
+          </td>
+
+          <td>
+            {% if ev.attachment_url %}
+              <a href="{{ ev.attachment_url }}" target="_blank"
+                 class="btn btn-base btn-vectr btn-sm">
+                View File
+              </a>
+            {% else %}
+              <span class="text-muted">No file</span>
+            {% endif %}
+          </td>
+
+          <td>{{ "%.2f"|format(ev.confidence_impact or 0) }}</td>
+
+          <td>
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+
+              <!-- EDIT -->
+              <a href="{{ url_for('main.edit_evidence', evidence_id=ev.id_evidence) }}"
+                 class="btn btn-base btn-edit table-btn">
+                Edit
+              </a>
+
+              <!-- DELETE -->
+              <form action="{{ url_for('main.delete_evidence', evidence_id=ev.id_evidence) }}" 
+                    method="post" class="form-inline">
+                <button type="submit" class="btn btn-base btn-danger-custom table-btn"
+                        onclick="return confirm('Delete this evidence?');">
+                  Delete
+                </button>
+              </form>
+
+            </div>
+          </td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  {% endif %}
+
+</div>
+
+{% endblock %}
