@@ -4,24 +4,25 @@
 {% block body_class %}projects-body{% endblock %}
 
 {% block content %}
-  <!-- FIXED DASHBOARD BUTTON -->
-  <div class="top-right-fixed">
-    <a href="{{ url_for('main.dashboard') }}" class="btn btn-base btn-nav btn-sm">Dashboard</a>
-  </div>
-  <!-- Logged-in info bottom right -->
-  <div class="bottom-info">
-    Logged in as: <strong>{{ session['name'] }}</strong> | Role: <strong>{{ session['role'] }}</strong>
-  </div>
+<!-- FIXED DASHBOARD BUTTON -->
+<div class="top-right-fixed">
+  <a href="{{ url_for('main.dashboard') }}" class="btn btn-base btn-nav btn-sm">Dashboard</a>
+</div>
+<!-- Logged-in info bottom right -->
+<div class="bottom-info">
+  Logged in as: <strong>{{ session['name'] }}</strong> | Role: <strong>{{ session['role'] }}</strong>
+</div>
 
-  <!-- Title -->
-  <h2 class="mb-4 text-center">Projects Overview</h2>
+<!-- Title -->
+<h2 class="mb-4 text-center">Projects Overview</h2>
 
-  <!-- Add Project button -->
-  <div class="mb-3 d-flex justify-content-center">
-    <a href="{{ url_for('main.add_project') }}" class="btn btn-base btn-primary-custom">+ Add Project</a>
-  </div>
+<!-- Add Project button -->
+<div class="mb-3 d-flex justify-content-center">
+  <a href="{{ url_for('main.add_project') }}" class="btn btn-base btn-primary-custom">+ Add Project</a>
+</div>
 
-  <div class="projects-wrapper">
+<div class="projects-wrapper">
+  <div class="table-responsive">
     <table class="table table-striped table-bordered align-middle">
       <thead class="table-light">
         <tr>
@@ -34,72 +35,72 @@
 
       <tbody>
         {% if projects|length == 0 %}
-          <tr>
-            <td colspan="5" class="text-muted py-4">No projects yet — add one soon!</td>
-          </tr>
+        <tr>
+          <td colspan="5" class="text-muted py-4">No projects yet — add one soon!</td>
+        </tr>
         {% else %}
-          {% for project, company_name in projects %}
-            <tr>
-              <!-- Project Name -->
-              <td>{{ project.project_name }}</td>
+        {% for project, company_name in projects %}
+        <tr>
+          <!-- Project Name -->
+          <td>{{ project.project_name }}</td>
 
-              <!-- FEATURES BUTTONS -->
-              <td>
-                <div class="d-flex justify-content-center gap-2">
-                  <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}"
-                     class="btn btn-base btn-primary-custom table-btn">Add</a>
+          <!-- FEATURES BUTTONS -->
+          <td>
+            <div class="d-flex justify-content-center gap-2">
+              <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}"
+                class="btn btn-base btn-primary-custom table-btn">Add</a>
 
-                  <a href="{{ url_for('main.view_features', project_id=project.id_project) }}"
-                     class="btn btn-base btn-primary-custom table-btn">View</a>
-                </div>
-              </td>
+              <a href="{{ url_for('main.view_features', project_id=project.id_project) }}"
+                class="btn btn-base btn-primary-custom table-btn">View</a>
+            </div>
+          </td>
 
-              <!-- ROADMAP BUTTONS (DYNAMIC ADD/EDIT) -->
-              <td>
-                <div class="d-flex justify-content-center gap-2">
+          <!-- ROADMAP BUTTONS (DYNAMIC ADD/EDIT) -->
+          <td>
+            <div class="d-flex justify-content-center gap-2">
 
-                  {% if project.roadmaps|length == 0 %}
-                    <!-- No roadmap → ADD -->
-                    <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}"
-                       class="btn btn-base btn-primary-custom table-btn">Add</a>
-                  {% else %}
-                    <!-- Already 1 roadmap → EDIT -->
-                    <a href="{{ url_for('main.edit_roadmap', roadmap_id=project.roadmaps[0].id_roadmap) }}"
-                       class="btn btn-base btn-edit table-btn">Edit</a>
-                  {% endif %}
+              {% if project.roadmaps|length == 0 %}
+              <!-- No roadmap → ADD -->
+              <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}"
+                class="btn btn-base btn-primary-custom table-btn">Add</a>
+              {% else %}
+              <!-- Already 1 roadmap → EDIT -->
+              <a href="{{ url_for('main.edit_roadmap', roadmap_id=project.roadmaps[0].id_roadmap) }}"
+                class="btn btn-base btn-edit table-btn">Edit</a>
+              {% endif %}
 
-                  <!-- View button always present -->
-                  <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}"
-                     class="btn btn-base btn-primary-custom table-btn">View</a>
+              <!-- View button always present -->
+              <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}"
+                class="btn btn-base btn-primary-custom table-btn">View</a>
 
-                </div>
-              </td>
+            </div>
+          </td>
 
-              <!-- PROJECT ACTIONS -->
-              <td>
-                <div class="d-flex justify-content-center gap-2">
+          <!-- PROJECT ACTIONS -->
+          <td>
+            <div class="d-flex justify-content-center gap-2">
 
-                  <a href="{{ url_for('main.edit_project', project_id=project.id_project) }}"
-                     class="btn btn-base btn-edit table-btn">Edit</a>
+              <a href="{{ url_for('main.edit_project', project_id=project.id_project) }}"
+                class="btn btn-base btn-edit table-btn">Edit</a>
 
-                  <form action="{{ url_for('main.delete_project', project_id=project.id_project) }}"
-                        method="post" class="form-inline">
-                    <button type="submit"
-                            class="btn btn-base btn-danger-custom table-btn"
-                            onclick="return confirm('Are you sure you want to delete this project?');">
-                      Delete
-                    </button>
-                  </form>
+              <form action="{{ url_for('main.delete_project', project_id=project.id_project) }}" method="post"
+                class="form-inline">
+                <button type="submit" class="btn btn-base btn-danger-custom table-btn"
+                  onclick="return confirm('Are you sure you want to delete this project?');">
+                  Delete
+                </button>
+              </form>
 
-                </div>
-              </td>
+            </div>
+          </td>
 
-            </tr>
-          {% endfor %}
+        </tr>
+        {% endfor %}
         {% endif %}
       </tbody>
 
     </table>
   </div>
+</div>
 
 {% endblock %}
