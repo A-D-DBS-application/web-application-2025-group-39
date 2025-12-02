@@ -30,6 +30,7 @@ import matplotlib
 
 matplotlib.use("Agg")  # gebruik een non-GUI backend (belangrijk op macOS servers)
 import matplotlib.pyplot as plt  # Matplotlib gebruiken we om de grafiek te tekenen (voor PDF knop)
+import datetime         # nodig voor inloggen
 
 import numpy as np  # Nodig voor array bewerkingen als u dit in een aparte file zet
 import matplotlib.patches as patches
@@ -61,10 +62,12 @@ def login():
         email = request.form.get("email")
         password = request.form.get("password")
 
+        email_to_lookup = email.lower()
+
         print(f"Login attempt received: email={email}")
 
         # Zoek user op email
-        user = Profile.query.filter_by(email=email).first()
+        user = Profile.query.filter_by(email=email_to_lookup).first()
 
         # Controleer wachtwoord via Argon2
         if user and user.check_password(password):
@@ -95,6 +98,8 @@ def register():
         password = request.form.get("password")
         role = request.form.get("role")
         company_name = request.form.get("company_name")
+
+        email_to_store = email.lower()
 
         print(f"Full request.form content: {request.form}")
         print(f"Data received: {name} {email} {role} {company_name}")
@@ -133,7 +138,10 @@ def register():
 
             # Maak nieuw Profile object via ORM
             new_user = Profile(
-                name=name, email=email, role=role, id_company=company.id_company
+                name=name,
+                email=email_to_store,
+                role=role,
+                id_company=company.id_company
             )
             new_user.set_password(password)  # Argon2 hash wordt hier gezet
 
@@ -929,8 +937,14 @@ def delete_evidence(evidence_id):
         flash("You must log in first.", "danger")
         return redirect(url_for("main.login"))
 
+    user = Profile.query.get(session['user_id'])
     ev = Evidence.query.get_or_404(evidence_id)
     feature = Features_ideas.query.get_or_404(ev.id_feature)
+
+    # Security check: must belong to the user's company
+    if feature.id_company != user.id_company:
+         flash("Not allowed.", "danger")
+         return redirect(url_for('main.projects'))
 
     # CONFIDENCE DOWN
     feature.quality_score = (feature.quality_score or 0) - (ev.confidence_impact or 0)
