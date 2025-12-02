@@ -88,15 +88,56 @@
     <div class="mb-4">
       <h4 class="mb-3">Time to Value (TTV)</h4>
       <div class="row g-3">
+        <!-- Left column: all Time-to-Market -->
         <div class="col-md-6">
-          <label class="form-label">Time-to-Market (weeks)</label>
+          <label class="form-label">Lowest Time-to-Market
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="Provide your best estimate of the minimum number of weeks required to build and release the feature. This will later be used to scale the graph correctly.">
+            </i>
+          </label>
+          <input type="number" class="form-control" name="ttm_low" value="{{ feature.ttm_low }}" min="0">
+
+          <label class="form-label mt-3">Highest Time-to-Market
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="Provide your best estimate of the maximum number of weeks required to build and release the feature. This will later be used to scale the graph correctly.">
+            </i>
+          </label>
+          <input type="number" class="form-control" name="ttm_high" value="{{ feature.ttm_high }}" min="0">
+
+          <label class="form-label mt-3">Time-to-Market (weeks)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The number of weeks needed to build and release the first usable version of the feature. This includes everything: design, development, testing and deployment.">
+            </i>
+          </label>
           <input type="number" class="form-control" name="ttm_weeks" value="{{ feature.ttm_weeks }}" min="0">
         </div>
+
+        <!-- Right column: all Time-to-Business-Value -->
         <div class="col-md-6">
-          <label class="form-label">Time-to-Business-Value (weeks)</label>
+          <label class="form-label">Lowest Time-to-Business-Value
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="Provide your best estimate of the minimum number of weeks after launch before the feature begins delivering measurable business value. This will later be used to scale the graph correctly.">
+            </i>
+          </label>
+          <input type="number" class="form-control" name="ttbv_low" value="{{ feature.ttbv_low }}" min="0">
+
+          <label class="form-label mt-3">Highest Time-to-Business-Value
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="Provide your best estimate of the maximum number of weeks after launch before the feature begins delivering measurable business value. This will later be used to scale the graph correctly.">
+            </i>
+          </label>
+          <input type="number" class="form-control" name="ttbv_high" value="{{ feature.ttbv_high }}" min="0">
+
+          <label class="form-label mt-3">Time-to-Business-Value (weeks)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The number of weeks after launch before the feature starts delivering measurable value. Examples include the first paying users, an improvement in key metrics, or visible customer adoption.">
+            </i>
+          </label>
           <input type="number" class="form-control" name="ttbv_weeks" value="{{ feature.ttbv_weeks }}" min="0">
         </div>
-        <div class="col-12">
+
+        <!-- Full width TTV summary -->
+        <div class="col-12 mt-3">
           <label class="form-label">TTV (weeks)</label>
           <input type="text" class="form-control" name="ttv_weeks" value="{{ feature.ttv_weeks }}" readonly>
         </div>
@@ -104,11 +145,10 @@
     </div>
 
     <!-- CONFIDENCE -->
-    <div class="mb-4">
+    <div class="mb-4 mt-4">
       <h4 class="mb-3">Evidence & Confidence Level</h4>
       <label class="form-label">Confidence Level</label>
       <select class="form-select" name="quality_score" required>
-        <option value="">Select score</option>
         <option value="0.01" {% if feature.quality_score==0.01 %}selected{% endif %}>Self Conviction — 0.01</option>
         <option value="0.03" {% if feature.quality_score==0.03 %}selected{% endif %}>Pitch Deck — 0.03</option>
         <option value="0.1" {% if feature.quality_score==0.1 %}selected{% endif %}>Thematic Support — 0.1</option>

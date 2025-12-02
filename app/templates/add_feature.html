@@ -141,99 +141,95 @@
     <!-- TTV -->
     <div class="mb-4">
       <h4 class="mb-3">Time to Value (TTV)</h4>
-      <p class="text-muted fst-italic">TTV = Time-to-Market + Time-to-Business-Value</p>
       <div class="row g-3">
+        <!-- Left column: all Time-to-Market -->
         <div class="col-md-6">
           <label class="form-label">Lowest Time-to-Market
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-              data-bs-content="Enter your estimate of the lowest possible number of weeks needed. This will later be used to scale the graph correctly.">
+              data-bs-content="Provide your best estimate of the minimum number of weeks required to build and release the feature. This will later be used to scale the graph correctly.">
             </i>
           </label>
           <input type="number" class="form-control" name="ttm_low" min="0">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Highest Time-to-Market
+
+          <label class="form-label mt-3">Highest Time-to-Market
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-              data-bs-content="Enter your estimate of the highest possible number of weeks needed. This will later be used to scale the graph correctly.">
+              data-bs-content="Provide your best estimate of the maximum number of weeks required to build and release the feature. This will later be used to scale the graph correctly.">
             </i>
           </label>
           <input type="number" class="form-control" name="ttm_high" min="0">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">
-            Time-to-Market (weeks)
+
+          <label class="form-label mt-3">Time-to-Market (weeks)
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The number of weeks needed to build and release the first usable version of the feature. This includes everything: design, development, testing and deployment.">
             </i>
           </label>
           <input type="number" class="form-control" name="ttm_weeks" min="0">
         </div>
-        <!-- Time-to-Business-Value -->
+
+        <!-- Right column: all Time-to-Business-Value -->
         <div class="col-md-6">
           <label class="form-label">Lowest Time-to-Business-Value
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-              data-bs-content="Enter your estimate of the lowest possible number of weeks before business value starts. This will later be used to scale the graph correctly.">
+              data-bs-content="Provide your best estimate of the minimum number of weeks after launch before the feature begins delivering measurable business value. This will later be used to scale the graph correctly.">
             </i>
           </label>
           <input type="number" class="form-control" name="ttbv_low" min="0">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Highest Time-to-Business-Value
+
+          <label class="form-label mt-3">Highest Time-to-Business-Value
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-              data-bs-content="Enter your estimate of the highest possible number of weeks before business value starts. This will later be used to scale the graph correctly.">
+              data-bs-content="Provide your best estimate of the maximum number of weeks after launch before the feature begins delivering measurable business value. This will later be used to scale the graph correctly.">
             </i>
           </label>
           <input type="number" class="form-control" name="ttbv_high" min="0">
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">
-            Time-to-Business-Value (weeks)
+
+          <label class="form-label mt-3">Time-to-Business-Value (weeks)
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The number of weeks after launch before the feature starts delivering measurable value. Examples include the first paying users, an improvement in key metrics, or visible customer adoption.">
             </i>
           </label>
           <input type="number" class="form-control" name="ttbv_weeks" min="0">
         </div>
-        <div class="col-12">
+
+        <!-- Full width TTV summary -->
+        <div class="col-12 mt-3">
           <label class="form-label">TTV (weeks)</label>
           <input type="text" class="form-control" name="ttv_weeks" placeholder="Calculated automatically" readonly>
         </div>
       </div>
-    </div>
 
-    <!-- CONFIDENCE -->
-    <div class="mb-4">
-      <h4 class="mb-3">Evidence & Confidence Level</h4>
-      <label class="form-label mb-2">
-        Confidence Score
-        <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-html="true"
-          data-bs-placement="top"
-          data-bs-content="Confidence is based on the strongest available evidence. Score range: 0.01 (very weak) &rarr; 10 (strong launch data). Used for the X-axis position in the VECTR graph.">
-        </i>
-      </label>
-      <select class="form-select" name="quality_score" required>
-        <option value="">Select score</option>
-        <option value="0.01">Self Conviction — 0.01</option>
-        <option value="0.03">Pitch Deck — 0.03</option>
-        <option value="0.1">Thematic Support — 0.1</option>
-        <option value="0.2">Other’s Opinion — 0.2</option>
-        <option value="0.5">Estimates & Plans — 0.5</option>
-        <option value="1">Anecdotal Evidence — 1.0</option>
-        <option value="2">Market Data — 2.0</option>
-        <option value="3">User/Customer Evidence — 3.0</option>
-        <option value="7">Test Results — 7.0</option>
-        <option value="10">Launch Data — 10.0</option>
-      </select>
-    </div>
+      <!-- CONFIDENCE -->
+      <div class="mb-4 mt-4">
+        <h4 class="mb-3">Evidence & Confidence Level</h4>
+        <label class="form-label mb-2">
+          Confidence Score
+          <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-html="true"
+            data-bs-placement="top"
+            data-bs-content="Confidence is based on the strongest available evidence. Score range: 0.01 (very weak) &rarr; 10 (strong launch data). Used for the X-axis position in the VECTR graph.">
+          </i>
+        </label>
+        <select class="form-select" name="quality_score" required>
+          <option value="">Select score</option>
+          <option value="0.01">Self Conviction — 0.01</option>
+          <option value="0.03">Pitch Deck — 0.03</option>
+          <option value="0.1">Thematic Support — 0.1</option>
+          <option value="0.2">Other’s Opinion — 0.2</option>
+          <option value="0.5">Estimates & Plans — 0.5</option>
+          <option value="1">Anecdotal Evidence — 1.0</option>
+          <option value="2">Market Data — 2.0</option>
+          <option value="3">User/Customer Evidence — 3.0</option>
+          <option value="7">Test Results — 7.0</option>
+          <option value="10">Launch Data — 10.0</option>
+        </select>
+      </div>
 
-    <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">
-      Save
-    </button>
+      <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">
+        Save
+      </button>
 
-    <a href="{{ url_for('main.view_features', project_id=project.id_project) }}"
-      class="btn btn-base btn-secondary-custom w-100 mt-2">
-      Cancel
-    </a>
+      <a href="{{ url_for('main.view_features', project_id=project.id_project) }}"
+        class="btn btn-base btn-secondary-custom w-100 mt-2">
+        Cancel
+      </a>
   </form>
 </div>
 
