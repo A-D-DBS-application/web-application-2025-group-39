@@ -16,3 +16,12 @@ CREATE TABLE public.profile (
         FOREIGN KEY (id_company)
         REFERENCES public.company (id_company)
 );
+
+
+/* 
+   Als volledig af is: eens testen dat alles werkt via één van deze:
+    pgAdmin (PostgreSQL)
+    DBeaver
+    MySQL Workbench
+    phpMyAdmin
+*/
