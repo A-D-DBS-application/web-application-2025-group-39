@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const churnInput = document.querySelector("[name='churn_reduction']");
   const savingsInput = document.querySelector("[name='cost_savings']");
   const devInput = document.querySelector("[name='investment_hours']");
+  const rateInput = document.querySelector("[name='hourly_rate']");
   const opexInput = document.querySelector("[name='opex_hours']");
   const otherInput = document.querySelector("[name='other_costs']");
   const roiOutput = document.querySelector("[name='roi_percent']");
@@ -18,8 +19,14 @@ document.addEventListener("DOMContentLoaded", function () {
       (parseFloat(churnInput.value) || 0) +
       (parseFloat(savingsInput.value) || 0);
 
+
+    // multiply hours × hourly rate
+    const devHours = parseFloat(devInput.value) || 0;
+    const hourlyRate = parseFloat(rateInput.value) || 0;
+    const devCost = devHours * hourlyRate;
+
     const costs =
-      (parseFloat(devInput.value) || 0) +
+      devCost +
       (parseFloat(opexInput.value) || 0) +
       (parseFloat(otherInput.value) || 0);
 
@@ -31,11 +38,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-[revenueInput, churnInput, savingsInput, devInput, opexInput, otherInput].forEach((el) => {
-  if (el) {
-    el.addEventListener("input", calculateROI);
-  }
-});
+  [revenueInput, churnInput, savingsInput, devInput, rateInput, opexInput, otherInput].forEach((el) => {
+    if (el) {
+      el.addEventListener("input", calculateROI);
+    }
+  });
 
   // =========================
   // TTV berekening
@@ -56,11 +63,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-[ttmInput, ttbvInput].forEach((el) => {
-  if (el) {
-    el.addEventListener("input", calculateTTV);
-  }
-});
+  [ttmInput, ttbvInput].forEach((el) => {
+    if (el) {
+      el.addEventListener("input", calculateTTV);
+    }
+  });
 
   // =========================
   // Wachtwoord toggle (oogje)
