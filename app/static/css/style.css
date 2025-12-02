@@ -104,6 +104,12 @@ body {
   color: #fff;
 }
 
+/* Make Decision */
+.btn-decision-make {
+    background-color: #ffc107;
+    color: #212529;
+}
+
 /* Secondary acties (Terug, All Features) */
 .btn-secondary-custom {
   background-color: #6c757d;
@@ -433,7 +439,22 @@ table {
     text-align: center;
 }
 
-
+/* ===========================
+   FEATURES OVERVIEW CONTAINER
+   =========================== */
+.features-container-card {
+/* Stel een maximale breedte in voor de witte kaart, zodat deze niet de volledige breedte van het scherm inneemt */
+    max-width: 1000px;
+/* CENTRERING: Stelt linker- en rechtermarges in op auto */
+    margin: 40px auto 20px auto; 
+/* Voeg wat marge boven en onder toe */
+    
+/* Zorg voor de visuele stijl van de 'kaart' */
+    background-color: #ffffff; 
+    padding: 30px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
 /* ===========================
    Table Styling
    =========================== */
@@ -586,4 +607,122 @@ table {
     text-decoration: none;
 }
 
+/* ===========================
+   RESPONSIVE STYLING (MOBIELE APPARATEN)
+   =========================== */
 
+@media (max-width: 768px) {
+    
+    /* 1. Containers en Formulier Kaarten (Login, Register, Edit, etc.) */
+    /* Vervangt vaste breedtes door percentages voor full-width weergave */
+    .login-container, 
+    .register-container, 
+    .profile-card, 
+    .form-card,
+    .roadmap-form,
+    .milestone-form,
+    .feature-form, /* Nieuw: de feature-form was erg breed */
+    .vectr-card {
+        width: 95%; /* Neem 95% van de beschikbare breedte in */
+        max-width: none; /* Negeer vaste max-breedtes */
+        margin: 20px auto; 
+        padding: 20px 15px; 
+    }
+    
+    /* 2. Index / Welkomstpagina */
+    .welcome-container {
+        margin: 40px 10px; 
+        padding: 30px 20px;
+    }
+    .welcome-container h1 {
+        font-size: 2.2rem; /* Kleinere titel */
+    }
+    .subtitle {
+        font-size: 1.1rem;
+    }
+
+    /* 3. Dashboard Knoppen (Verticale stapeling) */
+    .dashboard-wrapper {
+        justify-content: flex-start; /* Begin bovenaan */
+        padding-top: 50px;
+        min-height: auto; 
+    }
+    .main-buttons {
+        flex-direction: column; /* Stapel de knoppen verticaal */
+        gap: 15px; 
+        width: 80%; 
+        margin: 20px auto;
+    }
+    .main-buttons .btn {
+        width: 100%; /* Maak knoppen volledige breedte */
+        height: 50px; 
+        font-size: 16px;
+    }
+    .bottom-info {
+        position: static; /* Plakt niet langer vast aan de onderkant van het scherm */
+        text-align: center;
+        margin-top: 30px;
+    }
+    
+    /* 4. Projecten, Features en Tabellen */
+    .projects-wrapper, .features-container-card {
+        padding: 10px;
+        margin: 10px auto 20px auto; 
+        width: 95%;
+        box-sizing: border-box; 
+    }
+    
+    /* Maak de tabel zelf horizontaal scrollbaar */
+    table {
+        display: block; 
+        overflow-x: auto; 
+        white-space: nowrap; 
+    }
+
+    /* Knoppen in tabellen kleiner maken */
+    .table-btn {
+        min-width: 80px; 
+        height: 30px;
+        font-size: 12px;
+        padding: 0 5px;
+    }
+    .col-actions {
+        width: 180px; 
+    }
+    .col-roadmap {
+        width: 120px;
+    }
+
+    /* 5. Vaste elementen aanpassen */
+    .top-right-fixed, .top-right {
+        position: absolute; /* Verander 'fixed' naar 'absolute' of behoud 'absolute' */
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        display: flex;
+        gap: 5px;
+    }
+
+    /* 6. Roadmap aanpassingen (zodat alles stapelt) */
+    .roadmap-timeline {
+        flex-wrap: wrap; /* Sta toe dat items naar de volgende regel gaan */
+        overflow-x: auto; /* Zorg voor scrollen als het te lang is */
+    }
+
+    .arrow-block {
+        /* Minder breedte zodat er meer in een rij past of het kan scrollen */
+        min-width: 100px;
+        padding: 8px 15px;
+        margin-right: 5px;
+    }
+
+    .milestones-row {
+        flex-direction: column; /* Stapel mijlpalen onder elkaar */
+        gap: 0;
+    }
+
+    .milestone-group {
+        min-width: 100%;
+        margin-bottom: 10px;
+    }
+}

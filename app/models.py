@@ -150,6 +150,8 @@ class Features_ideas(db.Model):
     # Relatie terug naar project
     project = db.relationship("Project", back_populates="features_ideas")
 
+    #Relatie naar Decision
+    decisions = db.relationship("Decision", back_populates="feature", cascade="all, delete", passive_deletes=True) 
 
 class Roadmap(db.Model):
     __tablename__ = 'roadmap'
@@ -237,3 +239,27 @@ class Evidence(db.Model):
 
     # Relationship
     feature = db.relationship("Features_ideas", backref="evidence")
+
+class Decision(db.Model):
+    __tablename__ = 'decision'
+    __table_args__ = {'schema': 'public'}
+
+    id_decision = db.Column(db.Integer, primary_key=True)
+
+    id_feature = db.Column(
+        db.String,
+        db.ForeignKey('public.features_ideas.id_feature', ondelete="CASCADE"),
+        nullable=False
+    )
+
+    id_company = db.Column(
+        db.Integer,
+        db.ForeignKey('public.company.id_company'),
+        nullable=False
+    )
+
+    decision_type = db.Column(db.String(50), nullable=False)  # e.g., Approved, Rejected, Pending
+    reasoning = db.Column(db.Text, nullable=True)
+    
+    date_made = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    feature = db.relationship("Features_ideas", back_populates="decisions")

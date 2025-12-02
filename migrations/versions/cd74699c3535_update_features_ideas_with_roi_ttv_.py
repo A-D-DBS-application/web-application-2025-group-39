@@ -23,10 +23,10 @@ def upgrade():
         batch_op.add_column(sa.Column('id_company', sa.Integer(), nullable=False))
         batch_op.add_column(sa.Column('project_name', sa.String(), nullable=False))
         batch_op.add_column(sa.Column('createdat', sa.DateTime(), nullable=True))
-        batch_op.drop_constraint(batch_op.f('confidence_history_id_feature_fkey'), type_='foreignkey')
+        #batch_op.drop_constraint(batch_op.f('confidence_history_id_feature_fkey'), type_='foreignkey')
         batch_op.create_foreign_key(None, 'company', ['id_company'], ['id_company'], referent_schema='public')
         batch_op.drop_column('id_confidence')
-        batch_op.drop_column('id_feature')
+        #batch_op.drop_column('id_feature')
         batch_op.drop_column('old_value')
         batch_op.drop_column('new_value')
 
