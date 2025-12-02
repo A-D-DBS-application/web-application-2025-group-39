@@ -2,9 +2,10 @@ from . import db  # haal db uit __init__.py
 import datetime  # datetime importeren
 from .security import hash_password, verify_password, needs_rehash
 
+
 class Company(db.Model):
-    __tablename__ = 'company'
-    __table_args__ = {'schema': 'public'}  # tabel aanmaken in database
+    __tablename__ = "company"
+    __table_args__ = {"schema": "public"}  # tabel aanmaken in database
 
     # Primary key
     id_company = db.Column(db.Integer, primary_key=True)
@@ -13,13 +14,13 @@ class Company(db.Model):
     company_name = db.Column(db.String, nullable=False)
 
     # relaties:
-    profiles = db.relationship('Profile', back_populates='company', lazy=True)
-    projects = db.relationship('Project', back_populates='company', lazy=True)
+    profiles = db.relationship("Profile", back_populates="company", lazy=True)
+    projects = db.relationship("Project", back_populates="company", lazy=True)
 
 
 class Profile(db.Model):
-    __tablename__ = 'profile'
-    __table_args__ = {'schema': 'public'}
+    __tablename__ = "profile"
+    __table_args__ = {"schema": "public"}
 
     # Primary key
     id_profile = db.Column(db.Integer, primary_key=True)
@@ -32,13 +33,11 @@ class Profile(db.Model):
 
     # Foreign keys
     id_company = db.Column(
-        db.Integer,
-        db.ForeignKey('public.company.id_company'),
-        nullable=False
+        db.Integer, db.ForeignKey("public.company.id_company"), nullable=False
     )
 
     # relationship
-    company = db.relationship('Company', back_populates='profiles')
+    company = db.relationship("Company", back_populates="profiles")
 
     # tijd van aanmaak Profile
     createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
@@ -46,7 +45,7 @@ class Profile(db.Model):
     def __repr__(self):
         return f"<Profile {self.name}>"
 
-   # Helpers voor wachtwoordbeheer
+    # Helpers voor wachtwoordbeheer
     def set_password(self, plain_password: str):
         self.password_hash = hash_password(plain_password)
 
@@ -59,18 +58,17 @@ class Profile(db.Model):
             return True
         return False
 
+
 class Project(db.Model):
-    __tablename__ = 'project'
-    __table_args__ = {'schema': 'public'}
+    __tablename__ = "project"
+    __table_args__ = {"schema": "public"}
 
     # Primaire sleutel
     id_project = db.Column(db.Integer, primary_key=True)
 
     # Foreign key → company
     id_company = db.Column(
-        db.Integer,
-        db.ForeignKey('public.company.id_company'),
-        nullable=False
+        db.Integer, db.ForeignKey("public.company.id_company"), nullable=False
     )
 
     # project info
@@ -83,39 +81,31 @@ class Project(db.Model):
     company = db.relationship("Company", back_populates="projects")
 
     roadmaps = db.relationship(
-    "Roadmap",
-    back_populates="project",
-    cascade="all, delete",
-    passive_deletes=True
+        "Roadmap", back_populates="project", cascade="all, delete", passive_deletes=True
     )
-
 
     # alle features_ideas die aan dit project hangen
     features_ideas = db.relationship(
         "Features_ideas",
         back_populates="project",
-        cascade="all, delete",   # bij delete project → bijhorende features_ideas ook weg
-        passive_deletes=True
+        cascade="all, delete",  # bij delete project → bijhorende features_ideas ook weg
+        passive_deletes=True,
     )
 
 
 class Features_ideas(db.Model):
-    __tablename__ = 'features_ideas'
-    __table_args__ = {'schema': 'public'}
+    __tablename__ = "features_ideas"
+    __table_args__ = {"schema": "public"}
 
     # Primary key (UUID string)
     id_feature = db.Column(db.String, primary_key=True)
 
     # Foreign keys
     id_company = db.Column(
-        db.Integer,
-        db.ForeignKey('public.company.id_company'),
-        nullable=False
+        db.Integer, db.ForeignKey("public.company.id_company"), nullable=False
     )
     id_project = db.Column(
-        db.Integer,
-        db.ForeignKey('public.project.id_project'),
-        nullable=False
+        db.Integer, db.ForeignKey("public.project.id_project"), nullable=False
     )
 
     # Basic info
@@ -130,7 +120,6 @@ class Features_ideas(db.Model):
     investment_hours = db.Column(db.Integer)
     opex_hours = db.Column(db.Integer)
     other_costs = db.Column(db.Integer)
-    
 
     # TTV fields
     ttm_weeks = db.Column(db.Integer)
@@ -139,7 +128,7 @@ class Features_ideas(db.Model):
     # Confidence
     quality_score = db.Column(db.Float)
 
-    #berekende values:
+    # berekende values:
     expected_profit = db.Column(db.Integer)
     roi_percent = db.Column(db.Float)
     ttv_weeks = db.Column(db.Float)
@@ -150,20 +139,26 @@ class Features_ideas(db.Model):
     # Relatie terug naar project
     project = db.relationship("Project", back_populates="features_ideas")
 
-    #Relatie naar Decision
-    decisions = db.relationship("Decision", back_populates="feature", cascade="all, delete", passive_deletes=True) 
+    # Relatie naar Decision
+    decisions = db.relationship(
+        "Decision",
+        back_populates="feature",
+        cascade="all, delete",
+        passive_deletes=True,
+    )
+
 
 class Roadmap(db.Model):
-    __tablename__ = 'roadmap'
-    __table_args__ = {'schema': 'public'}
+    __tablename__ = "roadmap"
+    __table_args__ = {"schema": "public"}
 
     id_roadmap = db.Column(db.Integer, primary_key=True)
 
     # Foreign key naar project
     id_project = db.Column(
         db.Integer,
-        db.ForeignKey('public.project.id_project', ondelete="CASCADE"),
-        nullable=False
+        db.ForeignKey("public.project.id_project", ondelete="CASCADE"),
+        nullable=False,
     )
 
     # Roadmap velden
@@ -174,7 +169,6 @@ class Roadmap(db.Model):
     budget_allocation = db.Column(db.Integer, nullable=False)
     createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-
     # Relatie terug naar Project
     project = db.relationship("Project", back_populates="roadmaps")
 
@@ -183,22 +177,21 @@ class Roadmap(db.Model):
         "Milestone",
         back_populates="roadmap",
         cascade="all, delete",
-        passive_deletes=True
+        passive_deletes=True,
     )
 
 
-
 class Milestone(db.Model):
-    __tablename__ = 'milestone'
-    __table_args__ = {'schema': 'public'}
+    __tablename__ = "milestone"
+    __table_args__ = {"schema": "public"}
 
     id_milestone = db.Column(db.Integer, primary_key=True)
 
     # Foreign key naar roadmap
     id_roadmap = db.Column(
         db.Integer,
-        db.ForeignKey('public.roadmap.id_roadmap', ondelete="CASCADE"),
-        nullable=False
+        db.ForeignKey("public.roadmap.id_roadmap", ondelete="CASCADE"),
+        nullable=False,
     )
 
     # Milestone velden
@@ -210,22 +203,19 @@ class Milestone(db.Model):
 
     roadmap = db.relationship("Roadmap", back_populates="milestones")
 
+
 class Evidence(db.Model):
-    __tablename__ = 'evidence'
-    __table_args__ = {'schema': 'public'}
+    __tablename__ = "evidence"
+    __table_args__ = {"schema": "public"}
 
     id_evidence = db.Column(db.Integer, primary_key=True)
 
     id_feature = db.Column(
-        db.String,
-        db.ForeignKey('public.features_ideas.id_feature'),
-        nullable=False
+        db.String, db.ForeignKey("public.features_ideas.id_feature"), nullable=False
     )
 
     id_company = db.Column(
-        db.Integer,
-        db.ForeignKey('public.company.id_company'),
-        nullable=False
+        db.Integer, db.ForeignKey("public.company.id_company"), nullable=False
     )
 
     # Evidence metadata
@@ -240,26 +230,27 @@ class Evidence(db.Model):
     # Relationship
     feature = db.relationship("Features_ideas", backref="evidence")
 
+
 class Decision(db.Model):
-    __tablename__ = 'decision'
-    __table_args__ = {'schema': 'public'}
+    __tablename__ = "decision"
+    __table_args__ = {"schema": "public"}
 
     id_decision = db.Column(db.Integer, primary_key=True)
 
     id_feature = db.Column(
         db.String,
-        db.ForeignKey('public.features_ideas.id_feature', ondelete="CASCADE"),
-        nullable=False
+        db.ForeignKey("public.features_ideas.id_feature", ondelete="CASCADE"),
+        nullable=False,
     )
 
     id_company = db.Column(
-        db.Integer,
-        db.ForeignKey('public.company.id_company'),
-        nullable=False
+        db.Integer, db.ForeignKey("public.company.id_company"), nullable=False
     )
 
-    decision_type = db.Column(db.String(50), nullable=False)  # e.g., Approved, Rejected, Pending
+    decision_type = db.Column(
+        db.String(50), nullable=False
+    )  # e.g., Approved, Rejected, Pending
     reasoning = db.Column(db.Text, nullable=True)
-    
+
     date_made = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     feature = db.relationship("Features_ideas", back_populates="decisions")
