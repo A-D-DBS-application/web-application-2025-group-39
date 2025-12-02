@@ -26,7 +26,7 @@ class Profile(db.Model):
 
     # user information
     name = db.Column(db.String, nullable=False)
-    email = db.Column(db.String, nullable=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
     role = db.Column(db.String, nullable=True)
     password_hash = db.Column(db.String, nullable=False)
 
