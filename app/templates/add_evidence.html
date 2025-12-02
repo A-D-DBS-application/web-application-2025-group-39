@@ -3,6 +3,7 @@
 {% block title %}Add Evidence{% endblock %}
 
 {% block content %}
+
 <div class="top-right-fixed">
   <a href="{{ url_for('main.view_features', project_id=feature.id_project) }}"
      class="btn btn-base btn-nav btn-sm">
@@ -10,9 +11,9 @@
   </a>
 </div>
 
-<!-- Logged-in info bottom right -->
 <div class="bottom-info">
-  Logged in as: <strong>{{ session['name'] }}</strong> | Role: <strong>{{ session['role'] }}</strong>
+  Logged in as: <strong>{{ session['name'] }}</strong> |
+  Role: <strong>{{ session['role'] }}</strong>
 </div>
 
 <h2 class="text-center mb-4">Add Evidence for: {{ feature.name_feature }}</h2>
@@ -29,7 +30,7 @@
         <!-- Evidence Type -->
         <div class="mb-3">
             <label class="form-label">Evidence Type</label>
-            <select id="evidence_type" name="type" class="form-select">
+            <select id="evidence_type" name="type_select" class="form-select">
                 <option value="Customer Feedback">Customer Feedback</option>
                 <option value="Pilot Result">Pilot Result</option>
                 <option value="Paying Customer">Paying Customer</option>
@@ -62,10 +63,22 @@
             <input type="text" name="attachment_url" class="form-control">
         </div>
 
-        <!-- Confidence Impact -->
+        <!-- NEW CONFIDENCE LEVEL -->
         <div class="mb-3">
-            <label class="form-label">Confidence Impact (e.g. 0.2)</label>
-            <input type="number" step="0.01" name="confidence_impact" class="form-control" required>
+            <label class="form-label">Confidence Level</label>
+            <select name="new_confidence" class="form-select" required>
+                <option value="">Select score</option>
+                <option value="0.01">Self Conviction — 0.01</option>
+                <option value="0.03">Pitch Deck — 0.03</option>
+                <option value="0.1">Thematic Support — 0.10</option>
+                <option value="0.2">Other’s Opinion — 0.20</option>
+                <option value="0.5">Estimates & Plans — 0.50</option>
+                <option value="1">Anecdotal Evidence — 1.0</option>
+                <option value="2">Market Data — 2.0</option>
+                <option value="3">User/Customer Evidence — 3.0</option>
+                <option value="7">Test Results — 7.0</option>
+                <option value="10">Launch Data — 10.0</option>
+            </select>
         </div>
 
         <button class="btn btn-primary w-100">Add Evidence</button>

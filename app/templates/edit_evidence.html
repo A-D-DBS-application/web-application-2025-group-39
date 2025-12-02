@@ -3,14 +3,15 @@
 {% block title %}Edit Evidence{% endblock %}
 
 {% block content %}
+
 <div class="top-right-fixed">
-  <a href="{{ url_for('main.view_evidence', feature_id=evidence.id_feature) }}"
+  <a href="{{ url_for('main.view_evidence', feature_id=feature.id_feature) }}"
      class="btn btn-base btn-nav btn-sm">
     ← Back
   </a>
 </div>
 
-<h2 class="text-center mb-4">Edit Evidence for: {{ evidence.feature.name_feature }}</h2>
+<h2 class="text-center mb-4">Edit Evidence for: {{ feature.name_feature }}</h2>
 
 <div class="card p-4 mx-auto" style="max-width: 700px;">
     <form method="POST">
@@ -25,13 +26,10 @@
         <!-- Evidence Type -->
         <div class="mb-3">
             <label class="form-label">Evidence Type</label>
-            <select id="evidence_type" name="type" class="form-select">
+            <select id="evidence_type" name="type_select" class="form-select">
                 {% set default_types = [
-                    'Customer Feedback',
-                    'Pilot Result',
-                    'Paying Customer',
-                    'Market Data',
-                    'Other'
+                    'Customer Feedback', 'Pilot Result', 'Paying Customer',
+                    'Market Data', 'Other'
                 ] %}
 
                 {% for t in default_types %}
@@ -43,7 +41,7 @@
             </select>
         </div>
 
-        <!-- Custom Evidence Type -->
+        <!-- Custom Type -->
         <div class="mb-3" id="custom_type_group"
              style="display: {% if evidence.type not in default_types %}block{% else %}none{% endif %};">
             <label class="form-label">Custom Evidence Type</label>
@@ -62,8 +60,7 @@
         <!-- Description -->
         <div class="mb-3">
             <label class="form-label">Description</label>
-            <textarea name="description" class="form-control" rows="3" required>
-{{ evidence.description }}</textarea>
+            <textarea name="description" class="form-control" rows="3" required>{{ evidence.description }}</textarea>
         </div>
 
         <!-- Attachment -->
@@ -73,12 +70,17 @@
                    value="{{ evidence.attachment_url }}">
         </div>
 
-        <!-- Confidence Impact -->
+        <!-- NEW CONFIDENCE -->
         <div class="mb-3">
-            <label class="form-label">Confidence Impact (e.g. 0.2)</label>
-            <input type="number" step="0.01" name="confidence_impact"
-                   class="form-control"
-                   value="{{ evidence.confidence_impact }}" required>
+            <label class="form-label">Confidence Level</label>
+            <select name="new_confidence" class="form-select" required>
+                {% for value, label in CONFIDENCE_LEVELS.items() %}
+                    <option value="{{ value }}"
+                        {% if evidence.new_confidence == value %}selected{% endif %}>
+                        {{ label }} — {{ value }}
+                    </option>
+                {% endfor %}
+            </select>
         </div>
 
         <button class="btn btn-primary w-100">Save Changes</button>

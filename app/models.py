@@ -2,6 +2,21 @@ from . import db  # haal db uit __init__.py
 import datetime  # datetime importeren
 from .security import hash_password, verify_password, needs_rehash
 
+CONFIDENCE_LEVELS = {
+    0.01: "Self Conviction",
+    0.03: "Pitch Deck",
+    0.1:  "Thematic Support",
+    0.2:  "Other’s Opinion",
+    0.5:  "Estimates & Plans",
+    1.0:  "Anecdotal Evidence",
+    2.0:  "Market Data",
+    3.0:  "User/Customer Evidence",
+    7.0:  "Test Results",
+    10.0: "Launch Data"
+}
+
+
+
 class Company(db.Model):
     __tablename__ = 'company'
     __table_args__ = {'schema': 'public'}  # tabel aanmaken in database
@@ -150,8 +165,6 @@ class Features_ideas(db.Model):
     # Relatie terug naar project
     project = db.relationship("Project", back_populates="features_ideas")
 
-    #Relatie naar Decision
-    decisions = db.relationship("Decision", back_populates="feature", cascade="all, delete", passive_deletes=True) 
 
 class Roadmap(db.Model):
     __tablename__ = 'roadmap'
@@ -228,38 +241,17 @@ class Evidence(db.Model):
         nullable=False
     )
 
-    # Evidence metadata
     title = db.Column(db.String)
-    type = db.Column(db.String)  # e.g., Feedback, Contract, Pilot, Data…
+    type = db.Column(db.String)
     source = db.Column(db.String)
     description = db.Column(db.Text)
     attachment_url = db.Column(db.Text)
-    confidence_impact = db.Column(db.Float)  # e.g. +0.3
+
+    # NEW SYSTEM
+    old_confidence = db.Column(db.Float)     # feature score BEFORE adding this evidence
+    new_confidence = db.Column(db.Float)     # confidence level selected from list
+
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-    # Relationship
     feature = db.relationship("Features_ideas", backref="evidence")
 
-class Decision(db.Model):
-    __tablename__ = 'decision'
-    __table_args__ = {'schema': 'public'}
-
-    id_decision = db.Column(db.Integer, primary_key=True)
-
-    id_feature = db.Column(
-        db.String,
-        db.ForeignKey('public.features_ideas.id_feature', ondelete="CASCADE"),
-        nullable=False
-    )
-
-    id_company = db.Column(
-        db.Integer,
-        db.ForeignKey('public.company.id_company'),
-        nullable=False
-    )
-
-    decision_type = db.Column(db.String(50), nullable=False)  # e.g., Approved, Rejected, Pending
-    reasoning = db.Column(db.Text, nullable=True)
-    
-    date_made = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
-    feature = db.relationship("Features_ideas", back_populates="decisions")
