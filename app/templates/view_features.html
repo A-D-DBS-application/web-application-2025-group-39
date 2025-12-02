@@ -110,7 +110,9 @@
                 </th>
 
                 <th>Horizon</th>
-
+                <!--Decision Column-->
+                <th>Decision</th>
+    
                 <!-- Evidence Column -->
                 <th>Evidence</th>
 
@@ -144,6 +146,22 @@
 
                 <td>Q{{ feature.horizon }}</td>
 
+                <!-- DECISION BUTTONS-->
+                 <td>
+                    <div class="d-flex justify-content-center gap-2">
+
+                        <a href="{{ url_for('main.make_decision', feature_id=feature.id_feature) }}"
+                            class="btn btn-sm btn-decision-make">
+                            Make Decision
+                        </a>
+
+                        <a href="{{ url_for('main.view_decision', feature_id=feature.id_feature) }}"
+                            class="btn btn-info table-btn btn-sm">
+                            View
+                        </a>
+
+                    </div>
+                 </td>
                 <!-- EVIDENCE BUTTONS -->
                 <td>
                     <div class="d-flex justify-content-center gap-2">

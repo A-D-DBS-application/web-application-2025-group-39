@@ -1030,3 +1030,37 @@ def vectr_chart_pdf(project_id):
     plt.savefig(buf, format="pdf")
     buf.seek(0)
     return send_file(buf, as_attachment=True, download_name="vectr_chart.pdf")
+
+#=============================
+# DECISION ROUTE
+#============================
+@main.route('/feature/decide/<string:feature_id>', methods=['GET', 'POST'])
+def make_decision(feature_id):
+    feature = Features_ideas.query.get_or_404(feature_id)
+
+    if request.method == 'POST':
+        decision_type = reques.form.get('decision_type')
+        reasoning = request.form.get('reasoning')   
+
+        company_id = feature.id_company
+
+        new_decision = Decision(
+            id_feature=feature.id_company,  
+            id_company=company_id,
+            decision_type=decision_type,
+            reasoning=reasoning
+        )
+        db.session.add(new_decision)
+        db.session.commit()
+
+        return redirect(url_for('ùain.view_decision', feature_id=feature_id))
+    
+    return render_template('make_decision.html', feature=feature)
+
+# --- Route voor 'View Decision' ---
+@main.route('/feature/<string:feature_id>')
+def view_decision(feature_id):
+    feature = Features_ideas.query.get_or_404(feature_id)
+    decision = feature.decision
+    return render_template('view_decision.html', feature=feature, decision=decision)
+

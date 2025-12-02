@@ -104,6 +104,12 @@ body {
   color: #fff;
 }
 
+/* Make Decision */
+.btn-decision-make {
+    background-color: #ffc107;
+    color: #212529;
+}
+
 /* Secondary acties (Terug, All Features) */
 .btn-secondary-custom {
   background-color: #6c757d;
@@ -433,7 +439,22 @@ table {
     text-align: center;
 }
 
-
+/* ===========================
+   FEATURES OVERVIEW CONTAINER
+   =========================== */
+.features-container-card {
+/* Stel een maximale breedte in voor de witte kaart, zodat deze niet de volledige breedte van het scherm inneemt */
+    max-width: 1000px;
+/* CENTRERING: Stelt linker- en rechtermarges in op auto */
+    margin: 40px auto 20px auto; 
+/* Voeg wat marge boven en onder toe */
+    
+/* Zorg voor de visuele stijl van de 'kaart' */
+    background-color: #ffffff; 
+    padding: 30px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
 /* ===========================
    Table Styling
    =========================== */
