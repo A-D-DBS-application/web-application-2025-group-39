@@ -122,6 +122,10 @@ class Features_ideas(db.Model):
     other_costs = db.Column(db.Integer)
 
     # TTV fields
+    ttm_low = db.Column(db.Float)
+    ttm_high = db.Column(db.Float)
+    ttbv_low = db.Column(db.Float)
+    ttbv_high = db.Column(db.Float)
     ttm_weeks = db.Column(db.Integer)
     ttbv_weeks = db.Column(db.Integer)
 

@@ -35,6 +35,11 @@ import datetime         # nodig voor inloggen
 import numpy as np  # Nodig voor array bewerkingen als u dit in een aparte file zet
 import matplotlib.patches as patches
 
+from app.constants import (
+    CONF_MIN, CONF_LOW_THRESHOLD, CONF_MID_HIGH_THRESHOLD, CONF_MAX,
+    TTV_MIN, TTV_SLOW_THRESHOLD, TTV_MID_THRESHOLD, TTV_MAX
+)
+
 # Blueprint aanmaken
 main = Blueprint("main", __name__)
 
@@ -206,7 +211,10 @@ def profile():
     )
 
 
-# New route add_feature
+# ==============================
+# ADD_FEATURE ROUTE 
+# ==============================
+
 @main.route("/projects/<int:project_id>/add-feature", methods=["GET", "POST"])
 def add_feature(project_id):
     # Require login
@@ -255,6 +263,11 @@ def add_feature(project_id):
         # TTV fields
         ttm_weeks = to_numeric("ttm_weeks")
         ttbv_weeks = to_numeric("ttbv_weeks")
+        # TTV min/max fields
+        ttm_low = to_numeric("ttm_low")
+        ttm_high = to_numeric("ttm_high")
+        ttbv_low = to_numeric("ttbv_low")
+        ttbv_high = to_numeric("ttbv_high")
         ttv_weeks_raw = request.form.get("ttv_weeks", "").strip()
         try:
             ttv_weeks = float(ttv_weeks_raw) if ttv_weeks_raw else None
@@ -282,6 +295,10 @@ def add_feature(project_id):
             "Horizon": horizon,
             "TTM weeks": ttm_weeks,
             "TTBV weeks": ttbv_weeks,
+            "TTM low": ttm_low,
+            "TTM high": ttm_high,
+            "TTBV low": ttbv_low,
+            "TTBV high": ttbv_high,
         }
         for label, value in numeric_fields.items():
             if value is None:
@@ -338,6 +355,10 @@ def add_feature(project_id):
                 ttbv_weeks=ttbv_weeks,
                 ttv_weeks=ttv_weeks,  # Berekende waarde opslaan
                 quality_score=quality_score,
+                ttm_low=ttm_low,
+                ttm_high=ttm_high,
+                ttbv_low=ttbv_low,
+                ttbv_high=ttbv_high,
             )
             db.session.add(feature)
             db.session.commit()
@@ -375,22 +396,43 @@ def vectr_chart(project_id):
     # Alle features ophalen die de benodigde data hebben
     features = Features_ideas.query.filter_by(id_project=project_id).all()
 
+    # Bereken min/max TTV uit de ingevulde velden
+    valid_ttv = []
+    for f in features:
+        if f.ttm_low is not None and f.ttbv_low is not None and f.ttm_high is not None and f.ttbv_high is not None:
+            min_ttv = float(f.ttm_low) + float(f.ttbv_low)
+            max_ttv = float(f.ttm_high) + float(f.ttbv_high)
+            valid_ttv.append((min_ttv, max_ttv))
+
+    # Globale min/max voor alle features
+    if valid_ttv:
+        TTV_MIN = min(m for m, _ in valid_ttv)
+        TTV_MAX = max(M for _, M in valid_ttv)
+    else:
+        TTV_MIN, TTV_MAX = 0.0, 10.0  # fallback
+
+
     # Data transformeren naar een formaat dat geschikt is voor de grafiek (JSON)
     chart_data = []
     for f in features:
         # Zorg ervoor dat we alleen features met geldige data plotten
-        if (
-            f.roi_percent is not None
-            and f.quality_score is not None
-            and f.ttv_weeks is not None
-        ):
+        if f.roi_percent and f.quality_score and f.ttm_weeks and f.ttbv_weeks:
+            conf = float(f.quality_score)
+            effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
+
+            # Herschalen naar 0–10
+            if TTV_MAX > TTV_MIN:
+                ttv_scaled = (effective_ttv - TTV_MIN) / (TTV_MAX - TTV_MIN) * 10
+            else:
+                ttv_scaled = 0
+                
             chart_data.append(
                 {
                     "name": f.name_feature,
                     # X-as: Confidence
-                    "confidence": float(f.quality_score),
+                    "confidence": conf,
                     # Y-as: TtV (weeks)
-                    "ttv": float(f.ttv_weeks),
+                    "ttv": ttv_scaled,
                     # Grootte (Bubble Size): ROI (%)
                     "roi": float(f.roi_percent),
                     "id": f.id_feature,
@@ -471,7 +513,6 @@ def view_features(project_id):
 # EDIT FEATURE ROUTE
 # ==============================
 
-
 @main.route("/feature/<uuid:feature_id>/edit", methods=["GET", "POST"])
 def edit_feature(feature_id):
     # UUID als string opslaan
@@ -481,25 +522,62 @@ def edit_feature(feature_id):
 
     if request.method == "POST":
         try:
-            feature.name_feature = request.form.get("name_feature")
-            feature.roi_percent = float(request.form.get("roi_percent") or 0)
-            feature.ttv_weeks = float(request.form.get("ttv_weeks") or 0)
-            feature.quality_score = float(request.form.get("quality_score") or 0)
-            feature.horizon = float(request.form.get("horizon") or 0)
+            def to_numeric(field_name, is_float=False):
+                raw = request.form.get(field_name, "").strip()
+                if not raw:
+                    return None
+                try:
+                    return float(raw) if is_float else int(raw)
+                except ValueError:
+                    return None
+
+            # Basic info
+            feature.name_feature = request.form.get("name_feature", "").strip()
+            feature.description = request.form.get("description", "").strip()
+
+            # ROI fields
+            feature.extra_revenue = to_numeric("extra_revenue")
+            feature.churn_reduction = to_numeric("churn_reduction")
+            feature.cost_savings = to_numeric("cost_savings")
+            feature.investment_hours = to_numeric("investment_hours")
+            feature.opex_hours = to_numeric("opex_hours")
+            feature.other_costs = to_numeric("other_costs")
+            feature.horizon = to_numeric("horizon")
+
+            # TTV fields
+            feature.ttm_weeks = to_numeric("ttm_weeks")
+            feature.ttbv_weeks = to_numeric("ttbv_weeks")
+
+            # ✅ Nieuwe min/max velden
+            feature.ttm_low = to_numeric("ttm_low", is_float=True)
+            feature.ttm_high = to_numeric("ttm_high", is_float=True)
+            feature.ttbv_low = to_numeric("ttbv_low", is_float=True)
+            feature.ttbv_high = to_numeric("ttbv_high", is_float=True)
+
+            # Confidence
+            feature.quality_score = to_numeric("quality_score", is_float=True)
+
+            # Berekende waarden opnieuw updaten
+            total_gains = (feature.extra_revenue or 0) + (feature.churn_reduction or 0) + (feature.cost_savings or 0)
+            total_costs = (feature.investment_hours or 0) + (feature.opex_hours or 0) + (feature.other_costs or 0)
+            feature.expected_profit = total_gains - total_costs
+
+            if total_costs > 0:
+                feature.roi_percent = round(((total_gains / total_costs) - 1) * 100, 2)
+            else:
+                feature.roi_percent = None if total_gains == 0 else 9999.0
+
+            feature.ttv_weeks = float((feature.ttm_weeks or 0) + (feature.ttbv_weeks or 0))
 
             db.session.commit()
             flash("Feature updated successfully!", "success")
-            return redirect(
-                url_for("main.view_features", project_id=feature.id_project)
-            )
+            return redirect(url_for("main.view_features", project_id=feature.id_project))
+
         except Exception as e:
             db.session.rollback()
             flash(f"Error updating feature: {e}", "danger")
 
-    return render_template(
-        "edit_feature.html", feature=feature, project=project, company=company
-    )
-
+    return render_template("edit_feature.html", feature=feature, project=project, company=company)
 
 # ==============================
 # DELETE FEATURE ROUTE
@@ -1028,36 +1106,46 @@ def vectr_chart_pdf(project_id):
 
     features = Features_ideas.query.filter_by(id_project=project_id).all()
 
-    # --- 1. Definieer de VECTR-grenzen ---
-    CONF_MIN, CONF_MAX = 0.0, 10.0
-    CONF_LOW_THRESHOLD = 1.0
-    CONF_MID_HIGH_THRESHOLD = 7.0
+    # --- 1. Bereken min/max TTV ---
+    valid_ttv = []
+    for f in features:
+        if f.ttm_low is not None and f.ttbv_low is not None and f.ttm_high is not None and f.ttbv_high is not None:
+            min_ttv = float(f.ttm_low) + float(f.ttbv_low)
+            max_ttv = float(f.ttm_high) + float(f.ttbv_high)
+            valid_ttv.append((min_ttv, max_ttv))
 
-    TTV_MIN, TTV_MAX = 0.0, 10.0
-    TTV_SLOW_THRESHOLD = 5.0
-    TTV_MID_THRESHOLD = 7.0
+    if valid_ttv:
+        TTV_MIN = min(m for m, _ in valid_ttv)
+        TTV_MAX = max(M for _, M in valid_ttv)
+    else:
+        TTV_MIN, TTV_MAX = 0.0, 10.0  # fallback
 
     # --- 2. Matplotlib Setup ---
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.set_xlim(CONF_MIN, CONF_MAX)
-    ax.set_ylim(TTV_MIN, TTV_MAX)
+    fig, ax = plt.subplots(figsize=(10, 10))
+    ax.set_xlim(0.0, 10.0)   # Confidence altijd 0–10
+    ax.set_ylim(0.0, 10.0)   # TTV herschaald naar 0–10
 
     # --- 3. Zones ---
     zones = [
-        {"color": (0/255, 150/255, 0/255, 0.25), "x": CONF_MID_HIGH_THRESHOLD, "y": TTV_MID_THRESHOLD,
-         "w": CONF_MAX - CONF_MID_HIGH_THRESHOLD, "h": TTV_MAX - TTV_MID_THRESHOLD},
-        {"color": (144/255, 238/255, 144/255, 0.25), "x": CONF_MID_HIGH_THRESHOLD, "y": TTV_SLOW_THRESHOLD,
-         "w": CONF_MAX - CONF_MID_HIGH_THRESHOLD, "h": TTV_MID_THRESHOLD - TTV_SLOW_THRESHOLD},
-        {"color": (255/255, 165/255, 0/255, 0.25), "x": CONF_MID_HIGH_THRESHOLD, "y": TTV_MIN,
-         "w": CONF_MAX - CONF_MID_HIGH_THRESHOLD, "h": TTV_SLOW_THRESHOLD - TTV_MIN},
-        {"color": (255/255, 0/255, 0/255, 0.25), "x": CONF_MIN, "y": TTV_SLOW_THRESHOLD,
-         "w": CONF_LOW_THRESHOLD - CONF_MIN, "h": TTV_MAX - TTV_SLOW_THRESHOLD},
-        {"color": (255/255, 140/255, 0/255, 0.25), "x": CONF_LOW_THRESHOLD, "y": TTV_SLOW_THRESHOLD,
-         "w": CONF_MID_HIGH_THRESHOLD - CONF_LOW_THRESHOLD, "h": TTV_MAX - TTV_SLOW_THRESHOLD},
-        {"color": (255/255, 0/255, 0/255, 0.25), "x": CONF_MIN, "y": TTV_MIN,
-         "w": CONF_MID_HIGH_THRESHOLD - CONF_MIN, "h": TTV_SLOW_THRESHOLD - TTV_MIN},
-    ]
+        # Zone 1: Rood (Low/Mid Conf, Slow TtV) → onderaan
+        {"color": (255/255, 0/255, 0/255, 0.25), "x": 0.0, "y": 0.0, "w": 7.0, "h": 5.0},
 
+        # Zone 2: Donker Oranje (Mid Conf, Mid TtV) → bovenaan
+        {"color": (255/255, 140/255, 0/255, 0.25), "x": 1.0, "y": 5.0, "w": 6.0, "h": 5.0},
+
+        # Zone 3: Rood (Very Low Conf, Fast TtV) → bovenaan links
+        {"color": (255/255, 0/255, 0/255, 0.25), "x": 0.0, "y": 5.0, "w": 1.0, "h": 5.0},
+        
+        # Zone 4: Donkergroen (High Conf, Fast TtV) → bovenaan rechts
+        {"color": (0/255, 150/255, 0/255, 0.25), "x": 7.0, "y": 7.0, "w": 3.0, "h": 3.0},
+
+        # Zone 5: Lichtgroen (High Conf, Mid TtV) → midden rechts
+        {"color": (144/255, 238/255, 144/255, 0.25), "x": 7.0, "y": 5.0, "w": 3.0, "h": 2.0},
+
+        # Zone 6: Licht Oranje (High Conf, Slow TtV) → onderaan rechts
+        {"color": (255/255, 165/255, 0/255, 0.25), "x": 7.0, "y": 0.0, "w": 3.0, "h": 5.0},
+    ]
+    
     for zone in zones:
         rect = patches.Rectangle(
             (zone["x"], zone["y"]),
@@ -1070,38 +1158,45 @@ def vectr_chart_pdf(project_id):
 
     # --- 4. Zone kleur logica ---
     def get_zone_color_mpl(confidence, ttv):
-        x_low = CONF_LOW_THRESHOLD
+        x_low =  CONF_LOW_THRESHOLD
         x_high = CONF_MID_HIGH_THRESHOLD
         y_slow = TTV_SLOW_THRESHOLD
         y_fast = TTV_MID_THRESHOLD
 
         if confidence >= x_high:
-            if ttv >= y_fast:
-                return (0/255, 150/255, 0/255, 1)      # Donkergroen
-            elif y_slow <= ttv < y_fast:
-                return (144/255, 238/255, 144/255, 1)  # Lichtgroen
+            if ttv_scaled >= y_fast:
+                return (0/255, 150/255, 0/255, 1)
+            elif y_slow <= ttv_scaled < y_fast:
+                return (144/255, 238/255, 144/255, 1)
             else:
-                return (255/255, 165/255, 0/255, 1)    # Licht Oranje
+                return (255/255, 165/255, 0/255, 1)
         else:
-            if ttv < y_slow:
-                return (255/255, 0/255, 0/255, 1)      # Rood (Zone 1)
+            if ttv_scaled < y_slow:
+                return (255/255, 0/255, 0/255, 1)
             elif confidence < x_low:
-                return (255/255, 0/255, 0/255, 1)      # Rood (Zone 3)
+                return (255/255, 0/255, 0/255, 1)
             else:
-                return (255/255, 140/255, 0/255, 1)    # Donker Oranje
+                return (255/255, 140/255, 0/255, 1)
 
     # --- 5. Features plotten ---
     scatter_x, scatter_y, scatter_s, scatter_c, scatter_labels = [], [], [], [], []
     for f in features:
-        if f.roi_percent is not None and f.quality_score is not None and f.ttv_weeks is not None:
+        if f.roi_percent and f.quality_score and f.ttm_weeks and f.ttbv_weeks:
             conf = float(f.quality_score)
-            ttv_weeks = float(f.ttv_weeks)
+            effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
+
+            # Herschalen naar 0–10
+            if TTV_MAX > TTV_MIN:
+                ttv_scaled = (effective_ttv - TTV_MIN) / (TTV_MAX - TTV_MIN) * 10
+            else:
+                ttv_scaled = 0
+
             roiValue = float(f.roi_percent)
             size_mpl_area = max(50, min(2000, (max(0, roiValue) * 15)))
-            color = get_zone_color_mpl(conf, ttv_weeks)
+            color = get_zone_color_mpl(conf, ttv_scaled)
 
             scatter_x.append(conf)
-            scatter_y.append(ttv_weeks)
+            scatter_y.append(ttv_scaled)   # gebruik herschaalde waarde!
             scatter_s.append(size_mpl_area)
             scatter_c.append(color)
             scatter_labels.append(f.name_feature)
@@ -1112,15 +1207,18 @@ def vectr_chart_pdf(project_id):
         edgecolors="black", linewidths=1.0, alpha=0.8
     )
 
-    # --- 6. Labels ---
-    ax.set_xlabel("Confidence (Quality of Evidence - Hoger is Beter)")
-    ax.set_ylabel("Time-to-Value (TtV) in Weken (Lager is Beter)")
-    ax.set_title(f"VECTR Prioritization Chart for {project.project_name}", fontsize=14)
 
-    ax.text(CONF_LOW_THRESHOLD, TTV_MAX + 0.5, "Low", ha="left", fontsize=10, color="gray")
-    ax.text(CONF_MID_HIGH_THRESHOLD + 1.0, TTV_MAX + 0.5, "High", ha="left", fontsize=10, color="gray")
-    ax.text(CONF_MIN - 0.5, TTV_MAX - 1.0, "Fast", va="center", fontsize=10, color="gray", rotation=90)
-    ax.text(CONF_MIN - 0.5, TTV_MIN + 1.0, "Slow", va="center", fontsize=10, color="gray", rotation=90)
+    # --- 6. Labels ---
+        # As-ticks en labels
+    ax.set_xticks([0, 1, 3, 5, 7, 8, 10])
+    ax.set_xticklabels(["0", "Low", "3", "5", "7", "High", "10"])
+    ax.set_yticks([0, 1, 2, 3, 5, 7, 8, 10])
+    ax.set_yticklabels(["0", "1", "Slow", "3", "5", "7", "Fast", "10"])
+    
+    # Zet de labels en titel hier
+    ax.set_xlabel("Confidence")
+    ax.set_ylabel("Time-to-Value (TtV)")
+    ax.set_title(f"VECTR Prioritization Chart for {project.project_name}")
 
     for i, label in enumerate(scatter_labels):
         ax.annotate(label, (scatter_x[i], scatter_y[i]),

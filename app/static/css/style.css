@@ -5,19 +5,36 @@ body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
-    background-color: #bedbf7; 
+    background-color: #bedbf7;
 }
 
 /* Flash messages */
-.success, .error, .info {
+.success,
+.error,
+.info {
     padding: 10px;
     border-radius: 6px;
     margin-bottom: 10px;
     font-size: 14px;
 }
-.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-.error   { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-.info    { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
 
 
 /* ===========================
@@ -26,66 +43,79 @@ body {
 
 /* Basis voor alle knoppen */
 .btn-base {
-  min-width: 90px;
-  font-weight: 500;
-  border-radius: 6px;    
+    min-width: 90px;
+    font-weight: 500;
+    border-radius: 6px;
 }
 
 /* Top-right navigatieknoppen */
 .btn-nav {
-  background-color: #343a40; /* donkergrijs */
-  color: #fff;
+    background-color: #343a40;
+    /* donkergrijs */
+    color: #fff;
 }
+
 .btn-nav:hover {
-  background-color: #23272b;
-  color: #fff;
+    background-color: #23272b;
+    color: #fff;
 }
 
 /* Logout & Delete knoppen */
 .btn-danger-custom {
-  background-color: #dc3545;
-  color: #fff;
+    background-color: #dc3545;
+    color: #fff;
 }
+
 .btn-danger-custom:hover {
-  background-color: #c82333;
-  color: #fff;
+    background-color: #c82333;
+    color: #fff;
 }
 
 /* Edit knoppen */
 .btn-edit {
-  background-color: #c1429d;
-  color: #fff;
+    background-color: #c1429d;
+    color: #fff;
 }
+
 .btn-edit:hover {
-  background-color: #b33b91;
-  color: #fff;
+    background-color: #b33b91;
+    color: #fff;
 }
 
 /* Specifieke styling voor de VECTR Chart knop */
 .btn-vectr {
-  background-color: #00b5ad;   /* appelblauwzeegroen basis */
-  border-color: #008c85;       /* donkerder randkleur */
-  color: #fff;                 /* tekstkleur */
-  font-weight: 600;            /* iets dikker font */
-  padding: 0.4rem 1rem;        /* ruimte binnenin */
-  border-radius: 6px;          /* afgeronde hoeken */
-  transition: all 0.2s ease-in-out;
+    background-color: #00b5ad;
+    /* appelblauwzeegroen basis */
+    border-color: #008c85;
+    /* donkerder randkleur */
+    color: #fff;
+    /* tekstkleur */
+    font-weight: 600;
+    /* iets dikker font */
+    padding: 0.4rem 1rem;
+    /* ruimte binnenin */
+    border-radius: 6px;
+    /* afgeronde hoeken */
+    transition: all 0.2s ease-in-out;
 }
 
 .btn-vectr:hover {
-  background-color: #009c95;   /* donkerder bij hover */
-  border-color: #007a74;       /* nog donkerder rand */
-  color: #fff
+    background-color: #009c95;
+    /* donkerder bij hover */
+    border-color: #007a74;
+    /* nog donkerder rand */
+    color: #fff
 }
 
 /* Primary acties (Add, Save, View) */
 .btn-primary-custom {
-  background-color: #007bff;
-  color: #fff;
+    background-color: #007bff;
+    color: #fff;
 }
+
 .btn-primary-custom:hover {
-  background-color: #0056b3;
-  color: #fff;
+    background-color: #0056b3;
+    color: #fff;
 }
 
 /* Make Decision */
@@ -96,24 +126,33 @@ body {
 
 /* Secondary acties (Terug, All Features) */
 .btn-secondary-custom {
-  background-color: #6c757d;
-  color: #fff;
+    background-color: #6c757d;
+    color: #fff;
 }
+
 .btn-secondary-custom:hover {
-  background-color: #5a6268;
-  color: #fff;
+    background-color: #5a6268;
+    color: #fff;
 }
 
 /* Zorgt dat alle knoppen in tabellen dezelfde grootte hebben */
 .table-btn {
-  min-width: 100px;       /* vaste breedte voor uniformiteit */
-  height: 36px;           /* vaste hoogte */
-  display: flex;          /* flexbox voor centreren */
-  justify-content: center;/* horizontaal centreren */
-  align-items: center;    /* verticaal centreren */
-  font-size: 14px;        /* consistente tekstgrootte */
-  border-radius: 6px;     /* afgeronde hoeken */
-  padding: 0;             /* padding weg, flexbox doet het werk */
+    min-width: 100px;
+    /* vaste breedte voor uniformiteit */
+    height: 36px;
+    /* vaste hoogte */
+    display: flex;
+    /* flexbox voor centreren */
+    justify-content: center;
+    /* horizontaal centreren */
+    align-items: center;
+    /* verticaal centreren */
+    font-size: 14px;
+    /* consistente tekstgrootte */
+    border-radius: 6px;
+    /* afgeronde hoeken */
+    padding: 0;
+    /* padding weg, flexbox doet het werk */
 }
 
 
@@ -127,6 +166,7 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+
 .flash-container .alert {
     text-align: center;
 }
@@ -140,42 +180,50 @@ body {
     border-radius: 16px;
     padding: 60px 40px;
     margin: 80px auto;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
     text-align: center;
 }
+
 .welcome-container h1 {
     font-weight: 800;
     font-size: 3.5rem;
     margin-bottom: 10px;
     color: #111;
 }
+
 .subtitle {
     font-size: 1.5rem;
     color: #333;
     margin-bottom: 40px;
 }
+
 .auth-box {
     background: #fff;
     border-radius: 12px;
     display: inline-block;
     padding: 25px 40px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
 }
+
 .auth-box p {
     font-weight: 500;
     margin-bottom: 20px;
 }
-.btn-login, .btn-register {
+
+.btn-login,
+.btn-register {
     padding: 8px 20px;
     border-radius: 8px;
     min-width: 120px;
 }
+
 .footer {
     margin-top: 40px;
     color: #444;
     font-size: 0.9rem;
 }
+
 .brand {
     font-weight: 700;
 }
@@ -188,32 +236,38 @@ body {
     padding: 30px 40px;
     border-radius: 12px;
     width: 380px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
     margin: 0 auto;
     margin-top: 6%;
 }
+
 .login-title {
     text-align: center;
     margin-bottom: 25px;
     font-weight: 700;
     color: #333;
 }
+
 .form-group {
     margin-bottom: 18px;
 }
+
 label {
     font-weight: 500;
     margin-bottom: 6px;
     display: block;
     color: #555;
 }
-input, select {
+
+input,
+select {
     width: 100%;
     padding: 10px;
     border-radius: 6px;
     border: 1px solid #cccccc;
     box-sizing: border-box;
 }
+
 input[type="submit"] {
     margin-top: 10px;
     background-color: #007bff;
@@ -222,9 +276,11 @@ input[type="submit"] {
     font-weight: 600;
     cursor: pointer;
 }
+
 input[type="submit"]:hover {
     background-color: #0056b3;
 }
+
 .register-link {
     text-align: center;
     margin-top: 15px;
@@ -239,16 +295,18 @@ input[type="submit"]:hover {
     padding: 30px 40px;
     border-radius: 12px;
     width: 420px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
     margin: 0 auto;
     margin-top: 5%;
 }
+
 .register-title {
     text-align: center;
     margin-bottom: 25px;
     font-weight: 700;
     color: #333;
 }
+
 .login-link {
     text-align: center;
     margin-top: 15px;
@@ -266,31 +324,36 @@ input[type="submit"]:hover {
     align-items: center;
     text-align: center;
 }
+
 .dashboard-wrapper h1 {
     font-size: 2.3rem;
     font-weight: 600;
     margin-bottom: 25px;
     color: #222;
 }
+
 .main-buttons {
     display: flex;
     gap: 30px;
     margin-top: 20px;
 }
+
 .main-buttons .btn {
     width: 190px;
     height: 55px;
     font-size: 17px;
     border-radius: 10px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: center;
     align-items: center;
     transition: 0.2s ease-in-out;
 }
+
 .main-buttons .btn:hover {
     transform: translateY(-3px);
 }
+
 .bottom-info {
     position: fixed;
     bottom: 15px;
@@ -303,24 +366,30 @@ input[type="submit"]:hover {
    PROJECTS PAGE
    =========================== */
 .projects-wrapper {
-    max-width: 1000px;       /* of 800px, afhankelijk van je layout */
-    margin: 0 auto;          /* centreer horizontaal */
+    max-width: 1000px;
+    /* of 800px, afhankelijk van je layout */
+    margin: 0 auto;
+    /* centreer horizontaal */
     padding: 1rem;
-    background-color: #fff;  /* wit vlak */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background-color: #fff;
+    /* wit vlak */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
+
 .projects-wrapper h2 {
     margin-top: 20px;
     margin-bottom: 20px;
     font-weight: 600;
 }
+
 .top-right-fixed {
     position: fixed;
     top: 15px;
     right: 20px;
     z-index: 999;
 }
+
 table {
     text-align: center;
 }
@@ -334,10 +403,12 @@ table {
     justify-content: center;
     align-items: center;
 }
+
 .profile-card {
     width: 450px;
     border-radius: 12px;
 }
+
 .top-right {
     position: absolute;
     top: 20px;
@@ -376,8 +447,9 @@ table {
    =========================== */
 .card {
     border-radius: 12px;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
+
 .top-right {
     position: absolute;
     top: 15px;
@@ -400,18 +472,18 @@ table {
 /* Card container for the chart */
 .vectr-card {
     max-width: 800px;
-    max-height: 800px;
-    margin: 0 auto;          /* center horizontally */
-    margin-top: 2rem ;
+    margin: 0 auto;
+    /* center horizontally */
+    margin-top: 2rem;
     padding: 1rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
 
 /* Canvas sizing */
 #vectrChart {
     width: 100%;
-    height: 800px;           /* fixed height for consistent layout */
+    height: auto;
     display: block;
 }
 
@@ -419,7 +491,8 @@ table {
 .vectr-card p {
     margin-top: 1rem;
     font-size: 0.9rem;
-    color: #6c757d;          /* Bootstrap muted color */
+    color: #6c757d;
+    /* Bootstrap muted color */
     text-align: center;
 }
 
@@ -427,27 +500,30 @@ table {
    FEATURES OVERVIEW CONTAINER
    =========================== */
 .features-container-card {
-/* Stel een maximale breedte in voor de witte kaart, zodat deze niet de volledige breedte van het scherm inneemt */
+    /* Stel een maximale breedte in voor de witte kaart, zodat deze niet de volledige breedte van het scherm inneemt */
     max-width: 1000px;
-/* CENTRERING: Stelt linker- en rechtermarges in op auto */
-    margin: 40px auto 20px auto; 
-/* Voeg wat marge boven en onder toe */
-    
-/* Zorg voor de visuele stijl van de 'kaart' */
-    background-color: #ffffff; 
+    /* CENTRERING: Stelt linker- en rechtermarges in op auto */
+    margin: 40px auto 20px auto;
+    /* Voeg wat marge boven en onder toe */
+
+    /* Zorg voor de visuele stijl van de 'kaart' */
+    background-color: #ffffff;
     padding: 30px 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
+
 /* ===========================
    Table Styling
    =========================== */
 .col-actions {
-    width: 260px;  
-} 
+    width: 260px;
+}
+
 .col-roadmap {
     width: 220px;
 }
+
 .form-inline {
     display: inline;
 }
@@ -456,41 +532,47 @@ table {
 /* 1. Algemene Verbeteringen voor de Koptekstcel */
 .table thead th {
     /* Zorg voor meer padding links en rechts voor een luchtiger gevoel */
-    padding: 0.75rem 1rem; 
+    padding: 0.75rem 1rem;
 }
 
 /* 2. Verbeterde Sorteer Iconen (Pijlen) */
 .sort-icon,
 .sort-icon-placeholder {
     /* Gebruik een iets donkerder grijs voor de niet-actieve toestand, zodat ze niet wegvallen */
-    color: #a0a0a0; /* Zacht grijs */
-    font-size: 13px; /* Iets kleiner voor subtiliteit */
-    line-height: 0.5; 
+    color: #a0a0a0;
+    /* Zacht grijs */
+    font-size: 13px;
+    /* Iets kleiner voor subtiliteit */
+    line-height: 0.5;
     display: block;
     text-decoration: none;
     transition: color 0.15s ease-in-out;
-    padding: 1px 0; /* Minimalen padding om klikgebied te verbeteren */
+    padding: 1px 0;
+    /* Minimalen padding om klikgebied te verbeteren */
 }
 
 /* 3. De Actieve Sorteerpijl */
 .sort-icon.active {
     /* Gebruik de primaire tekstkleur voor scherpte */
-    color: #343a40; /* Zeer donkergrijs/bijna zwart */
+    color: #343a40;
+    /* Zeer donkergrijs/bijna zwart */
 }
 
 /* 4. Verbeterde Afstand en Uitlijning */
 .d-flex {
     /* Zorg dat de tekst op de basislijn van de cel blijft */
-    align-items: center; 
+    align-items: center;
 }
+
 .me-2 {
     /* Ruimte tussen de pijlenstapel en de tekst */
-    margin-right: 0.6rem; 
+    margin-right: 0.6rem;
 }
 
 /* Zorg dat de tekst zelf duidelijk is */
 .table thead th strong {
-    font-weight: 600; /* Iets minder hard dan bold */
+    font-weight: 600;
+    /* Iets minder hard dan bold */
 }
 
 
@@ -511,12 +593,13 @@ table {
     display: flex;
     flex-wrap: nowrap;
     /* Grote marge bovenaan zodat de milestones eronder passen */
-    margin-bottom: 25px; 
-    position: relative; 
+    margin-bottom: 25px;
+    position: relative;
 }
 
 .arrow-block {
-    display: inline-block;  /* naast elkaar */
+    display: inline-block;
+    /* naast elkaar */
     background-color: #1e4974;
     color: white;
     padding: 10px 20px;
@@ -553,21 +636,24 @@ table {
 
 .milestone-info {
     font-size: 0.9rem;
-    color:ivory;
+    color: ivory;
     margin: 5px 0;
 }
 
 .status-planned {
     color: orange;
 }
+
 .status-in-progress {
     color: #00bfff;
 }
+
 .status-done {
     color: #00ff88;
 }
 
-.edit-btn, .delete-btn {
+.edit-btn,
+.delete-btn {
     margin-right: 10px;
     background-color: #444;
     color: white;
@@ -577,11 +663,13 @@ table {
     cursor: pointer;
 }
 
-.edit-btn:hover, .delete-btn:hover {
+.edit-btn:hover,
+.delete-btn:hover {
     background-color: #666;
 }
 
-.btn-add-quarter, .btn-add-milestone-small {
+.btn-add-quarter,
+.btn-add-milestone-small {
     display: inline-block;
     margin-top: 10px;
     background-color: #007bff;
@@ -596,90 +684,108 @@ table {
    =========================== */
 
 @media (max-width: 768px) {
-    
+
     /* 1. Containers en Formulier Kaarten (Login, Register, Edit, etc.) */
     /* Vervangt vaste breedtes door percentages voor full-width weergave */
-    .login-container, 
-    .register-container, 
-    .profile-card, 
+    .login-container,
+    .register-container,
+    .profile-card,
     .form-card,
     .roadmap-form,
     .milestone-form,
-    .feature-form, /* Nieuw: de feature-form was erg breed */
+    .feature-form,
+    /* Nieuw: de feature-form was erg breed */
     .vectr-card {
-        width: 95%; /* Neem 95% van de beschikbare breedte in */
-        max-width: none; /* Negeer vaste max-breedtes */
-        margin: 20px auto; 
-        padding: 20px 15px; 
+        width: 95%;
+        /* Neem 95% van de beschikbare breedte in */
+        max-width: none;
+        /* Negeer vaste max-breedtes */
+        margin: 20px auto;
+        padding: 20px 15px;
     }
-    
+
     /* 2. Index / Welkomstpagina */
     .welcome-container {
-        margin: 40px 10px; 
+        margin: 40px 10px;
         padding: 30px 20px;
     }
+
     .welcome-container h1 {
-        font-size: 2.2rem; /* Kleinere titel */
+        font-size: 2.2rem;
+        /* Kleinere titel */
     }
+
     .subtitle {
         font-size: 1.1rem;
     }
 
     /* 3. Dashboard Knoppen (Verticale stapeling) */
     .dashboard-wrapper {
-        justify-content: flex-start; /* Begin bovenaan */
+        justify-content: flex-start;
+        /* Begin bovenaan */
         padding-top: 50px;
-        min-height: auto; 
+        min-height: auto;
     }
+
     .main-buttons {
-        flex-direction: column; /* Stapel de knoppen verticaal */
-        gap: 15px; 
-        width: 80%; 
+        flex-direction: column;
+        /* Stapel de knoppen verticaal */
+        gap: 15px;
+        width: 80%;
         margin: 20px auto;
     }
+
     .main-buttons .btn {
-        width: 100%; /* Maak knoppen volledige breedte */
-        height: 50px; 
+        width: 100%;
+        /* Maak knoppen volledige breedte */
+        height: 50px;
         font-size: 16px;
     }
+
     .bottom-info {
-        position: static; /* Plakt niet langer vast aan de onderkant van het scherm */
+        position: static;
+        /* Plakt niet langer vast aan de onderkant van het scherm */
         text-align: center;
         margin-top: 30px;
     }
-    
+
     /* 4. Projecten, Features en Tabellen */
-    .projects-wrapper, .features-container-card {
+    .projects-wrapper,
+    .features-container-card {
         padding: 10px;
-        margin: 10px auto 20px auto; 
+        margin: 10px auto 20px auto;
         width: 95%;
-        box-sizing: border-box; 
+        box-sizing: border-box;
     }
-    
+
     /* Maak de tabel zelf horizontaal scrollbaar */
     table {
-        display: block; 
-        overflow-x: auto; 
-        white-space: nowrap; 
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
     }
 
     /* Knoppen in tabellen kleiner maken */
     .table-btn {
-        min-width: 80px; 
+        min-width: 80px;
         height: 30px;
         font-size: 12px;
         padding: 0 5px;
     }
+
     .col-actions {
-        width: 180px; 
+        width: 180px;
     }
+
     .col-roadmap {
         width: 120px;
     }
 
     /* 5. Vaste elementen aanpassen */
-    .top-right-fixed, .top-right {
-        position: absolute; /* Verander 'fixed' naar 'absolute' of behoud 'absolute' */
+    .top-right-fixed,
+    .top-right {
+        position: absolute;
+        /* Verander 'fixed' naar 'absolute' of behoud 'absolute' */
         top: 10px;
         right: 10px;
         z-index: 1000;
@@ -689,8 +795,10 @@ table {
 
     /* 6. Roadmap aanpassingen (zodat alles stapelt) */
     .roadmap-timeline {
-        flex-wrap: wrap; /* Sta toe dat items naar de volgende regel gaan */
-        overflow-x: auto; /* Zorg voor scrollen als het te lang is */
+        flex-wrap: wrap;
+        /* Sta toe dat items naar de volgende regel gaan */
+        overflow-x: auto;
+        /* Zorg voor scrollen als het te lang is */
     }
 
     .arrow-block {
@@ -701,7 +809,8 @@ table {
     }
 
     .milestones-row {
-        flex-direction: column; /* Stapel mijlpalen onder elkaar */
+        flex-direction: column;
+        /* Stapel mijlpalen onder elkaar */
         gap: 0;
     }
 
