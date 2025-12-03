@@ -82,6 +82,28 @@ body {
     color: #fff;
 }
 
+/* Make Decision */
+.btn-decision-make {
+    background-color: #ffc107;
+    color: #fff;
+}
+
+/* Hover state */
+.btn-decision-make:hover {
+    background-color: #e0a800;
+    color: #fff;
+}
+
+.btn-view {
+    background-color: #0dcaf0;
+    color: #fff;
+}
+
+.btn-view:hover {
+    background-color: #0bb8db;
+    color: #fff;
+}
+
 /* Specifieke styling voor de VECTR Chart knop */
 .btn-vectr {
     background-color: #00b5ad;
@@ -118,11 +140,6 @@ body {
     color: #fff;
 }
 
-/* Make Decision */
-.btn-decision-make {
-    background-color: #ffc107;
-    color: #212529;
-}
 
 /* Secondary acties (Terug, All Features) */
 .btn-secondary-custom {
