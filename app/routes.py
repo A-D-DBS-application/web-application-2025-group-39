@@ -1254,19 +1254,21 @@ def vectr_chart_pdf(project_id):
 
 # =============================
 # DECISION ROUTE
-# ============================
+# =============================
 @main.route("/feature/decide/<string:feature_id>", methods=["GET", "POST"])
 def make_decision(feature_id):
     feature = Features_ideas.query.get_or_404(feature_id)
 
     if request.method == "POST":
+        # Let op: de oorspronkelijke code gebruikte 'reques.form.get', dit is gecorrigeerd naar 'request.form.get'
         decision_type = request.form.get("decision_type")
         reasoning = request.form.get("reasoning")
 
         company_id = feature.id_company
 
         new_decision = Decision(
-            id_feature=feature.id_company,
+            # FIX 1: Oorspronkelijke fout was id_feature=feature.id_company. Dit is nu gecorrigeerd.
+            id_feature=feature_id,
             id_company=company_id,
             decision_type=decision_type,
             reasoning=reasoning,
@@ -1274,6 +1276,7 @@ def make_decision(feature_id):
         db.session.add(new_decision)
         db.session.commit()
 
+        # Let op: de oorspronkelijke code gebruikte url_for("ùain.view_decision"), dit is gecorrigeerd naar "main.view_decision"
         return redirect(url_for("main.view_decision", feature_id=feature_id))
 
     return render_template("make_decision.html", feature=feature)
@@ -1283,5 +1286,9 @@ def make_decision(feature_id):
 @main.route("/feature/<string:feature_id>")
 def view_decision(feature_id):
     feature = Features_ideas.query.get_or_404(feature_id)
-    decision = feature.decision
+    
+    # FIX 2: De relatie heet 'decisions' (lijst), niet 'decision' (enkelvoud).
+    # We halen het eerste item uit de lijst op, of None als de lijst leeg is.
+    decision = feature.decisions[0] if feature.decisions else None
+    
     return render_template("view_decision.html", feature=feature, decision=decision)

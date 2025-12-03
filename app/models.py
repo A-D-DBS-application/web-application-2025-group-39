@@ -239,8 +239,9 @@ class Decision(db.Model):
     __tablename__ = "decision"
     __table_args__ = {"schema": "public"}
 
-    id_decision = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True) 
 
+    # Foreign keys
     id_feature = db.Column(
         db.String,
         db.ForeignKey("public.features_ideas.id_feature", ondelete="CASCADE"),
@@ -256,5 +257,6 @@ class Decision(db.Model):
     )  # e.g., Approved, Rejected, Pending
     reasoning = db.Column(db.Text, nullable=True)
 
-    date_made = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    
     feature = db.relationship("Features_ideas", back_populates="decisions")
