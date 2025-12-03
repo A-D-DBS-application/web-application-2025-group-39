@@ -441,9 +441,12 @@ def vectr_chart(project_id):
             conf = float(f.quality_score)
             effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
 
-            # Herschalen naar 0–10
+            # Herschalen naar 0–10 en inverteren: Lage TtV (Fast) moet een hoge score (10) krijgen op de Y-as.
             if TTV_MAX > TTV_MIN:
-                ttv_scaled = (effective_ttv - TTV_MIN) / (TTV_MAX - TTV_MIN) * 10
+                # Bereken de geschaalde waarde (0=snelst, 10=traagst)
+                ttv_normalized_slow_is_high = (effective_ttv - TTV_MIN) / (TTV_MAX - TTV_MIN) * 10
+                # Inverteren: 10 - waarde geeft de score: 10=snelst (hoog op Y-as), 0=traagst (laag op Y-as)
+                ttv_scaled = 10.0 - ttv_normalized_slow_is_high
             else:
                 ttv_scaled = 0
                 
@@ -1216,9 +1219,12 @@ def vectr_chart_pdf(project_id):
             conf = float(f.quality_score)
             effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
 
-            # Herschalen naar 0–10
+            # Herschalen naar 0–10 en inverteren: Lage TtV (Fast) moet een hoge score (10) krijgen op de Y-as.
             if TTV_MAX > TTV_MIN:
-                ttv_scaled = (effective_ttv - TTV_MIN) / (TTV_MAX - TTV_MIN) * 10
+                # Bereken de geschaalde waarde (0=snelst, 10=traagst)
+                ttv_normalized_slow_is_high = (effective_ttv - TTV_MIN) / (TTV_MAX - TTV_MIN) * 10
+                # Inverteren: 10 - waarde geeft de score: 10=snelst (hoog op Y-as), 0=traagst (laag op Y-as)
+                ttv_scaled = 10.0 - ttv_normalized_slow_is_high
             else:
                 ttv_scaled = 0
 
