@@ -393,6 +393,10 @@ def features_calc_ttv():
 
     return render_template("features/_ttv_partial.html", ttv_weeks=ttv_weeks_result)
 
+
+
+
+
 # ==============================
 # VECTR CHART OVERZICHT ROUTE
 # ==============================
@@ -494,7 +498,7 @@ def view_features(project_id):
 
     # 4. Bepaal de SQLAlchemy-kolom voor sortering
 
-    # Standaard query om alle features voor dit project op te halen
+    # 4. Haal alle features op
     features_query = Features_ideas.query.filter_by(id_project=project_id)
 
     if sort_by == "roi":
@@ -513,6 +517,20 @@ def view_features(project_id):
         features = features_query.order_by(column.desc()).all()
     else:
         features = features_query.order_by(column.asc()).all()
+
+    #berekening vectr score
+    for feature in features:
+        # Gebruik de opgeslagen VECTR scores
+        ttv_weeks = feature.ttv_weeks if feature.ttv_weeks is not None else 5.5
+        roi_percent = feature.roi_percent if feature.roi_percent is not None else 0.0
+        confidence_score = feature.quality_score if feature.quality_score is not None else 0.0
+        
+        # De ROI% moet gedeeld worden door 100 om als factor te dienen
+        vecr_score = ttv_weeks * roi_percent * confidence_score
+        vecr_score_rounded = round(vecr_score, 2)
+        
+        # Voeg de berekende score toe als een dynamische property aan het feature object
+        setattr(feature, 'vecr_score', vecr_score_rounded)
 
     # 6. Template Renderen (LET OP: komma's en alle benodigde variabelen)
     return render_template(
