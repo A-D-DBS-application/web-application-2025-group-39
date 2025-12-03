@@ -835,3 +835,52 @@ table {
         margin-bottom: 10px;
     }
 }
+
+
+/* ===========================
+   SIDEBAR & LAYOUT STYLING 
+   =========================== */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+:root {
+    --color-sidebar-bg: var(--color-blue-mid);    
+    --color-sidebar-hover: var(--color-blue-dark); 
+}
+
+.sidebar {
+    background-color: var(--color-sidebar-bg); 
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); 
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+}
+
+.sidebar .nav-link,
+.sidebar a {
+    display: flex; 
+    align-items: center;
+    padding: 10px 20px; 
+    color: var(--color-sidebar-link); 
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+}
+
+.sidebar .nav-link:hover,
+.sidebar a:hover {
+    background-color: var(--color-sidebar-hover);
+    color: white;
+}
+
+.sidebar .nav-link.active {
+    background-color: var(--color-primary);
+    color: white; 
+    font-weight: 600;
+    border-radius: 6px; 
+}
