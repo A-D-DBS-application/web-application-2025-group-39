@@ -40,6 +40,8 @@ from app.constants import (
     TTV_MIN, TTV_SLOW_THRESHOLD, TTV_MID_THRESHOLD, TTV_MAX
 )
 
+from app.utils.calculations import calc_roi, calc_ttv, to_numeric
+
 # Blueprint aanmaken
 main = Blueprint("main", __name__)
 
@@ -235,17 +237,6 @@ def add_feature(project_id):
         # Helper to convert safely to int
         # routes.py (Gecorrigeerde helperfunctie, noem hem to_numeric of to_int)
 
-        def to_numeric(
-            field_name, is_float=False
-        ):  # <-- Zorg dat dit argument aanwezig is!
-            raw = request.form.get(field_name, "").strip()
-            if not raw:
-                return None
-            try:
-                return float(raw) if is_float else int(raw)
-            except ValueError:
-                return None  # Zorgt ervoor dat ongeldige input None (NULL) wordt
-
         # Basic info
         name_feature = request.form.get("name_feature", "").strip()
         description = request.form.get("description", "").strip()
@@ -255,6 +246,7 @@ def add_feature(project_id):
         churn_reduction = to_numeric("churn_reduction")  # Veld toevoegen voor Churn
         cost_savings = to_numeric("cost_savings")
         investment_hours = to_numeric("investment_hours")
+        hourly_rate = to_numeric("hourly_rate")
         opex_hours = to_numeric("opex_hours")
         other_costs = to_numeric("other_costs")
         horizon = to_numeric("horizon")
@@ -290,6 +282,7 @@ def add_feature(project_id):
             "Churn Reduction": churn_reduction,
             "Cost savings": cost_savings,
             "Investment hours": investment_hours,
+            "Hourly rate": hourly_rate,
             "OPEX hours": opex_hours,
             "Other costs": other_costs,
             "Horizon": horizon,
@@ -312,28 +305,9 @@ def add_feature(project_id):
         # Create a unique ID for the feature
         new_id = str(uuid.uuid4())
 
-        # BEREKEN ROI WAARDEN
-        total_gains = (
-            (extra_revenue or 0) + (churn_reduction or 0) + (cost_savings or 0)
-        )
-        total_costs = (investment_hours or 0) + (opex_hours or 0) + (other_costs or 0)
-
-        # Bereken Expected Profit (Net Gains)
-        expected_profit = total_gains - total_costs
-
-        # Bereken ROI in percentage: (Netto Winst / Totale Kosten) * 100
-        # Alleen berekenen als de kosten > 0 zijn om delen door nul te voorkomen
-        if total_costs > 0:
-            roi_percent = ((total_gains / total_costs) - 1) * 100
-            # Afkappen op 2 decimalen
-            roi_percent = round(roi_percent, 2)
-        else:
-            # Als er geen kosten zijn, is de ROI oneindig hoog; stel een hoge (of NULL) waarde in
-            roi_percent = None if total_gains == 0 else 9999.0
-
-        # BEREKEN TTV WAARDEN
-        ttv_weeks = (ttm_weeks or 0) + (ttbv_weeks or 0)
-        ttv_weeks = float(ttv_weeks)  # Zet om naar float voor de database
+        roi_percent = calc_roi(extra_revenue, churn_reduction, cost_savings,
+                                        investment_hours, hourly_rate, opex_hours, other_costs)
+        ttv_weeks = calc_ttv(ttm_weeks, ttbv_weeks)
 
         try:
             feature = Features_ideas(
@@ -349,7 +323,6 @@ def add_feature(project_id):
                 opex_hours=opex_hours,
                 other_costs=other_costs,
                 horizon=horizon,
-                expected_profit=expected_profit,  # Berekende waarde opslaan
                 roi_percent=roi_percent,  # Berekende waarde opslaan
                 ttm_weeks=ttm_weeks,
                 ttbv_weeks=ttbv_weeks,
@@ -375,6 +348,50 @@ def add_feature(project_id):
     # GET
     return render_template("add_feature.html", project=project, company=company)
 
+# ==================================
+# LIVE CALCULATIES VOOR ROI
+# ==================================
+@main.route("/features/calc/roi", methods=["POST"])
+def features_calc_roi():
+    # Haal ruwe string-waarden op. Je calc_roi functie converteert ze intern met to_float.
+    roi_percent_raw = calc_roi(
+        request.form.get("extra_revenue"),
+        request.form.get("churn_reduction"),
+        request.form.get("cost_savings"),
+        request.form.get("investment_hours"),
+        request.form.get("hourly_rate"),
+        request.form.get("opex_hours"),
+        request.form.get("other_costs"),
+    )
+    
+    # CRUCIALE STAP: Als calc_roi None retourneert (bijv. deling door nul), toon dan 0.0
+    if roi_percent_raw is None:
+        roi_percent = 0.0
+    else:
+        # roi_percent is al afgerond in calc_roi, maar we laten het zo staan
+        roi_percent = roi_percent_raw
+    
+    # Stuur de berekende waarde terug naar de partial template
+    return render_template("features/_roi_partial.html", roi_percent=roi_percent)
+
+
+# ==================================
+# LIVE CALCULATIES VOOR TTV
+# ==================================
+@main.route("/features/calc/ttv", methods=["POST"])
+def features_calc_ttv():
+    ttv_weeks_raw = calc_ttv(
+        request.form.get("ttm_weeks"),
+        request.form.get("ttbv_weeks"),
+    )
+    
+    # CRUCIALE STAP: Als calc_ttv None retourneert, toon dan 0.0
+    if ttv_weeks_raw is None:
+        ttv_weeks_result = 0.0
+    else:
+        ttv_weeks_result = ttv_weeks_raw
+
+    return render_template("features/_ttv_partial.html", ttv_weeks=ttv_weeks_result)
 
 # ==============================
 # VECTR CHART OVERZICHT ROUTE
@@ -540,6 +557,7 @@ def edit_feature(feature_id):
             feature.churn_reduction = to_numeric("churn_reduction")
             feature.cost_savings = to_numeric("cost_savings")
             feature.investment_hours = to_numeric("investment_hours")
+            feature.hourly_rate = to_numeric("hourly_rate")
             feature.opex_hours = to_numeric("opex_hours")
             feature.other_costs = to_numeric("other_costs")
             feature.horizon = to_numeric("horizon")
@@ -548,7 +566,7 @@ def edit_feature(feature_id):
             feature.ttm_weeks = to_numeric("ttm_weeks")
             feature.ttbv_weeks = to_numeric("ttbv_weeks")
 
-            # ✅ Nieuwe min/max velden
+            # Nieuwe min/max velden
             feature.ttm_low = to_numeric("ttm_low", is_float=True)
             feature.ttm_high = to_numeric("ttm_high", is_float=True)
             feature.ttbv_low = to_numeric("ttbv_low", is_float=True)
@@ -557,18 +575,14 @@ def edit_feature(feature_id):
             # Confidence
             feature.quality_score = to_numeric("quality_score", is_float=True)
 
-            # Berekende waarden opnieuw updaten
-            total_gains = (feature.extra_revenue or 0) + (feature.churn_reduction or 0) + (feature.cost_savings or 0)
-            total_costs = (feature.investment_hours or 0) + (feature.opex_hours or 0) + (feature.other_costs or 0)
-            feature.expected_profit = total_gains - total_costs
+            # Berekeningen via utils
+            feature.roi_percent = calc_roi(
+                feature.extra_revenue, feature.churn_reduction, feature.cost_savings,
+                feature.investment_hours, feature.hourly_rate, feature.opex_hours, feature.other_costs
+            )
 
-            if total_costs > 0:
-                feature.roi_percent = round(((total_gains / total_costs) - 1) * 100, 2)
-            else:
-                feature.roi_percent = None if total_gains == 0 else 9999.0
-
-            feature.ttv_weeks = float((feature.ttm_weeks or 0) + (feature.ttbv_weeks or 0))
-
+            feature.ttv_weeks = calc_ttv(feature.ttm_weeks, feature.ttbv_weeks)
+            
             db.session.commit()
             flash("Feature updated successfully!", "success")
             return redirect(url_for("main.view_features", project_id=feature.id_project))
@@ -582,7 +596,6 @@ def edit_feature(feature_id):
 # ==============================
 # DELETE FEATURE ROUTE
 # ==============================
-
 
 @main.route("/feature/<uuid:feature_id>/delete", methods=["POST"])
 def delete_feature(feature_id):
@@ -1247,7 +1260,7 @@ def make_decision(feature_id):
     feature = Features_ideas.query.get_or_404(feature_id)
 
     if request.method == "POST":
-        decision_type = reques.form.get("decision_type")
+        decision_type = request.form.get("decision_type")
         reasoning = request.form.get("reasoning")
 
         company_id = feature.id_company
@@ -1261,7 +1274,7 @@ def make_decision(feature_id):
         db.session.add(new_decision)
         db.session.commit()
 
-        return redirect(url_for("ùain.view_decision", feature_id=feature_id))
+        return redirect(url_for("main.view_decision", feature_id=feature_id))
 
     return render_template("make_decision.html", feature=feature)
 
