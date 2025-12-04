@@ -17,6 +17,7 @@ from app.models import (
     Roadmap,
     Milestone,
     Evidence,
+    CONFIDENCE_LEVELS
 )
 import uuid  # mag blijven staan als je het later nodig hebt
 from flask import (
@@ -44,6 +45,19 @@ from app.utils.calculations import calc_roi, calc_ttv, to_numeric
 
 # Blueprint aanmaken
 main = Blueprint("main", __name__)
+
+def recompute_feature_confidence(feature):
+    """Sets feature.quality_score to highest new_confidence OR old_confidence if no evidence is left."""
+    remaining = feature.evidence
+
+    if not remaining:
+        # No evidence → use last old_confidence (if any)
+        return None  # caller will restore fallback
+
+    new_scores = [e.new_confidence for e in remaining if e.new_confidence is not None]
+
+    return max(new_scores) if new_scores else 0
+
 
 
 # ==============================
@@ -975,6 +989,10 @@ def delete_milestone(milestone_id):
 
     return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
 
+# ==============================
+# ADD EVIDENCE
+# ==============================
+
 
 @main.route("/feature/<feature_id>/add-evidence", methods=["GET", "POST"])
 def add_evidence(feature_id):
@@ -990,25 +1008,29 @@ def add_evidence(feature_id):
         return redirect(url_for("main.projects"))
 
     if request.method == "POST":
+
+        # Retrieve basic fields
         title = request.form.get("title", "").strip()
         type_select = request.form.get("type_select", "").strip()
         custom_type = request.form.get("custom_type", "").strip()
         source = request.form.get("source", "").strip()
         description = request.form.get("description", "").strip()
         attachment_url = request.form.get("attachment_url", "").strip()
-        impact_raw = request.form.get("confidence_impact", "").strip()
 
-        # Type logic
-        final_type = (
-            custom_type if (type_select == "Other" and custom_type) else type_select
-        )
+        # Determine evidence type
+        final_type = custom_type if (type_select == "Other" and custom_type) else type_select
 
-        # Impact
+        # Get new confidence
+        conf_raw = request.form.get("new_confidence", "").strip()
         try:
-            impact = float(impact_raw)
+            new_value = float(conf_raw)
         except:
-            impact = 0.0
+            new_value = 0.0
 
+        # Store old confidence BEFORE change
+        old_value = feature.quality_score or 0
+
+        # Create evidence entry
         ev = Evidence(
             id_company=user.id_company,
             id_feature=feature_id,
@@ -1017,20 +1039,33 @@ def add_evidence(feature_id):
             source=source,
             description=description,
             attachment_url=attachment_url,
-            confidence_impact=impact,
+            old_confidence=old_value,
+            new_confidence=new_value
         )
-
-        # CONFIDENCE UP
-        feature.quality_score = (feature.quality_score or 0) + impact
-
         db.session.add(ev)
-        db.session.commit()
 
+        # Update feature confidence
+        # Combine existing evidence + this one
+        all_scores = [e.new_confidence for e in feature.evidence] + [new_value]
+        feature.quality_score = max(all_scores)
+
+        db.session.commit()
         flash("Evidence added!", "success")
         return redirect(url_for("main.view_evidence", feature_id=feature_id))
 
-    return render_template("add_evidence.html", feature=feature)
+    return render_template(
+        "add_evidence.html",
+        feature=feature,
+        CONFIDENCE_LEVELS=CONFIDENCE_LEVELS
+    )
 
+
+
+
+
+# ==============================
+# VIEW EVIDENCE LIST
+# ==============================
 
 @main.route("/feature/<feature_id>/evidence")
 def view_evidence(feature_id):
@@ -1040,36 +1075,66 @@ def view_evidence(feature_id):
 
     feature = Features_ideas.query.get_or_404(feature_id)
 
-    evidence_list = Evidence.query.filter_by(id_feature=feature_id).all()
+    evidence_list = Evidence.query.filter_by(id_feature=feature_id)\
+                                  .order_by(Evidence.new_confidence.desc())\
+                                  .all()
 
     return render_template(
-        "view_evidence.html", feature=feature, evidence_list=evidence_list
+        "view_evidence.html",
+        feature=feature,
+        evidence_list=evidence_list,
+        CONFIDENCE_LEVELS=CONFIDENCE_LEVELS
     )
+
+
+
+
+# ==============================
+# DELETE EVIDENCE
+# ==============================
+
 
 
 @main.route("/evidence/<int:evidence_id>/delete", methods=["POST"])
 def delete_evidence(evidence_id):
     if "user_id" not in session:
         flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+        return redirect(url_for('main.login'))
 
-    user = Profile.query.get(session['user_id'])
+    user = Profile.query.get(session["user_id"])
     ev = Evidence.query.get_or_404(evidence_id)
     feature = Features_ideas.query.get_or_404(ev.id_feature)
 
-    # Security check: must belong to the user's company
-    if feature.id_company != user.id_company:
-         flash("Not allowed.", "danger")
-         return redirect(url_for('main.projects'))
+    if ev.id_company != user.id_company:
+        flash("Not allowed.", "danger")
+        return redirect(url_for("main.projects"))
 
-    # CONFIDENCE DOWN
-    feature.quality_score = (feature.quality_score or 0) - (ev.confidence_impact or 0)
+    # Save fallback value before deletion
+    fallback_old = ev.old_confidence or 0
 
     db.session.delete(ev)
     db.session.commit()
 
+    # Recompute remaining confidence
+    new_score = recompute_feature_confidence(feature)
+
+    if new_score is None:
+        # No remaining evidence → restore old_confidence
+        feature.quality_score = fallback_old
+    else:
+        feature.quality_score = new_score
+
+    db.session.commit()
+
     flash("Evidence deleted!", "success")
     return redirect(url_for("main.view_evidence", feature_id=feature.id_feature))
+
+
+
+
+# ==============================
+# EDIT EVIDENCE
+# ==============================
 
 
 @main.route("/evidence/<int:evidence_id>/edit", methods=["GET", "POST"])
@@ -1087,44 +1152,49 @@ def edit_evidence(evidence_id):
         return redirect(url_for("main.projects"))
 
     if request.method == "POST":
-        title = request.form.get("title", "").strip()
-        type_select = request.form.get("type_select", "").strip()
-        custom_type = request.form.get("custom_type", "").strip()
-        source = request.form.get("source", "").strip()
-        description = request.form.get("description", "").strip()
-        attachment_url = request.form.get("attachment_url", "").strip()
-        impact_raw = request.form.get("confidence_impact", "").strip()
 
-        # Determine type
-        final_type = (
-            custom_type if (type_select == "Other" and custom_type) else type_select
-        )
+        # Update fields
+        title = request.form.get("title")
+        type_select = request.form.get("type_select")
+        custom_type = request.form.get("custom_type")
+        source = request.form.get("source")
+        description = request.form.get("description")
+        attachment_url = request.form.get("attachment_url")
 
-        # Convert impact
+        final_type = custom_type if (type_select == "Other" and custom_type) else type_select
+
+        # new confidence
+        conf_raw = request.form.get("new_confidence", "")
         try:
-            new_impact = float(impact_raw)
-        except ValueError:
-            new_impact = 0.0
+            new_value = float(conf_raw)
+        except:
+            new_value = 0.0
 
-        old_impact = ev.confidence_impact or 0.0
-        old_conf = feature.quality_score or 0.0
-
-        # NEW CONFIDENCE
-        feature.quality_score = old_conf - old_impact + new_impact
-
-        # Update evidence data
+        # Update evidence record
         ev.title = title
         ev.type = final_type
         ev.source = source
         ev.description = description
         ev.attachment_url = attachment_url
-        ev.confidence_impact = new_impact
+        ev.new_confidence = new_value
 
         db.session.commit()
+
+        # Recalculate feature score
+        all_scores = [e.new_confidence for e in feature.evidence]
+        feature.quality_score = max(all_scores) if all_scores else ev.old_confidence
+
+        db.session.commit()
+
         flash("Evidence updated!", "success")
         return redirect(url_for("main.view_evidence", feature_id=feature.id_feature))
 
-    return render_template("edit_evidence.html", evidence=ev, feature=feature)
+    return render_template(
+        "edit_evidence.html",
+        evidence=ev,
+        feature=feature,
+        CONFIDENCE_LEVELS=CONFIDENCE_LEVELS
+    )
 
 
 # ====================================================

@@ -2,6 +2,20 @@ from . import db  # haal db uit __init__.py
 import datetime  # datetime importeren
 from .security import hash_password, verify_password, needs_rehash
 
+CONFIDENCE_LEVELS = {
+    0.01: "Self Conviction",
+    0.03: "Pitch Deck",
+    0.1:  "Thematic Support",
+    0.2:  "Other’s Opinion",
+    0.5:  "Estimates & Plans",
+    1.0:  "Anecdotal Evidence",
+    2.0:  "Market Data",
+    3.0:  "User/Customer Evidence",
+    7.0:  "Test Results",
+    10.0: "Launch Data"
+}
+
+
 
 class Company(db.Model):
     __tablename__ = "company"
@@ -223,16 +237,18 @@ class Evidence(db.Model):
         db.Integer, db.ForeignKey("public.company.id_company"), nullable=False
     )
 
-    # Evidence metadata
     title = db.Column(db.String)
-    type = db.Column(db.String)  # e.g., Feedback, Contract, Pilot, Data…
+    type = db.Column(db.String)
     source = db.Column(db.String)
     description = db.Column(db.Text)
     attachment_url = db.Column(db.Text)
-    confidence_impact = db.Column(db.Float)  # e.g. +0.3
+
+    # NEW SYSTEM
+    old_confidence = db.Column(db.Float)     # feature score BEFORE adding this evidence
+    new_confidence = db.Column(db.Float)     # confidence level selected from list
+
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-    # Relationship
     feature = db.relationship("Features_ideas", backref="evidence")
 
 
