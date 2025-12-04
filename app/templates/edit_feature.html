@@ -41,45 +41,91 @@
       <h4 class="mb-3">Return on Investment (ROI)</h4>
       <div class="row g-3">
         <div class="col-md-6">
-          <label class="form-label">Horizon (months)</label>
+          <label class="form-label">
+            Horizon (months)
+            <!--aanmaken van het i icoontje -->
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The number of months we look ahead to estimate the impact of this feature. During this period, we calculate expected revenue, churn reduction, and cost savings.">
+            </i>
+          </label>
           <input type="number" class="form-control" name="horizon" value="{{ feature.horizon }}" min="0">
         </div>
         <div class="col-md-6">
-          <label class="form-label">Extra Revenue</label>
+          <label class="form-label">
+            Extra Revenue
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The additional money this feature is expected to bring in during the selected time period. Use realistic estimates based on benchmarks or results from previous releases.">
+            </i>
+          </label>
           <input type="number" class="form-control" name="extra_revenue" value="{{ feature.extra_revenue }}" min="0">
         </div>
         <div class="col-md-6">
-          <label class="form-label">Churn Reduction Savings</label>
+          <label class="form-label">
+            Churn Reduction Savings
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The amount of money saved because fewer customers leave.If possible, use metrics like customer lifetime value or retention rates to estimate this.">
+            </i>
+          </label>
           <input type="number" class="form-control" name="churn_reduction" value="{{ feature.churn_reduction }}"
             min="0">
         </div>
         <div class="col-md-6">
-          <label class="form-label">Cost Savings</label>
+          <label class="form-label">
+            Cost Savings
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The direct costs that go down thanks to this feature. Examples include fewer support tickets, automation that replaces manual work, or lower operational overhead.">
+            </i>
+          </label>
           <input type="number" class="form-control" name="cost_savings" value="{{ feature.cost_savings }}" min="0">
         </div>
       </div>
       <h5 class="mt-4">Investment Cost</h5>
       <div class="row g-3">
         <div class="col-md-6">
-          <label class="form-label">Development Effort (hours)</label>
+          <label class="form-label">
+            Development Effort (hours)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="How much time the team needs to build this feature, expressed in hours or person-days. This number is used to calculate the investment cost — keep it honest and consistent.">
+            </i>
+          </label>
           <input type="number" class="form-control" name="investment_hours" value="{{ feature.investment_hours }}"
             min="0">
         </div>
         <div class="col-md-6">
-          <label class="form-label">Cost per Hour (€)</label>
+          <label class="form-label">
+            Cost per Hour (€)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The hourly cost of development. This can be internal cost or external billing rate.">
+            </i>
+          </label>
           <input type="number" class="form-control" name="hourly_rate" value="{{ feature.hourly_rate }}" min="0">
         </div>
         <div class="col-md-6">
-          <label class="form-label">OPEX (operational costs)</label>
+          <label class="form-label">
+            OPEX (operational costs)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The ongoing costs required after the feature is launched. This could be hosting, subscriptions, monitoring, or maintenance. Only include the extra costs specifically caused by this feature.">
+            </i>
+          </label>
           <input type="number" class="form-control" name="opex_hours" value="{{ feature.opex_hours }}" min="0">
         </div>
         <div class="col-md-6">
-          <label class="form-label">Other Costs (optional)</label>
+          <label class="form-label">
+            Other Costs (optional)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="A category for any costs that do not fit elsewhere.This could include licensing fees, integration costs or opportunity costs.">
+            </i>
+          </label>
           <input type="number" class="form-control" name="other_costs" value="{{ feature.other_costs }}" min="0">
         </div>
       </div>
       <div class="mt-3">
-        <label class="form-label">ROI (%)</label>
+        <label class="form-label">
+          ROI (%)
+          <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+            data-bs-content="ROI shows how much return we get from the investment. The formula: ROI = (Expected Profit over the chosen period / Total Investment Cost) times 100 It is shown as a percentage and used to determine bubble size in VECTR.">
+          </i>
+        </label>
         <input type="text" class="form-control" name="roi_percent" value="{{ feature.roi_percent }}" readonly>
       </div>
     </div>
@@ -88,15 +134,56 @@
     <div class="mb-4">
       <h4 class="mb-3">Time to Value (TTV)</h4>
       <div class="row g-3">
+        <!-- Left column: all Time-to-Market -->
         <div class="col-md-6">
-          <label class="form-label">Time-to-Market (weeks)</label>
+          <label class="form-label">Lowest Time-to-Market
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="Provide your best estimate of the minimum number of weeks required to build and release the feature. This will later be used to scale the graph correctly.">
+            </i>
+          </label>
+          <input type="number" class="form-control" name="ttm_low" value="{{ feature.ttm_low }}" min="0">
+
+          <label class="form-label mt-3">Highest Time-to-Market
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="Provide your best estimate of the maximum number of weeks required to build and release the feature. This will later be used to scale the graph correctly.">
+            </i>
+          </label>
+          <input type="number" class="form-control" name="ttm_high" value="{{ feature.ttm_high }}" min="0">
+
+          <label class="form-label mt-3">Time-to-Market (weeks)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The number of weeks needed to build and release the first usable version of the feature. This includes everything: design, development, testing and deployment.">
+            </i>
+          </label>
           <input type="number" class="form-control" name="ttm_weeks" value="{{ feature.ttm_weeks }}" min="0">
         </div>
+
+        <!-- Right column: all Time-to-Business-Value -->
         <div class="col-md-6">
-          <label class="form-label">Time-to-Business-Value (weeks)</label>
+          <label class="form-label">Lowest Time-to-Business-Value
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="Provide your best estimate of the minimum number of weeks after launch before the feature begins delivering measurable business value. This will later be used to scale the graph correctly.">
+            </i>
+          </label>
+          <input type="number" class="form-control" name="ttbv_low" value="{{ feature.ttbv_low }}" min="0">
+
+          <label class="form-label mt-3">Highest Time-to-Business-Value
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="Provide your best estimate of the maximum number of weeks after launch before the feature begins delivering measurable business value. This will later be used to scale the graph correctly.">
+            </i>
+          </label>
+          <input type="number" class="form-control" name="ttbv_high" value="{{ feature.ttbv_high }}" min="0">
+
+          <label class="form-label mt-3">Time-to-Business-Value (weeks)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The number of weeks after launch before the feature starts delivering measurable value. Examples include the first paying users, an improvement in key metrics, or visible customer adoption.">
+            </i>
+          </label>
           <input type="number" class="form-control" name="ttbv_weeks" value="{{ feature.ttbv_weeks }}" min="0">
         </div>
-        <div class="col-12">
+
+        <!-- Full width TTV summary -->
+        <div class="col-12 mt-3">
           <label class="form-label">TTV (weeks)</label>
           <input type="text" class="form-control" name="ttv_weeks" value="{{ feature.ttv_weeks }}" readonly>
         </div>
@@ -104,11 +191,16 @@
     </div>
 
     <!-- CONFIDENCE -->
-    <div class="mb-4">
+    <div class="mb-4 mt-4">
       <h4 class="mb-3">Evidence & Confidence Level</h4>
-      <label class="form-label">Confidence Level</label>
+      <label class="form-label mb-2">
+          Confidence Score
+          <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-html="true"
+            data-bs-placement="top"
+            data-bs-content="Confidence is based on the strongest available evidence. Score range: 0.01 (very weak) &rarr; 10 (strong launch data). Used for the X-axis position in the VECTR graph.">
+          </i>
+      </label>
       <select class="form-select" name="quality_score" required>
-        <option value="">Select score</option>
         <option value="0.01" {% if feature.quality_score==0.01 %}selected{% endif %}>Self Conviction — 0.01</option>
         <option value="0.03" {% if feature.quality_score==0.03 %}selected{% endif %}>Pitch Deck — 0.03</option>
         <option value="0.1" {% if feature.quality_score==0.1 %}selected{% endif %}>Thematic Support — 0.1</option>
@@ -132,5 +224,16 @@
     </a>
   </form>
 </div>
+
+<script>
+  // Initialiseer alle Popovers op de pagina
+  document.addEventListener('DOMContentLoaded', function () {
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+      // Gebruik de 'html: true' optie als je HTML in de Popover content wilt, maar hier niet nodig
+      return new bootstrap.Popover(popoverTriggerEl)
+    })
+  });
+</script>
 
 {% endblock %}
