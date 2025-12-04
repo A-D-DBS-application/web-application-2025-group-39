@@ -547,11 +547,11 @@ def view_features(project_id):
         confidence_score = feature.quality_score if feature.quality_score is not None else 0.0
         
         # De ROI% moet gedeeld worden door 100 om als factor te dienen
-        vecr_score = ttv_weeks * roi_percent * confidence_score
-        vecr_score_rounded = round(vecr_score, 2)
+        vectr_score = ttv_weeks * roi_percent * confidence_score
+        vectr_score_rounded = round(vectr_score, 2)
         
         # Voeg de berekende score toe als een dynamische property aan het feature object
-        setattr(feature, 'vecr_score', vecr_score_rounded)
+        setattr(feature, 'vectr_score', vectr_score_rounded)
 
     # 6. Template Renderen (LET OP: komma's en alle benodigde variabelen)
     return render_template(
