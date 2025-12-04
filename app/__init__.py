@@ -9,6 +9,7 @@ from config import Config
 db = SQLAlchemy()
 migrate = Migrate()
 
+
 def create_app():
     app = Flask(__name__)
 
@@ -26,7 +27,7 @@ def create_app():
     app.config.update(
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
-        SESSION_COOKIE_SECURE=False  # zet True zodra je via HTTPS draait
+        SESSION_COOKIE_SECURE=False,  # zet True zodra je via HTTPS draait
     )
 
     # DB en migratie koppelen
@@ -39,6 +40,7 @@ def create_app():
 
     # Blueprints registreren
     from app import routes, models
+
     app.register_blueprint(routes.main)
 
     return app

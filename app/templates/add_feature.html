@@ -73,7 +73,7 @@
           <label class="form-label">
             Churn Reduction Savings
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-              data-bs-content="The amount of money saved because fewer customers leave.If possible, use metrics like customer lifetime value or retention rates to estimate this.">
+              data-bs-content="The amount of money saved because fewer customers leave. If possible, use metrics like customer lifetime value or retention rates to estimate this.">
             </i>
           </label>
           <input type="number" class="form-control" name="churn_reduction" min="0">
@@ -127,14 +127,8 @@
           <input type="number" class="form-control" name="other_costs" min="0">
         </div>
       </div>
-      <div class="mt-3">
-        <label class="form-label">
-          ROI (%)
-          <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-            data-bs-content="ROI shows how much return we get from the investment. The formula: ROI = (Expected Profit over the chosen period / Total Investment Cost) times 100 It is shown as a percentage and used to determine bubble size in VECTR.">
-          </i>
-        </label>
-        <input type="text" class="form-control" name="roi_percent" placeholder="Calculated automatically" readonly>
+      <div id="roi-results">
+        {% include "features/_roi_partial.html" %}
       </div>
     </div>
 
@@ -191,45 +185,45 @@
         </div>
 
         <!-- Full width TTV summary -->
-        <div class="col-12 mt-3">
-          <label class="form-label">TTV (weeks)</label>
-          <input type="text" class="form-control" name="ttv_weeks" placeholder="Calculated automatically" readonly>
+        <div id="ttv-results">
+          {% include "features/_ttv_partial.html" %}
         </div>
       </div>
+    </div>
 
-      <!-- CONFIDENCE -->
-      <div class="mb-4 mt-4">
-        <h4 class="mb-3">Evidence & Confidence Level</h4>
-        <label class="form-label mb-2">
-          Confidence Score
-          <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-html="true"
-            data-bs-placement="top"
-            data-bs-content="Confidence is based on the strongest available evidence. Score range: 0.01 (very weak) &rarr; 10 (strong launch data). Used for the X-axis position in the VECTR graph.">
-          </i>
-        </label>
-        <select class="form-select" name="quality_score" required>
-          <option value="">Select score</option>
-          <option value="0.01">Self Conviction — 0.01</option>
-          <option value="0.03">Pitch Deck — 0.03</option>
-          <option value="0.1">Thematic Support — 0.1</option>
-          <option value="0.2">Other’s Opinion — 0.2</option>
-          <option value="0.5">Estimates & Plans — 0.5</option>
-          <option value="1">Anecdotal Evidence — 1.0</option>
-          <option value="2">Market Data — 2.0</option>
-          <option value="3">User/Customer Evidence — 3.0</option>
-          <option value="7">Test Results — 7.0</option>
-          <option value="10">Launch Data — 10.0</option>
-        </select>
-      </div>
+    <!-- CONFIDENCE -->
+    <div class="mb-4 mt-4">
+      <h4 class="mb-3">Evidence & Confidence Level</h4>
+      <label class="form-label mb-2">
+        Confidence Score
+        <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-html="true"
+          data-bs-placement="top"
+          data-bs-content="Confidence is based on the strongest available evidence. Score range: 0.01 (very weak) &rarr; 10 (strong launch data). Used for the X-axis position in the VECTR graph.">
+        </i>
+      </label>
+      <select class="form-select" name="quality_score" required>
+        <option value="">Select score</option>
+        <option value="0.01">Self Conviction — 0.01</option>
+        <option value="0.03">Pitch Deck — 0.03</option>
+        <option value="0.1">Thematic Support — 0.1</option>
+        <option value="0.2">Other’s Opinion — 0.2</option>
+        <option value="0.5">Estimates & Plans — 0.5</option>
+        <option value="1">Anecdotal Evidence — 1.0</option>
+        <option value="2">Market Data — 2.0</option>
+        <option value="3">User/Customer Evidence — 3.0</option>
+        <option value="7">Test Results — 7.0</option>
+        <option value="10">Launch Data — 10.0</option>
+      </select>
+    </div>
 
-      <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">
-        Save
-      </button>
+    <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">
+      Save
+    </button>
 
-      <a href="{{ url_for('main.view_features', project_id=project.id_project) }}"
-        class="btn btn-base btn-secondary-custom w-100 mt-2">
-        Cancel
-      </a>
+    <a href="{{ url_for('main.view_features', project_id=project.id_project) }}"
+      class="btn btn-base btn-secondary-custom w-100 mt-2">
+      Cancel
+    </a>
   </form>
 </div>
 
