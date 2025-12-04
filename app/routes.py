@@ -436,8 +436,12 @@ def vectr_chart(project_id):
     # Data transformeren naar een formaat dat geschikt is voor de grafiek (JSON)
     chart_data = []
     for f in features:
-        # Zorg ervoor dat we alleen features met geldige data plotten
-        if f.roi_percent and f.quality_score and f.ttm_weeks and f.ttbv_weeks:
+        # Zorg ervoor dat we alleen features met geldige data plotten (inclusief 0)
+        if (f.roi_percent is not None and 
+            f.quality_score is not None and 
+            f.ttm_weeks is not None and 
+            f.ttbv_weeks is not None):
+            
             conf = float(f.quality_score)
             effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
 
@@ -1148,6 +1152,7 @@ def vectr_chart_pdf(project_id):
             max_ttv = float(f.ttm_high) + float(f.ttbv_high)
             valid_ttv.append((min_ttv, max_ttv))
 
+    # Globale min/max voor alle features
     if valid_ttv:
         TTV_MIN = min(m for m, _ in valid_ttv)
         TTV_MAX = max(M for _, M in valid_ttv)
@@ -1215,7 +1220,12 @@ def vectr_chart_pdf(project_id):
     # --- 5. Features plotten ---
     scatter_x, scatter_y, scatter_s, scatter_c, scatter_labels = [], [], [], [], []
     for f in features:
-        if f.roi_percent and f.quality_score and f.ttm_weeks and f.ttbv_weeks:
+        # Zorg ervoor dat we alleen features met geldige data plotten (inclusief 0)
+        if (f.roi_percent is not None and 
+            f.quality_score is not None and 
+            f.ttm_weeks is not None and 
+            f.ttbv_weeks is not None):
+            
             conf = float(f.quality_score)
             effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
 
