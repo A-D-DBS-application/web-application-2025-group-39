@@ -4,11 +4,6 @@
 {% block body_class %}dashboard-body{% endblock %}
 
 {% block content %}
-  <!-- LOGOUT BUTTON -->
-  <div class="top-right">
-    <a href="{{ url_for('main.logout') }}" class="btn btn-base btn-danger-custom">Logout</a>
-  </div>
-
   <div class="dashboard-wrapper">
     <h1>Welcome to your Dashboard</h1>
 
@@ -19,8 +14,4 @@
     </div>
   </div>
 
-  <!-- Logged-in info bottom right -->
-  <div class="bottom-info">
-    Logged in as: <strong>{{ name }}</strong> | Role: <strong>{{ role }}</strong>
-  </div>
 {% endblock %}

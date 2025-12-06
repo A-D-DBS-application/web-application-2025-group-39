@@ -1396,3 +1396,41 @@ def view_decision(feature_id):
     decision = feature.decisions[0] if feature.decisions else None
     
     return render_template("view_decision.html", feature=feature, decision=decision)
+
+
+#route voor deraction balk:
+@main.route("/project/<string:project_id>") 
+def project_detail(project_id):
+    # 1. Haal het Project object op
+    project = Project.query.filter_by(id_project=project_id).first_or_404()
+    
+    # 2. Haal alle features op die bij dit project horen
+    features = Features_ideas.query.filter_by(id_project=project_id).all()
+
+    # 3. Render de view_features template (die je al hebt)
+    # Zorg dat de template de benodigde variabelen krijgt
+    return render_template(
+        "view_features.html", 
+        project=project, 
+        features=features
+    )
+# Dit is een Context Processor. Het injecteert de user_projects variabele in ALLE templates.
+@main.context_processor
+def inject_user_projects():
+    user_projects = []
+    user_id = session.get("user_id")
+    
+    if user_id:
+        # Stap 1: Zoek de user zijn Profile om de id_company te vinden
+        # We gaan ervan uit dat id_profile overeenkomt met de user_id in de sessie
+        profile = Profile.query.filter_by(id_profile=user_id).first() 
+        
+        if profile and profile.id_company:
+            company_id = profile.id_company
+            
+            # Stap 2: Haal alle projecten op voor die company_id
+            # Sorteer ze op naam (project_name.asc()) voor een mooie lijst
+            user_projects = Project.query.filter_by(id_company=company_id).order_by(Project.project_name.asc()).all()
+            
+    # Zorgt dat {{ user_projects }} overal beschikbaar is
+    return dict(user_projects=user_projects)
