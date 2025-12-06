@@ -1017,7 +1017,7 @@ input[type="submit"]:hover {
    ROADMAP PAGE 
    ===================================== */
 
-/* Titel boven de kaart (zoals andere pagina's) */
+/* Titel boven de kaart*/
 .roadmap-header {
     position: relative;
     display: flex;
@@ -1041,7 +1041,7 @@ input[type="submit"]:hover {
     transform: translateY(-50%);
 }
 
-/* De witte kaart waar de pijlen op staan (zelfde look als andere cards) */
+/* De witte kaart waar de pijlen op staan*/
 .roadmap-container {
     max-width: 1100px;
     margin: 0 auto 60px auto;
@@ -1082,7 +1082,7 @@ input[type="submit"]:hover {
         100% 50%,
         85% 100%,
         0 100%
-    ); /* scherpe pijl */
+    ); 
 
     box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
 
@@ -1093,7 +1093,7 @@ input[type="submit"]:hover {
     transition: transform .15s ease, box-shadow .15s ease;
 }
 
-/* Hover-lift zoals andere kaarten */
+/* Hover-lift*/
 .milestone-card:hover,
 .btn-add-milestone-small:hover {
     transform: translateY(-3px);
@@ -1120,7 +1120,7 @@ input[type="submit"]:hover {
     font-size: 0.8rem;
 }
 
-/* Statuskleuren blijven zoals je had */
+/* Statuskleuren*/
 .status-planned {
     color: #ffc107;
     font-weight: 600;
@@ -1176,7 +1176,7 @@ input[type="submit"]:hover {
     color: #ffffff;
 }
 
-/* "+ Add Milestone"-pijl: tekst gecentreerd, zelfde look */
+/* "+ Add Milestone"-pijl: tekst gecentreerd,*/
 .btn-add-milestone-small {
     display: flex;
     align-items: center;
@@ -1185,10 +1185,6 @@ input[type="submit"]:hover {
     text-decoration: none;
 }
 
-/* Quarter-error verstoppen (die tekst bovenaan) */
-.quarter-error {
-    display: none;
-}
 
 /* Mobile: pijlen onder elkaar full width */
 @media (max-width: 768px) {
