@@ -617,43 +617,112 @@ input[type="submit"]:hover {
     border-radius: 12px;
 }
 
-.projects-wrapper h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
+/* Container voor de grid van kaarten */
+.projects-grid-container {
+    padding: 30px; /* Binnenruimte in de container */
+}
+
+
+/* Stijl van de Project Kaart (de glass-card simuleren) */
+.project-card {
+    background-color: #ffffff; /* Witte achtergrond */
+    border: 1px solid #e0e0e0; /* Zachte rand */
+    border-radius: 16px; /* Afgeronde hoeken */
+    padding: 24px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    height: 100%; /* Zorgt dat alle kaarten in een rij even hoog zijn */
+}
+
+.project-card:hover {
+    transform: translateY(-4px); /* Lift effect bij hover */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Titel en Statistieken */
+.project-card .card-title {
+    font-size: 1.25rem;
     font-weight: 600;
+    margin-bottom: 0;
+    color: #1E46D0; /* Primaire kleur voor de titel */
 }
 
-.top-right-fixed {
-    position: fixed;
-    top: 80px; /* Onder de navbar */
-    right: 30px;
-    z-index: 999;
+.project-card .card-stats {
+    font-size: 0.85rem;
+    color: #6c757d; /* Grijze tekst */
+    margin: 0;
 }
 
-/* ===========================
-   PROFILE PAGE (Aangepast aan nieuwe stijl)
-   =========================== */
-.profile-wrapper {
-    min-height: 80vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.profile-card {
-    width: 450px;
+/* Project Initialen Cirkel (simulatie van de gradient-primary div) */
+.project-initials-circle {
+    width: 40px;
+    height: 40px;
     border-radius: 12px;
-    padding: 30px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background-color: #1E46D0; /* Primaire kleur */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(30, 70, 208, 0.3);
+    flex-shrink: 0; /* Zorgt ervoor dat de cirkel niet krimpt */
 }
 
-.top-right {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+/* Actie Boxen (Features/Roadmap) */
+.card-action-box {
+    padding: 15px;
+    border-radius: 10px;
+    background-color: #f7f9fc; /* Zeer lichte, off-white achtergrond */
+    border: 1px solid #ededed;
 }
 
+.card-action-box:not(:last-child) {
+    margin-bottom: 1rem; /* Afstand tussen Features en Roadmap */
+}
+
+.card-section-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Knoppen binnen de kaartacties */
+.btn-card-action {
+    /* Maak de knoppen iets kleiner en uniformer */
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Knoppen Iconen */
+.icon-sm {
+    font-size: 0.8rem;
+    margin-right: 5px;
+}
+
+
+/* Footer Actions (Edit/Delete) */
+.card-footer-actions {
+    border-color: #ededed !important; /* Lichte scheidingslijn */
+}
+
+/* Custom button overrides voor de kaart */
+.btn-edit-custom {
+    color: #495057;
+    background-color: #f1f1f1;
+    border-color: #e0eeef;
+    transition: background-color 0.2s;
+}
+
+.btn-edit-custom:hover {
+    background-color: #e5e5e5;
+    color: #333;
+}
 /* ===========================
    EDIT/ADD PROJECT PAGE (Aangepast aan nieuwe stijl)
    =========================== */

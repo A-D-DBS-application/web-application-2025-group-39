@@ -61,10 +61,10 @@
                             </div>
 
                         {% else %}
-                            <span class="no-projects-message">Geen projecten gevonden.</span>
+                            <span class="no-projects-message">No projects found.</span>
                         {% endfor %}
                         
-                        <a href="{{ url_for('main.add_project') }}" class="add-project-link"> + Nieuw Project</a>
+                        <a href="{{ url_for('main.add_project') }}" class="add-project-link"> + New Project</a>
                     </div>
 
                 </div>
@@ -74,9 +74,10 @@
         <div class="navbar-right">
             {% if "user_id" in session %}
                 <a href="{{ url_for('main.profile') }}"class="btn-login">{{ session["name"] | default('Profiel') }}</a> 
-                <a href="{{ url_for('main.logout') }}"class="btn-login">Log uit</a>
+                <a href="{{ url_for('main.logout') }}"class="btn-login">Logout</a>
+</a>
             {% else %}
-                <a href="{{ url_for('main.login') }}" class="btn-login">Log in</a>
+                <a href="{{ url_for('main.login') }}" class="btn-login">Login</a>
                 <a href="{{ url_for('main.register') }}" class="btn-register">Register</a>
             {% endif %}
         </div>
