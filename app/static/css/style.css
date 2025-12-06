@@ -1164,3 +1164,39 @@ input[type="submit"]:hover {
         margin-bottom: 10px;
     }
 }
+
+
+/* === Roadmap: pijlen op één rij === */
+
+/* De hele rij met roadmaps (bovenaan je pagina) */
+.roadmap-timeline {
+    display: flex;
+    flex-wrap: nowrap;      /* niet afbreken */
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+    overflow-x: auto;       /* als het te breed is, kan je horizontaal scrollen */
+}
+
+/* Binnen één roadmap: de pijlen zelf */
+.roadmap-quarter-range {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
+}
+
+/* Vorm & stijl van één pijl */
+.arrow-block {
+    background-color: #1E46D0;   /* blauw dat je al gebruikt */
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 5px;
+    min-width: 120px;
+    text-align: center;
+    font-weight: 600;
+
+    /* Maak er een pijl van */
+    clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%);
+}
+
+
