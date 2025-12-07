@@ -34,11 +34,11 @@
 
             <thead class="table-light">
                 <tr>
-                    <th>Title</th>
+                    <th class="text-center">Title</th>
 
                     <!-- ROI Column -->
-                    <th>
-                        <div class="d-flex align-items-center">
+                    <th class="text-center">
+                        <div class="d-flex justify-content-center align-items-center">
                             <div class="me-2">
                                 {% if can_sort %}
                                 <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='roi', direction='asc') }}"
@@ -59,8 +59,8 @@
                     </th>
 
                     <!-- TtV Column -->
-                    <th>
-                        <div class="d-flex align-items-center">
+                    <th class="text-center">
+                        <div class="d-flex justify-content-center align-items-center">
                             <div class="me-2">
                                 {% if can_sort %}
                                 <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='ttv', direction='asc') }}"
@@ -81,8 +81,8 @@
                     </th>
 
                     <!-- Confidence Column -->
-                    <th>
-                        <div class="d-flex align-items-center">
+                    <th class="text-center">
+                        <div class="d-flex justify-content-center align-items-center">
                             <div class="me-2">
                                 {% if can_sort %}
                                 <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='confidence', direction='asc') }}"
@@ -102,23 +102,19 @@
                         </div>
                     </th>
 
-                    <th>
-                        VECTR Score
-                    </th>
-
-                    <th>Horizon</th>
+                    <th class="text-center">VECTR Score</th>
+                    <th class="text-center">Horizon</th>
                     <!--Decision Column-->
-                    <th>Decision (set)</th>
-                    <th>Decision (status)</th>
-
+                    <th class="text-center">Decision (set)</th>
+                    <th class="text-center">Decision (status)</th>
                     <!-- Evidence Column -->
-                    <th>Evidence</th>
-
-                    <th class="col-actions">Actions</th>
+                    <th class="text-center">Evidence</th>
+                    <!-- Actions Column -->
+                    <th class="text-center col-actions">Actions</th>
                 </tr>
             </thead>
 
-            <tbody>
+            <tbody class="text-center">
                 {% for feature in features %}
                 <tr>
 
@@ -155,18 +151,24 @@
                     <!-- DECISION BUTTONS-->
                     <td>
                         <div class="d-flex justify-content-center gap-2">
-                            
+
                             {# De knop die de beslissing 'Yes' (Approved) via POST verstuurt #}
-                            <form method="POST" action="{{ url_for('main.set_feature_decision', feature_id=feature.id_feature, decision_value='Yes') }}" style="display:inline;">
-                                <button type="submit" class="btn-base table-btn btn-decision-yes" title="Keur de feature goed">
-                                    Ja
+                            <form method="POST"
+                                action="{{ url_for('main.set_feature_decision', feature_id=feature.id_feature, decision_value='Yes') }}"
+                                style="display:inline;">
+                                <button type="submit" class="btn-base table-btn btn-decision-yes"
+                                    title="Keur de feature goed">
+                                    yes
                                 </button>
                             </form>
 
                             {# De knop die de beslissing 'No' (Rejected) via POST verstuurt #}
-                            <form method="POST" action="{{ url_for('main.set_feature_decision', feature_id=feature.id_feature, decision_value='No') }}" style="display:inline;">
-                                <button type="submit" class="btn-base table-btn btn-danger-custom" title="Keur de feature af">
-                                    Nee
+                            <form method="POST"
+                                action="{{ url_for('main.set_feature_decision', feature_id=feature.id_feature, decision_value='No') }}"
+                                style="display:inline;">
+                                <button type="submit" class="btn-base table-btn btn-danger-custom"
+                                    title="Keur de feature af">
+                                    No
                                 </button>
                             </form>
 
@@ -175,14 +177,16 @@
 
                     <td>
                         {# 1. Haal de meest recente beslissing op uit de Decisions lijst. #}
-                        {% set latest_decision = feature.decisions | sort(attribute='created_at', reverse=True) | first %}
-                        
+                        {% set latest_decision = feature.decisions | sort(attribute='created_at', reverse=True) | first
+                        %}
+
                         {% if latest_decision %}
-                            {# 2. Toon de beslissing met een CSS klasse voor de styling (bv. decision-approved) #}
-                            <span class="decision-{{ latest_decision.decision_type | lower }}">{{ latest_decision.decision_type }}</span>
+                        {# 2. Toon de beslissing met een CSS klasse voor de styling (bv. decision-approved) #}
+                        <span class="decision-{{ latest_decision.decision_type | lower }}">{{
+                            latest_decision.decision_type }}</span>
                         {% else %}
-                            {# 3. Toon 'Nog geen beslissing' als er geen Decision records zijn. #}
-                            <span class="decision-pending">Nog geen beslissing</span>
+                        {# 3. Toon 'Nog geen beslissing' als er geen Decision records zijn. #}
+                        <span class="decision-pending">No decision yet</span>
                         {% endif %}
                     </td>
 
