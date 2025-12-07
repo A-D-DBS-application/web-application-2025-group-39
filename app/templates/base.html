@@ -19,66 +19,63 @@
 <body class="{% block body_class %}{% endblock %}">
 
 <nav class="navbar">
-        <div class="navbar-brand">
-            <a href="{{ url_for('main.index') }}">VECTR</a>
+  <div class="nav-top">
+    <div class="navbar-brand">
+      <a href="{{ url_for('main.index') }}">VECTR</a>
+    </div>
+
+    <div class="navbar-right">
+      {% if "user_id" in session %}
+        <a href="{{ url_for('main.profile') }}" class="btn-login">
+          {{ session["name"] | default('Profiel') }}
+        </a>
+        <a href="{{ url_for('main.logout') }}" class="btn-login">Logout</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="navbar-center">
+    {% if "user_id" in session %}
+      <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+
+      <div class="nav-dropdown">
+        <a href="{{ url_for('main.projects') }}" class="nav-dropdown-btn">
+          Projects <i class="bi bi-chevron-down"></i>
+        </a>
+
+        <div class="nav-dropdown-content">
+          {% for project in user_projects %}
+            <a class="project-collapse-trigger"
+               data-bs-toggle="collapse"
+               href="#project-{{ project.id_project }}"
+               role="button"
+               aria-expanded="false"
+               aria-controls="project-{{ project.id_project }}">
+              {{ project.project_name }}
+              <i class="bi bi-chevron-down"></i>
+            </a>
+
+            <div class="collapse project-menu-options" id="project-{{ project.id_project }}">
+              <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" class="project-menu-link">
+                View Features
+              </a>
+              <a href="{{ url_for('main.vectr_chart', project_id=project.id_project) }}" class="project-menu-link">
+                VECTR Chart
+              </a>
+              <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}" class="project-menu-link">
+                View Roadmap
+              </a>
+            </div>
+          {% else %}
+            <span class="no-projects-message">No projects found.</span>
+          {% endfor %}
+
+          <a href="{{ url_for('main.add_project') }}" class="add-project-link"> + New Project</a>
         </div>
-
-        <div class="navbar-center">
-            {% if "user_id" in session %}
-                <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
-                
-                <div class="nav-dropdown">
-                    <a href="{{ url_for('main.projects') }}" class="nav-dropdown-btn">
-                        Projects
-                        <i class="bi bi-chevron-down"></i> </a>
-                    
-                    <div class="nav-dropdown-content">
-    
-                        {% for project in user_projects %}
-                            
-                            <a class="project-collapse-trigger" 
-                            data-bs-toggle="collapse" 
-                            href="#project-{{ project.id_project }}" 
-                            role="button" 
-                            aria-expanded="false" 
-                            aria-controls="project-{{ project.id_project }}">
-                                {{ project.project_name }}
-                                <i class="bi bi-chevron-down"></i> </a>
-                            
-                            <div class="collapse project-menu-options" id="project-{{ project.id_project }}">
-                                
-                                <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" class="project-menu-link">
-                                    View Features
-                                </a>
-
-                                <a href="{{ url_for('main.vectr_chart', project_id=project.id_project) }}" class="project-menu-link">
-                                    VECTR Chart
-                                </a>
-                                
-                                <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}" class="project-menu-link">
-                                    View Roadmap
-                                </a>
-                            </div>
-
-                        {% else %}
-                            <span class="no-projects-message">No projects found.</span>
-                        {% endfor %}
-                        
-                        <a href="{{ url_for('main.add_project') }}" class="add-project-link"> + New Project</a>
-                    </div>
-
-                </div>
-                {% endif %}
-        </div>
-
-        <div class="navbar-right">
-            {% if "user_id" in session %}
-                <a href="{{ url_for('main.profile') }}"class="btn-login">{{ session["name"] | default('Profiel') }}</a> 
-                <a href="{{ url_for('main.logout') }}"class="btn-login">Logout</a>
-</a>
-            {% endif %}
-        </div>
-    </nav>
+      </div>
+    {% endif %}
+  </div>
+</nav>
 
     <div class="main-layout">
         {% block sidebar %}
