@@ -16,6 +16,20 @@ from app.utils.form_helpers import prepare_vectr_chart_data, require_login, requ
 # Blueprint
 main = Blueprint("main", __name__)
 
+#helper om te controleren of gebruiker zaken mag doen.
+def require_editor_access():
+    
+    # 1. Login check
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user  # Retourneert direct de redirect response
+
+    # 2. Role check
+    role_redirect = require_role(["founder", "PM"], user)
+    if role_redirect:
+        return role_redirect # Retourneert direct de redirect response
+        
+    return user
 
 # ==============================
 # INDEX
@@ -160,21 +174,6 @@ def projects():
     return render_template("projects.html", projects=projects)
 
 
-def require_editor_access():
-    """
-    Controleert of de gebruiker is ingelogd en de rol 'founder' of 'PM' heeft.
-    """
-    # 1. Login check
-    user = require_login()
-    if not isinstance(user, Profile):
-        return user  # Retourneert direct de redirect response
-
-    # 2. Role check
-    role_redirect = require_role(["founder", "PM"], user)
-    if role_redirect:
-        return role_redirect # Retourneert direct de redirect response
-        
-    return user
 
 # ==============================
 # ADD PROJECT
