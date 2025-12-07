@@ -200,16 +200,17 @@
         </i>
       </label>
       <select class="form-select" name="quality_score" required>
-        <option value="0.01" {% if feature.quality_score==0.01 %}selected{% endif %}>Self Conviction — 0.01</option>
-        <option value="0.03" {% if feature.quality_score==0.03 %}selected{% endif %}>Pitch Deck — 0.03</option>
-        <option value="0.1" {% if feature.quality_score==0.1 %}selected{% endif %}>Thematic Support — 0.1</option>
-        <option value="0.2" {% if feature.quality_score==0.2 %}selected{% endif %}>Other’s Opinion — 0.2</option>
-        <option value="0.5" {% if feature.quality_score==0.5 %}selected{% endif %}>Estimates & Plans — 0.5</option>
-        <option value="1" {% if feature.quality_score==1 %}selected{% endif %}>Anecdotal Evidence — 1.0</option>
-        <option value="2" {% if feature.quality_score==2 %}selected{% endif %}>Market Data — 2.0</option>
-        <option value="3" {% if feature.quality_score==3 %}selected{% endif %}>User/Customer Evidence — 3.0</option>
-        <option value="7" {% if feature.quality_score==7 %}selected{% endif %}>Test Results — 7.0</option>
-        <option value="10" {% if feature.quality_score==10 %}selected{% endif %}>Launch Data — 10.0</option>
+        <option value="0" {% if feature.quality_score==0 %}selected{% endif %}>No Longer Relevant (0.0) - Evidence is outdated or invalid and will no longer be considered.</option>
+        <option value="0.01" {% if feature.quality_score==0.01 %}selected{% endif %}>Self Conviction (0.01) - Your own belief or intuition that the feature is important.</option>
+        <option value="0.03" {% if feature.quality_score==0.03 %}selected{% endif %}>Pitch Deck (0.03) - Information from high-level presentations; not validated.</option>
+        <option value="0.1" {% if feature.quality_score==0.1 %}selected{% endif %}>Thematic Support (0.10) - Fits the overall strategy but has no strong evidence.</option>
+        <option value="0.2" {% if feature.quality_score==0.2 %}selected{% endif %}>Other's Opinion (0.20) - Someone else's judgement; subjective evidence.</option>
+        <option value="0.5" {% if feature.quality_score==0.5 %}selected{% endif %}>Estimates & Plans (0.50) - Forward-looking assumptions or planning data.</option>
+        <option value="1" {% if feature.quality_score==1 %}selected{% endif %}>Anecdotal Evidence (1.0) - Stories, experiences, isolated examples.</option>
+        <option value="2" {% if feature.quality_score==2 %}selected{% endif %}>Market Data (2.0) - Research or trend information; moderately strong.</option>
+        <option value="3" {% if feature.quality_score==3 %}selected{% endif %}>User/Customer Evidence (3.0) - Direct feedback or behavior from users.</option>
+        <option value="7" {% if feature.quality_score==7 %}selected{% endif %}>Test Results (7.0) - Data from experiments or tests; very strong evidence.</option>
+        <option value="10" {% if feature.quality_score==10 %}selected{% endif %}>Launch Data (10.0) - Real usage data after launch; strongest evidence.</option>
       </select>
     </div>
 
