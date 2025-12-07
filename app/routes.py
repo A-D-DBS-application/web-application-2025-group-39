@@ -160,19 +160,30 @@ def projects():
     return render_template("projects.html", projects=projects)
 
 
+def require_editor_access():
+    """
+    Controleert of de gebruiker is ingelogd en de rol 'founder' of 'PM' heeft.
+    """
+    # 1. Login check
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user  # Retourneert direct de redirect response
+
+    # 2. Role check
+    role_redirect = require_role(["founder", "PM"], user)
+    if role_redirect:
+        return role_redirect # Retourneert direct de redirect response
+        
+    return user
+
 # ==============================
 # ADD PROJECT
 # ==============================
 @main.route("/add_project", methods=["GET", "POST"])
 def add_project():
-    user = require_login()
+    user = require_editor_access()
     if not isinstance(user, Profile):
-        return user
-
-    # Only founder/PM
-    role_redirect = require_role(["founder", "PM"], user)
-    if role_redirect:
-        return role_redirect
+        return user # Afgevangen door helper: retourneert redirect/error
 
     user_company = Company.query.get(user.id_company)
 
@@ -195,22 +206,18 @@ def add_project():
 
     return render_template("add_project.html", company=user_company)
 
-
 # ==============================
 # EDIT PROJECT
 # ==============================
 @main.route("/projects/edit/<int:project_id>", methods=["GET", "POST"])
 def edit_project(project_id):
-    user = require_login()
+    user = require_editor_access()
     if not isinstance(user, Profile):
-        return user
+        return user # Afgevangen door helper: retourneert redirect/error
 
     project = Project.query.get_or_404(project_id)
 
-    # Only founder/PM + same company
-    role_redirect = require_role(["founder", "PM"], user)
-    if role_redirect:
-        return role_redirect
+    # De volgende stap moet in deze route blijven, omdat deze projectspecifiek is.
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
         return company_redirect
@@ -267,14 +274,7 @@ def delete_project(project_id):
 # ==============================
 @main.route("/projects/<int:project_id>/add-feature", methods=["GET", "POST"])
 def add_feature(project_id):
-    user = require_login()
-    if not isinstance(user, Profile):
-        return user
-
-    # Only founder/PM
-    role_redirect = require_role(["founder", "PM"], user)
-    if role_redirect:
-        return role_redirect
+    user = require_editor_access()
 
     project = Project.query.get_or_404(project_id)
     company_redirect = require_company_ownership(project.id_company, user)
@@ -668,14 +668,7 @@ def edit_roadmap(roadmap_id):
 
 @main.route("/milestone/add/<int:roadmap_id>", methods=["GET", "POST"])
 def add_milestone(roadmap_id):
-    user = require_login()
-    if not isinstance(user, Profile):
-        return user
-
-    # founder / PM only
-    role_redirect = require_role(["founder", "PM"], user)
-    if role_redirect:
-        return role_redirect
+    user = require_editor_access()
 
     roadmap = Roadmap.query.get_or_404(roadmap_id)
     project = Project.query.get_or_404(roadmap.id_project)
@@ -745,14 +738,7 @@ def add_milestone(roadmap_id):
 
 @main.route("/milestone/edit/<int:milestone_id>", methods=["GET", "POST"])
 def edit_milestone(milestone_id):
-    user = require_login()
-    if not isinstance(user, Profile):
-        return user
-
-    # founder / PM only
-    role_redirect = require_role(["founder", "PM"], user)
-    if role_redirect:
-        return role_redirect
+    user = require_editor_access()
 
     milestone = Milestone.query.get_or_404(milestone_id)
     roadmap = Roadmap.query.get_or_404(milestone.id_roadmap)
