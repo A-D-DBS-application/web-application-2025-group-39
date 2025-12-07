@@ -1,7 +1,7 @@
 # app/utils/form_helpers.py
 
 from flask import session, flash, redirect, url_for
-from app.models import Profile, CONFIDENCE_LEVELS
+from app.models import Profile, CONFIDENCE_LEVELS, Features_ideas
 
 # -----------------------------------
 # LOGIN / ROLE / OWNERSHIP HELPERS
@@ -36,6 +36,63 @@ def require_company_ownership(obj_company_id: int, user: Profile):
         flash("Not allowed.", "danger")
         return redirect(url_for("main.dashboard"))
     return None
+
+# -----------------------------------
+# vectr chart HELPERS
+# -----------------------------------
+def prepare_vectr_chart_data(features_list):
+    """
+    Verwerkt een lijst van features in de genormaliseerde structuur die Chart.js nodig heeft,
+    inclusief TtV-normalisatie (schaling).
+    """
+    valid_ttv = []
+    for f in features_list:
+        if (
+            f.ttm_low is not None
+            and f.ttbv_low is not None
+            and f.ttm_high is not None
+            and f.ttbv_high is not None
+        ):
+            min_ttv = float(f.ttm_low) + float(f.ttbv_low)
+            max_ttv = float(f.ttm_high) + float(f.ttbv_high)
+            valid_ttv.append((min_ttv, max_ttv))
+
+    if valid_ttv:
+        local_TTV_MIN = min(m for m, _ in valid_ttv)
+        local_TTV_MAX = max(M for _, M in valid_ttv)
+    else:
+        local_TTV_MIN, local_TTV_MAX = 0.0, 10.0
+
+    chart_data = []
+    for f in features_list:
+        if (
+            f.roi_percent is not None
+            and f.quality_score is not None
+            and f.ttm_weeks is not None
+            and f.ttbv_weeks is not None
+        ):
+            conf = float(f.quality_score)
+            effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
+
+            if local_TTV_MAX > local_TTV_MIN:
+                ttv_norm = (effective_ttv - local_TTV_MIN) / (
+                    local_TTV_MAX - local_TTV_MIN
+                ) * 10
+                ttv_scaled = 10.0 - ttv_norm
+            else:
+                ttv_scaled = 0
+
+            chart_data.append(
+                {
+                    "name": f.name_feature,
+                    "confidence": conf,
+                    "ttv": ttv_scaled,
+                    "ttv_weeks": effective_ttv,
+                    "roi": float(f.roi_percent),
+                    "id": f.id_feature,
+                }
+            )
+    return chart_data
 
 
 # -----------------------------------

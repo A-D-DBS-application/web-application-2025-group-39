@@ -27,3 +27,14 @@ def to_numeric(raw_value):
         return float(str(raw_value).strip())
     except ValueError:
         return 0
+    
+def calculate_vectr_scores(features_list):
+    """Berekent de VECTR-score en voegt deze toe aan elk Feature-object."""
+    for f in features_list:
+        ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
+        roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
+        confidence_score = f.quality_score if f.quality_score is not None else 0.0
+        vectr_score = ttv_weeks * roi_percent * confidence_score
+        setattr(f, "vectr_score", round(vectr_score, 2))
+    return features_list
+

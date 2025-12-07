@@ -1,61 +1,17 @@
-from flask import (
-    Blueprint,
-    render_template,
-    request,
-    redirect,
-    url_for,
-    flash,
-    jsonify,
-    session,
-    send_file,
-    Response,
-)
-from app import db
-from app.models import (
-    Profile,
-    Company,
-    Project,
-    Features_ideas,
-    Roadmap,
-    Milestone,
-    Evidence,
-    Decision,
-    CONFIDENCE_LEVELS,
-)
-
 import uuid
 import datetime
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, send_file, Response
+from app import db
+from app.models import Profile, Company, Project, Features_ideas, Roadmap, Milestone, Evidence, Decision, CONFIDENCE_LEVELS
 from io import BytesIO
-
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.patches as patches
-
-from app.constants import (
-    CONF_MIN,
-    CONF_LOW_THRESHOLD,
-    CONF_MID_HIGH_THRESHOLD,
-    CONF_MAX,
-    TTV_MIN,
-    TTV_SLOW_THRESHOLD,
-    TTV_MID_THRESHOLD,
-    TTV_MAX,
-)
-
+from app.constants import CONF_MIN, CONF_LOW_THRESHOLD, CONF_MID_HIGH_THRESHOLD, CONF_MAX, TTV_MIN, TTV_SLOW_THRESHOLD, TTV_MID_THRESHOLD, TTV_MAX
 from app.utils.calculations import calc_roi, calc_ttv, to_numeric
-from app.utils.form_helpers import (
-    require_login,
-    require_role,
-    require_company_ownership,
-    parse_project_form,
-    parse_feature_form,
-    parse_roadmap_form,
-    parse_milestone_form,
-    parse_evidence_form,
-    recompute_feature_confidence,
-)
+from app.utils.form_helpers import prepare_vectr_chart_data, require_login, require_role, require_company_ownership, parse_project_form, parse_feature_form, parse_roadmap_form, parse_milestone_form, parse_evidence_form, recompute_feature_confidence
 
 # Blueprint
 main = Blueprint("main", __name__)
@@ -72,17 +28,18 @@ def index():
 
 
 # ==============================
-# LOGIN
+# LOGIN, REGISTER, LOGOUT
 # ==============================
 @main.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         email = (request.form.get("email") or "").lower().strip()
-        password = request.form.get("password") or ""
-
+        password = request.form.get("password") 
+        #zoek gebruiker op basis van email
         user = Profile.query.filter_by(email=email).first()
-        if user and user.check_password(password):
-            session["user_id"] = user.id_profile
+        #controleer of gebruiker bestaat
+        if user and user.check_password(password):                  #controleer of wachtwoord overeenkomt
+            session["user_id"] = user.id_profile                    
             session["name"] = user.name
             session["role"] = user.role
             flash("Successfully logged in!", "success")
@@ -92,47 +49,36 @@ def login():
 
     return render_template("login.html")
 
-
-# ==============================
-# REGISTER
-# ==============================
 @main.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        name = request.form.get("name", "").strip()
+        #haal de gegevens op 
+        name = request.form.get("name")
         email = (request.form.get("email") or "").lower().strip()
-        password = request.form.get("password", "")
-        role = request.form.get("role", "")
-        company_name = request.form.get("company_name", "").strip()
+        password = request.form.get("password")
+        role = request.form.get("role")
+        company_name = request.form.get("company_name")
 
         if not all([name, email, password, role, company_name]):
             flash("All fields are required.", "danger")
             return render_template("register.html")
+        
+        #controleer of de gebruiker al bestaat op basis van email 
+        if Profile.query.filter((Profile.email == email)).first():
+            flash("This e-mail address is already registered.", "danger") 
+            return redirect(url_for('main.register'))
 
         try:
-            # Find or create company
-            company = db.session.execute(
-                db.text(
-                    "SELECT * FROM public.company WHERE company_name = :company_name LIMIT 1"
-                ),
-                {"company_name": company_name},
-            ).fetchone()
+            #Vind of maak bedrijf aan
+            company = Company.query.filter_by(company_name=company_name).first()
 
+            #maak nieuw bedrijf aan
             if not company:
-                db.session.execute(
-                    db.text(
-                        "INSERT INTO public.company (company_name) VALUES (:company_name)"
-                    ),
-                    {"company_name": company_name},
-                )
+                new_company = Company(company_name=company_name)
+                db.session.add(new_company)
                 db.session.commit()
-                company = db.session.execute(
-                    db.text(
-                        "SELECT * FROM public.company WHERE company_name = :company_name LIMIT 1"
-                    ),
-                    {"company_name": company_name},
-                ).fetchone()
-
+                company = new_company  # Gebruik het nieuwe ORM-object
+            #maak nieuwe gebruiker aan
             new_user = Profile(
                 name=name,
                 email=email,
@@ -140,7 +86,7 @@ def register():
                 id_company=company.id_company,
             )
             new_user.set_password(password)
-
+            #voeg gebruiker toe aan databaase
             db.session.add(new_user)
             db.session.commit()
 
@@ -151,8 +97,14 @@ def register():
             db.session.rollback()
             print(f"Registration error: {e}")
             flash("An error occurred during registration.", "danger")
-
+    #bij een GET-verzoek toon het registratieformulier
     return render_template("register.html")
+
+@main.route("/logout")
+def logout():
+    session.clear()
+    flash("You have been logged out.", "info")
+    return redirect(url_for("main.index"))
 
 
 # ==============================
@@ -168,15 +120,6 @@ def dashboard():
     role = session.get("role")
     return render_template("dashboard.html", name=name, role=role)
 
-
-# ==============================
-# LOGOUT
-# ==============================
-@main.route("/logout")
-def logout():
-    session.clear()
-    flash("You have been logged out.", "info")
-    return redirect(url_for("main.index"))
 
 
 # ==============================
@@ -438,7 +381,8 @@ def view_features(project_id):
     if company_redirect:
         return company_redirect
 
-    company = Company.query.get(user.id_company)
+    # Company ophalen via project-relatie (aangenomen dat project.company bestaat)
+    company = project.company
 
     user_role = session.get("role")
     can_sort = user_role == "PM"
@@ -583,6 +527,7 @@ def delete_feature(feature_id):
     return redirect(url_for("main.view_features", project_id=project_id))
 
 
+
 # ==============================
 # VECTR CHART (WEB)
 # ==============================
@@ -597,55 +542,11 @@ def vectr_chart(project_id):
     if company_redirect:
         return company_redirect
 
+    # Gebruik ORM relatie om features op te halen
     features = Features_ideas.query.filter_by(id_project=project_id).all()
 
-    valid_ttv = []
-    for f in features:
-        if (
-            f.ttm_low is not None
-            and f.ttbv_low is not None
-            and f.ttm_high is not None
-            and f.ttbv_high is not None
-        ):
-            min_ttv = float(f.ttm_low) + float(f.ttbv_low)
-            max_ttv = float(f.ttm_high) + float(f.ttbv_high)
-            valid_ttv.append((min_ttv, max_ttv))
-
-    if valid_ttv:
-        local_TTV_MIN = min(m for m, _ in valid_ttv)
-        local_TTV_MAX = max(M for _, M in valid_ttv)
-    else:
-        local_TTV_MIN, local_TTV_MAX = 0.0, 10.0
-
-    chart_data = []
-    for f in features:
-        if (
-            f.roi_percent is not None
-            and f.quality_score is not None
-            and f.ttm_weeks is not None
-            and f.ttbv_weeks is not None
-        ):
-            conf = float(f.quality_score)
-            effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
-
-            if local_TTV_MAX > local_TTV_MIN:
-                ttv_norm = (effective_ttv - local_TTV_MIN) / (
-                    local_TTV_MAX - local_TTV_MIN
-                ) * 10
-                ttv_scaled = 10.0 - ttv_norm
-            else:
-                ttv_scaled = 0
-
-            chart_data.append(
-                {
-                    "name": f.name_feature,
-                    "confidence": conf,
-                    "ttv": ttv_scaled,
-                    "ttv_weeks": effective_ttv,
-                    "roi": float(f.roi_percent),
-                    "id": f.id_feature,
-                }
-            )
+    #De hele TtV-normalisatie en chart_data-constructie is verplaatst
+    chart_data = prepare_vectr_chart_data(features) 
 
     return render_template("vectr_chart.html", project=project, chart_data=chart_data)
 
