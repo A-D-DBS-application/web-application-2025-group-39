@@ -1244,3 +1244,49 @@ input[type="submit"]:hover {
     background-color: #218838;
     border-color: #1e7e34;
 }
+
+
+/* Navbar layout in 2 rijen */
+.navbar {
+  flex-direction: column;          /* belangrijk: top rij + menu rij */
+  gap: 10px;
+}
+
+.nav-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Center row blijft bestaan */
+.navbar-center {
+  width: 100%;
+  margin-left: 0;                  /* je had margin-left:50px */
+}
+
+/* Mobile: zet knoppen bovenaan en menu eronder */
+@media (max-width: 768px) {
+  .nav-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .navbar-right {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .navbar-center {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .navbar-center a {
+    margin: 0 12px 0 0;            /* minder ruimte */
+  }
+}
