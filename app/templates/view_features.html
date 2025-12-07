@@ -150,7 +150,7 @@
 
                     <!-- DECISION BUTTONS-->
                     <td>
-                        <div class="d-flex justify-content-center gap-2">
+                        <div class="d-flex flex-column align-items-center gap-2">
 
                             {# De knop die de beslissing 'Yes' (Approved) via POST verstuurt #}
                             <form method="POST"
@@ -193,7 +193,7 @@
 
                     <!-- EVIDENCE BUTTONS -->
                     <td>
-                        <div class="d-flex justify-content-center gap-2">
+                        <div class="d-flex flex-column align-items-center gap-2">
 
                             <a href="{{ url_for('main.add_evidence', feature_id=feature.id_feature) }}"
                                 class="btn btn-success table-btn btn-sm">
@@ -210,7 +210,7 @@
 
                     <!-- ACTIONS -->
                     <td>
-                        <div class="d-flex justify-content-center gap-2">
+                        <div class="d-flex flex-column align-items-center gap-2">
 
                             <a href="{{ url_for('main.edit_feature', feature_id=feature.id_feature) }}"
                                 class="btn btn-edit table-btn btn-sm">
