@@ -2,18 +2,20 @@ from . import db  # haal db uit __init__.py
 import datetime  # datetime importeren
 from .security import hash_password, verify_password, needs_rehash
 
-CONFIDENCE_LEVELS = {
-    0.01: "Self Conviction",
-    0.03: "Pitch Deck",
-    0.1:  "Thematic Support",
-    0.2:  "Other’s Opinion",
-    0.5:  "Estimates & Plans",
-    1.0:  "Anecdotal Evidence",
-    2.0:  "Market Data",
-    3.0:  "User/Customer Evidence",
-    7.0:  "Test Results",
-    10.0: "Launch Data"
-}
+CONFIDENCE_LEVELS = [
+    (0.0,  "No Longer Relevant"),
+    (0.01, "Self Conviction"),
+    (0.03, "Pitch Deck"),
+    (0.1,  "Thematic Support"),
+    (0.2,  "Other’s Opinion"),
+    (0.5,  "Estimates & Plans"),
+    (1.0,  "Anecdotal Evidence"),
+    (2.0,  "Market Data"),
+    (3.0,  "User/Customer Evidence"),
+    (7.0,  "Test Results"),
+    (10.0, "Launch Data")
+]
+
 
 
 

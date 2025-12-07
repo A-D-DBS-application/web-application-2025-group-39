@@ -7,6 +7,8 @@ from flask import (
     flash,
     jsonify,
     session,
+    send_file,
+    Response,
 )
 from app import db
 from app.models import (
@@ -17,121 +19,101 @@ from app.models import (
     Roadmap,
     Milestone,
     Evidence,
-    CONFIDENCE_LEVELS
+    Decision,
+    CONFIDENCE_LEVELS,
 )
-import uuid  # mag blijven staan als je het later nodig hebt
-from flask import (
-    send_file,
-)  # send_file laat je een bestand terugsturen als HTTP response (voor PDF knop)
-from io import (
-    BytesIO,
-)  # BytesIO is een buffer in geheugen (geen fysiek bestand) (voor PDF knop)
+
+import uuid
+import datetime
+from io import BytesIO
 
 import matplotlib
-
-matplotlib.use("Agg")  # gebruik een non-GUI backend (belangrijk op macOS servers)
-import matplotlib.pyplot as plt  # Matplotlib gebruiken we om de grafiek te tekenen (voor PDF knop)
-import datetime         # nodig voor inloggen
-
-import numpy as np  # Nodig voor array bewerkingen als u dit in een aparte file zet
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import numpy as np
 import matplotlib.patches as patches
 
 from app.constants import (
-    CONF_MIN, CONF_LOW_THRESHOLD, CONF_MID_HIGH_THRESHOLD, CONF_MAX,
-    TTV_MIN, TTV_SLOW_THRESHOLD, TTV_MID_THRESHOLD, TTV_MAX
+    CONF_MIN,
+    CONF_LOW_THRESHOLD,
+    CONF_MID_HIGH_THRESHOLD,
+    CONF_MAX,
+    TTV_MIN,
+    TTV_SLOW_THRESHOLD,
+    TTV_MID_THRESHOLD,
+    TTV_MAX,
 )
 
 from app.utils.calculations import calc_roi, calc_ttv, to_numeric
+from app.utils.form_helpers import (
+    require_login,
+    require_role,
+    require_company_ownership,
+    parse_project_form,
+    parse_feature_form,
+    parse_roadmap_form,
+    parse_milestone_form,
+    parse_evidence_form,
+    recompute_feature_confidence,
+)
 
-# Blueprint aanmaken
+# Blueprint
 main = Blueprint("main", __name__)
-
-def recompute_feature_confidence(feature):
-    """Sets feature.quality_score to highest new_confidence OR old_confidence if no evidence is left."""
-    remaining = feature.evidence
-
-    if not remaining:
-        # No evidence → use last old_confidence (if any)
-        return None  # caller will restore fallback
-
-    new_scores = [e.new_confidence for e in remaining if e.new_confidence is not None]
-
-    return max(new_scores) if new_scores else 0
-
 
 
 # ==============================
-# INDEX ROUTE
+# INDEX
 # ==============================
 @main.route("/", methods=["GET"])
 def index():
-    # If logged in → go to dashboard
     if "user_id" in session:
         return redirect(url_for("main.dashboard"))
-
-    # Otherwise → show start page
     return render_template("index.html")
 
 
 # ==============================
-# LOGIN ROUTE
+# LOGIN
 # ==============================
 @main.route("/login", methods=["GET", "POST"])
 def login():
-    print("Login route started")
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
+        email = (request.form.get("email") or "").lower().strip()
+        password = request.form.get("password") or ""
 
-        email_to_lookup = email.lower()
-
-        print(f"Login attempt received: email={email}")
-
-        # Zoek user op email
-        user = Profile.query.filter_by(email=email_to_lookup).first()
-
-        # Controleer wachtwoord via Argon2
+        user = Profile.query.filter_by(email=email).first()
         if user and user.check_password(password):
             session["user_id"] = user.id_profile
             session["name"] = user.name
             session["role"] = user.role
-
             flash("Successfully logged in!", "success")
-            print("Login successful")
             return redirect(url_for("main.dashboard"))
-        else:
-            flash("Invalid email or password.", "danger")
-            print("Invalid credentials")
+
+        flash("Invalid email or password.", "danger")
 
     return render_template("login.html")
 
 
 # ==============================
-# REGISTER ROUTE (WORKS WITH SUPABASE STRUCTURE)
+# REGISTER
 # ==============================
 @main.route("/register", methods=["GET", "POST"])
 def register():
-    print("Register route started")
-
     if request.method == "POST":
-        name = request.form.get("name")
-        email = request.form.get("email")
-        password = request.form.get("password")
-        role = request.form.get("role")
-        company_name = request.form.get("company_name")
+        name = request.form.get("name", "").strip()
+        email = (request.form.get("email") or "").lower().strip()
+        password = request.form.get("password", "")
+        role = request.form.get("role", "")
+        company_name = request.form.get("company_name", "").strip()
 
-        email_to_store = email.lower()
-
-        print(f"Full request.form content: {request.form}")
-        print(f"Data received: {name} {email} {role} {company_name}")
+        if not all([name, email, password, role, company_name]):
+            flash("All fields are required.", "danger")
+            return render_template("register.html")
 
         try:
-            # Zoek of company bestaat
+            # Find or create company
             company = db.session.execute(
                 db.text(
-                    """
-                    SELECT * FROM public.company WHERE company_name = :company_name LIMIT 1
-                """
+                    "SELECT * FROM public.company WHERE company_name = :company_name LIMIT 1"
                 ),
                 {"company_name": company_name},
             ).fetchone()
@@ -139,50 +121,42 @@ def register():
             if not company:
                 db.session.execute(
                     db.text(
-                        """
-                        INSERT INTO public.company (company_name)
-                        VALUES (:company_name)
-                    """
+                        "INSERT INTO public.company (company_name) VALUES (:company_name)"
                     ),
                     {"company_name": company_name},
                 )
                 db.session.commit()
-
                 company = db.session.execute(
                     db.text(
-                        """
-                        SELECT * FROM public.company WHERE company_name = :company_name LIMIT 1
-                    """
+                        "SELECT * FROM public.company WHERE company_name = :company_name LIMIT 1"
                     ),
                     {"company_name": company_name},
                 ).fetchone()
 
-            # Maak nieuw Profile object via ORM
             new_user = Profile(
                 name=name,
-                email=email_to_store,
+                email=email,
                 role=role,
-                id_company=company.id_company
+                id_company=company.id_company,
             )
-            new_user.set_password(password)  # Argon2 hash wordt hier gezet
+            new_user.set_password(password)
 
             db.session.add(new_user)
             db.session.commit()
 
             flash("Registration successful! You can now log in.", "success")
-            print("Registration successful")
             return redirect(url_for("main.login"))
 
         except Exception as e:
             db.session.rollback()
-            print(f"ERROR during registration: {e}")
+            print(f"Registration error: {e}")
             flash("An error occurred during registration.", "danger")
 
     return render_template("register.html")
 
 
 # ==============================
-# DASHBOARD ROUTE
+# DASHBOARD
 # ==============================
 @main.route("/dashboard", methods=["GET"])
 def dashboard():
@@ -196,7 +170,7 @@ def dashboard():
 
 
 # ==============================
-# LOGOUT ROUTE
+# LOGOUT
 # ==============================
 @main.route("/logout")
 def logout():
@@ -206,168 +180,223 @@ def logout():
 
 
 # ==============================
-# PROFILE PAGE ROUTE
+# PROFILE
 # ==============================
 @main.route("/profile")
 def profile():
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user  # redirect
 
-    # Get current user
-    user = Profile.query.get(session["user_id"])
     company = Company.query.get(user.id_company)
-
     return render_template(
         "profile.html",
         name=user.name,
         email=user.email,
-        company=company.company_name,
+        company=company.company_name if company else "N/A",
         role=user.role,
     )
 
 
 # ==============================
-# ADD_FEATURE ROUTE 
+# PROJECTS OVERVIEW
 # ==============================
+@main.route("/projects")
+def projects():
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
 
-@main.route("/projects/<int:project_id>/add-feature", methods=["GET", "POST"])
-def add_feature(project_id):
-    # Require login
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+    projects = (
+        db.session.query(Project, Company.company_name)
+        .join(Company, Project.id_company == Company.id_company)
+        .filter(Project.id_company == user.id_company)
+        .order_by(Project.id_project.desc())
+        .all()
+    )
+    return render_template("projects.html", projects=projects)
 
-    # Role control: Founder OR PM
-    if session.get("role") not in ["founder", "PM"]:
-        flash("Only Founders or PMs can add new features.", "danger")
+
+# ==============================
+# ADD PROJECT
+# ==============================
+@main.route("/add_project", methods=["GET", "POST"])
+def add_project():
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
+
+    # Only founder/PM
+    role_redirect = require_role(["founder", "PM"], user)
+    if role_redirect:
+        return role_redirect
+
+    user_company = Company.query.get(user.id_company)
+
+    if request.method == "POST":
+        data, errors = parse_project_form(request.form)
+        if errors:
+            for e in errors:
+                flash(e, "danger")
+            return render_template("add_project.html", company=user_company)
+
+        new_project = Project(
+            project_name=data["project_name"],
+            id_company=user_company.id_company,
+        )
+        db.session.add(new_project)
+        db.session.commit()
+
+        flash("Project added successfully.", "success")
         return redirect(url_for("main.projects"))
 
-    # Haal project en company op
+    return render_template("add_project.html", company=user_company)
+
+
+# ==============================
+# EDIT PROJECT
+# ==============================
+@main.route("/projects/edit/<int:project_id>", methods=["GET", "POST"])
+def edit_project(project_id):
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
+
     project = Project.query.get_or_404(project_id)
+
+    # Only founder/PM + same company
+    role_redirect = require_role(["founder", "PM"], user)
+    if role_redirect:
+        return role_redirect
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
+
+    if request.method == "POST":
+        data, errors = parse_project_form(request.form)
+        if errors:
+            for e in errors:
+                flash(e, "danger")
+            return render_template("edit_project.html", project=project)
+
+        project.project_name = data["project_name"]
+        db.session.commit()
+
+        flash("Project updated successfully.", "success")
+        return redirect(url_for("main.projects"))
+
+    return render_template("edit_project.html", project=project)
+
+
+# ==============================
+# DELETE PROJECT
+# ==============================
+@main.route("/projects/delete/<int:project_id>", methods=["POST"])
+def delete_project(project_id):
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
+
+    project = Project.query.get_or_404(project_id)
+
+    # Only founder/PM + same company
+    role_redirect = require_role(["founder", "PM"], user)
+    if role_redirect:
+        return role_redirect
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
+
+    try:
+        db.session.delete(project)
+        db.session.commit()
+        flash("Project deleted successfully.", "success")
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deleting project: {e}")
+        flash("An error occurred while deleting the project.", "danger")
+
+    return redirect(url_for("main.projects"))
+
+
+# ==============================
+# ADD FEATURE
+# ==============================
+@main.route("/projects/<int:project_id>/add-feature", methods=["GET", "POST"])
+def add_feature(project_id):
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
+
+    # Only founder/PM
+    role_redirect = require_role(["founder", "PM"], user)
+    if role_redirect:
+        return role_redirect
+
+    project = Project.query.get_or_404(project_id)
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
+
     company = project.company
 
     if request.method == "POST":
-        # Helper to convert safely to int
-        # routes.py (Gecorrigeerde helperfunctie, noem hem to_numeric of to_int)
-
-        # Basic info
-        name_feature = request.form.get("name_feature", "").strip()
-        description = request.form.get("description", "").strip()
-
-        # ROI fields
-        extra_revenue = to_numeric("extra_revenue")  # Was 'revenue', nu 'extra_revenue'
-        churn_reduction = to_numeric("churn_reduction")  # Veld toevoegen voor Churn
-        cost_savings = to_numeric("cost_savings")
-        investment_hours = to_numeric("investment_hours")
-        hourly_rate = to_numeric("hourly_rate")
-        opex_hours = to_numeric("opex_hours")
-        other_costs = to_numeric("other_costs")
-        horizon = to_numeric("horizon")
-        # roi_percent = request.form.get('roi_percent')  # readonly, string/float
-
-        # TTV fields
-        ttm_weeks = to_numeric("ttm_weeks")
-        ttbv_weeks = to_numeric("ttbv_weeks")
-        # TTV min/max fields
-        ttm_low = to_numeric("ttm_low")
-        ttm_high = to_numeric("ttm_high")
-        ttbv_low = to_numeric("ttbv_low")
-        ttbv_high = to_numeric("ttbv_high")
-        ttv_weeks_raw = request.form.get("ttv_weeks", "").strip()
-        try:
-            ttv_weeks = float(ttv_weeks_raw) if ttv_weeks_raw else None
-        except ValueError:
-            # Als het een lege string is, zal het al None zijn. Als het een ongeldige string is,
-            # moet je misschien valideren of None retourneren.
-            ttv_weeks = None
-
-        # Confidence
-        quality_score = request.form.get("quality_score")
-
-        # Validations
-        errors = []
-        if not name_feature:
-            errors.append("Title is required.")
-
-        numeric_fields = {
-            "Title": name_feature,  # De title check blijft
-            "Extra Revenue": extra_revenue,
-            "Churn Reduction": churn_reduction,
-            "Cost savings": cost_savings,
-            "Investment hours": investment_hours,
-            "Hourly rate": hourly_rate,
-            "OPEX hours": opex_hours,
-            "Other costs": other_costs,
-            "Horizon": horizon,
-            "TTM weeks": ttm_weeks,
-            "TTBV weeks": ttbv_weeks,
-            "TTM low": ttm_low,
-            "TTM high": ttm_high,
-            "TTBV low": ttbv_low,
-            "TTBV high": ttbv_high,
-        }
-        for label, value in numeric_fields.items():
-            if value is None:
-                errors.append(f"{label} must be an integer.")
-
+        data, errors = parse_feature_form(request.form)
         if errors:
             for e in errors:
                 flash(e, "danger")
             return render_template("add_feature.html", project=project, company=company)
 
-        # Create a unique ID for the feature
-        new_id = str(uuid.uuid4())
+        roi_percent = calc_roi(
+            data["extra_revenue"],
+            data["churn_reduction"],
+            data["cost_savings"],
+            data["investment_hours"],
+            data["hourly_rate"],
+            data["opex_hours"],
+            data["other_costs"],
+        )
+        ttv_weeks = calc_ttv(data["ttm_weeks"], data["ttbv_weeks"])
 
-        roi_percent = calc_roi(extra_revenue, churn_reduction, cost_savings,
-                                        investment_hours, hourly_rate, opex_hours, other_costs)
-        ttv_weeks = calc_ttv(ttm_weeks, ttbv_weeks)
+        new_feature = Features_ideas(
+            id_feature=str(uuid.uuid4()),
+            id_company=company.id_company,
+            id_project=project.id_project,
+            name_feature=data["name_feature"],
+            description=data["description"],
+            extra_revenue=data["extra_revenue"],
+            churn_reduction=data["churn_reduction"],
+            cost_savings=data["cost_savings"],
+            investment_hours=data["investment_hours"],
+            hourly_rate=data["hourly_rate"],
+            opex_hours=data["opex_hours"],
+            other_costs=data["other_costs"],
+            horizon=data["horizon"],
+            ttm_weeks=data["ttm_weeks"],
+            ttbv_weeks=data["ttbv_weeks"],
+            ttm_low=data["ttm_low"],
+            ttm_high=data["ttm_high"],
+            ttbv_low=data["ttbv_low"],
+            ttbv_high=data["ttbv_high"],
+            roi_percent=roi_percent,
+            ttv_weeks=ttv_weeks,
+            quality_score=data["quality_score"],
+        )
 
-        try:
-            feature = Features_ideas(
-                id_feature=new_id,  # primary key
-                id_company=company.id_company,
-                id_project=project.id_project,
-                name_feature=name_feature,
-                description=description,
-                extra_revenue=extra_revenue,
-                churn_reduction=churn_reduction,
-                cost_savings=cost_savings,
-                investment_hours=investment_hours,
-                opex_hours=opex_hours,
-                other_costs=other_costs,
-                horizon=horizon,
-                roi_percent=roi_percent,  # Berekende waarde opslaan
-                ttm_weeks=ttm_weeks,
-                ttbv_weeks=ttbv_weeks,
-                ttv_weeks=ttv_weeks,  # Berekende waarde opslaan
-                quality_score=quality_score,
-                ttm_low=ttm_low,
-                ttm_high=ttm_high,
-                ttbv_low=ttbv_low,
-                ttbv_high=ttbv_high,
-            )
-            db.session.add(feature)
-            db.session.commit()
+        db.session.add(new_feature)
+        db.session.commit()
 
-            flash("Feature saved successfully.", "success")
-            return redirect(url_for("main.projects"))
+        flash("Feature saved successfully.", "success")
+        return redirect(url_for("main.projects"))
 
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error while saving feature: {e}")
-            flash("An error occurred while saving.", "danger")
-            return render_template("add_feature.html", project=project, company=company)
-
-    # GET
     return render_template("add_feature.html", project=project, company=company)
 
+
 # ==================================
-# LIVE CALCULATIES VOOR ROI
+# LIVE CALC: ROI
 # ==================================
 @main.route("/features/calc/roi", methods=["POST"])
 def features_calc_roi():
-    # Haal ruwe string-waarden op. Je calc_roi functie converteert ze intern met to_float.
     roi_percent_raw = calc_roi(
         request.form.get("extra_revenue"),
         request.form.get("churn_reduction"),
@@ -377,20 +406,13 @@ def features_calc_roi():
         request.form.get("opex_hours"),
         request.form.get("other_costs"),
     )
-    
-    # CRUCIALE STAP: Als calc_roi None retourneert (bijv. deling door nul), toon dan 0.0
-    if roi_percent_raw is None:
-        roi_percent = 0.0
-    else:
-        # roi_percent is al afgerond in calc_roi, maar we laten het zo staan
-        roi_percent = roi_percent_raw
-    
-    # Stuur de berekende waarde terug naar de partial template
+
+    roi_percent = roi_percent_raw if roi_percent_raw is not None else 0.0
     return render_template("features/_roi_partial.html", roi_percent=roi_percent)
 
 
 # ==================================
-# LIVE CALCULATIES VOOR TTV
+# LIVE CALC: TTV
 # ==================================
 @main.route("/features/calc/ttv", methods=["POST"])
 def features_calc_ttv():
@@ -398,162 +420,60 @@ def features_calc_ttv():
         request.form.get("ttm_weeks"),
         request.form.get("ttbv_weeks"),
     )
-    
-    # CRUCIALE STAP: Als calc_ttv None retourneert, toon dan 0.0
-    if ttv_weeks_raw is None:
-        ttv_weeks_result = 0.0
-    else:
-        ttv_weeks_result = ttv_weeks_raw
-
+    ttv_weeks_result = ttv_weeks_raw if ttv_weeks_raw is not None else 0.0
     return render_template("features/_ttv_partial.html", ttv_weeks=ttv_weeks_result)
 
 
-
-
-
 # ==============================
-# VECTR CHART OVERZICHT ROUTE
-# ==============================
-@main.route("/projects/<int:project_id>/vectr-chart", methods=["GET"])
-def vectr_chart(project_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
-
-    user = Profile.query.get(session["user_id"])
-    project = Project.query.get_or_404(project_id)
-
-    # Beveiliging: controleer of het project van het bedrijf van de gebruiker is
-    if project.id_company != user.id_company:
-        flash("You are not allowed to view this chart.", "danger")
-        return redirect(url_for("main.projects"))
-
-    # Alle features ophalen die de benodigde data hebben
-    features = Features_ideas.query.filter_by(id_project=project_id).all()
-
-    # Bereken min/max TTV uit de ingevulde velden
-    valid_ttv = []
-    for f in features:
-        if f.ttm_low is not None and f.ttbv_low is not None and f.ttm_high is not None and f.ttbv_high is not None:
-            min_ttv = float(f.ttm_low) + float(f.ttbv_low)
-            max_ttv = float(f.ttm_high) + float(f.ttbv_high)
-            valid_ttv.append((min_ttv, max_ttv))
-
-    # Globale min/max voor alle features
-    if valid_ttv:
-        TTV_MIN = min(m for m, _ in valid_ttv)
-        TTV_MAX = max(M for _, M in valid_ttv)
-    else:
-        TTV_MIN, TTV_MAX = 0.0, 10.0  # fallback
-
-
-    # Data transformeren naar een formaat dat geschikt is voor de grafiek (JSON)
-    chart_data = []
-    for f in features:
-        # Zorg ervoor dat we alleen features met geldige data plotten (inclusief 0)
-        if (f.roi_percent is not None and 
-            f.quality_score is not None and 
-            f.ttm_weeks is not None and 
-            f.ttbv_weeks is not None):
-            
-            conf = float(f.quality_score)
-            effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
-
-            # Herschalen naar 0–10 en inverteren: Lage TtV (Fast) moet een hoge score (10) krijgen op de Y-as.
-            if TTV_MAX > TTV_MIN:
-                # Bereken de geschaalde waarde (0=snelst, 10=traagst)
-                ttv_normalized_slow_is_high = (effective_ttv - TTV_MIN) / (TTV_MAX - TTV_MIN) * 10
-                # Inverteren: 10 - waarde geeft de score: 10=snelst (hoog op Y-as), 0=traagst (laag op Y-as)
-                ttv_scaled = 10.0 - ttv_normalized_slow_is_high
-            else:
-                ttv_scaled = 0
-                
-            chart_data.append(
-                {
-                    "name": f.name_feature,
-                    # X-as: Confidence
-                    "confidence": conf,
-                    # Y-as: TtV (weeks)
-                    "ttv": ttv_scaled,
-                    # Grootte (Bubble Size): ROI (%)
-                    "roi": float(f.roi_percent),
-                    "id": f.id_feature,
-                }
-            )
-    # Geef de data door aan de template
-    return render_template("vectr_chart.html", project=project, chart_data=chart_data)
-
-
-# ==============================
-# VIEW FEATURES ROUTE
+# VIEW FEATURES
 # ==============================
 @main.route("/projects/<int:project_id>/features", methods=["GET"])
 def view_features(project_id):
-    # 1. Beveiliging en Gebruikersgegevens ophalen
-    if "user_id" not in session:
-        flash("U moet eerst inloggen.", "danger")
-        return redirect(url_for("main.login"))
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
 
-    user = Profile.query.get(session["user_id"])
     project = Project.query.get_or_404(project_id)
-    company = Company.query.get_or_404(user.id_company)
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
 
-    # Beveiliging: controleer of het project van het bedrijf van de gebruiker is
-    if project.id_company != user.id_company:
-        flash("U mag dit project niet bekijken.", "danger")
-        return redirect(url_for("main.projects"))
+    company = Company.query.get(user.id_company)
 
-    # 2. Bepaal de rol en sorteerpermissie
     user_role = session.get("role")
     can_sort = user_role == "PM"
 
-    # 3. Parameters Bepalen op basis van de Rol
     if can_sort:
-        # PM: Haal parameters uit URL, standaard op 'roi' desc
         sort_by = request.args.get("sort_by", "roi")
         direction = request.args.get("direction", "desc")
     else:
-        # Andere Rollen: Forceer standaard sortering op naam/ID (niet-dynamisch)
-        sort_by = "name"  # of 'id'
+        sort_by = "name"
         direction = "asc"
 
-    # 4. Bepaal de SQLAlchemy-kolom voor sortering
-
-    # 4. Haal alle features op
     features_query = Features_ideas.query.filter_by(id_project=project_id)
 
     if sort_by == "roi":
         column = Features_ideas.roi_percent
     elif sort_by == "ttv":
-        # Sorteer op TTM (Time-to-Market) als proxy voor TTV, omdat TTV berekend is
         column = Features_ideas.ttm_weeks
     elif sort_by == "confidence":
         column = Features_ideas.quality_score
     else:
-        # Fallback op naam/ID
         column = Features_ideas.name_feature
 
-    # 5. Voer de Sortering uit
     if direction == "desc":
         features = features_query.order_by(column.desc()).all()
     else:
         features = features_query.order_by(column.asc()).all()
 
-    #berekening vectr score
-    for feature in features:
-        # Gebruik de opgeslagen VECTR scores
-        ttv_weeks = feature.ttv_weeks if feature.ttv_weeks is not None else 5.5
-        roi_percent = feature.roi_percent if feature.roi_percent is not None else 0.0
-        confidence_score = feature.quality_score if feature.quality_score is not None else 0.0
-        
-        # De ROI% moet gedeeld worden door 100 om als factor te dienen
+    # Compute VECTR score
+    for f in features:
+        ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
+        roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
+        confidence_score = f.quality_score if f.quality_score is not None else 0.0
         vectr_score = ttv_weeks * roi_percent * confidence_score
-        vectr_score_rounded = round(vectr_score, 2)
-        
-        # Voeg de berekende score toe als een dynamische property aan het feature object
-        setattr(feature, 'vectr_score', vectr_score_rounded)
+        setattr(f, "vectr_score", round(vectr_score, 2))
 
-    # 6. Template Renderen (LET OP: komma's en alle benodigde variabelen)
     return render_template(
         "view_features.html",
         project=project,
@@ -566,79 +486,96 @@ def view_features(project_id):
 
 
 # ==============================
-# EDIT FEATURE ROUTE
+# EDIT FEATURE
 # ==============================
-
 @main.route("/feature/<uuid:feature_id>/edit", methods=["GET", "POST"])
 def edit_feature(feature_id):
-    # UUID als string opslaan
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
+
     feature = Features_ideas.query.get_or_404(str(feature_id))
     project = Project.query.get_or_404(feature.id_project)
-    company = Company.query.get_or_404(project.id_company)
+    company = Company.query.get(project.id_company)
+
+    # Only founder/PM + ownership
+    role_redirect = require_role(["founder", "PM"], user)
+    if role_redirect:
+        return role_redirect
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
 
     if request.method == "POST":
-        try:
-            def to_numeric(field_name, is_float=False):
-                raw = request.form.get(field_name, "").strip()
-                if not raw:
-                    return None
-                try:
-                    return float(raw) if is_float else int(raw)
-                except ValueError:
-                    return None
-
-            # Basic info
-            feature.name_feature = request.form.get("name_feature", "").strip()
-            feature.description = request.form.get("description", "").strip()
-
-            # ROI fields
-            feature.extra_revenue = to_numeric("extra_revenue")
-            feature.churn_reduction = to_numeric("churn_reduction")
-            feature.cost_savings = to_numeric("cost_savings")
-            feature.investment_hours = to_numeric("investment_hours")
-            feature.hourly_rate = to_numeric("hourly_rate")
-            feature.opex_hours = to_numeric("opex_hours")
-            feature.other_costs = to_numeric("other_costs")
-            feature.horizon = to_numeric("horizon")
-
-            # TTV fields
-            feature.ttm_weeks = to_numeric("ttm_weeks")
-            feature.ttbv_weeks = to_numeric("ttbv_weeks")
-
-            # Nieuwe min/max velden
-            feature.ttm_low = to_numeric("ttm_low", is_float=True)
-            feature.ttm_high = to_numeric("ttm_high", is_float=True)
-            feature.ttbv_low = to_numeric("ttbv_low", is_float=True)
-            feature.ttbv_high = to_numeric("ttbv_high", is_float=True)
-
-            # Confidence
-            feature.quality_score = to_numeric("quality_score", is_float=True)
-
-            # Berekeningen via utils
-            feature.roi_percent = calc_roi(
-                feature.extra_revenue, feature.churn_reduction, feature.cost_savings,
-                feature.investment_hours, feature.hourly_rate, feature.opex_hours, feature.other_costs
+        data, errors = parse_feature_form(request.form)
+        if errors:
+            for e in errors:
+                flash(e, "danger")
+            return render_template(
+                "edit_feature.html",
+                feature=feature,
+                project=project,
+                company=company,
             )
 
-            feature.ttv_weeks = calc_ttv(feature.ttm_weeks, feature.ttbv_weeks)
-            
-            db.session.commit()
-            flash("Feature updated successfully!", "success")
-            return redirect(url_for("main.view_features", project_id=feature.id_project))
+        feature.name_feature = data["name_feature"]
+        feature.description = data["description"]
+        feature.extra_revenue = data["extra_revenue"]
+        feature.churn_reduction = data["churn_reduction"]
+        feature.cost_savings = data["cost_savings"]
+        feature.investment_hours = data["investment_hours"]
+        feature.hourly_rate = data["hourly_rate"]
+        feature.opex_hours = data["opex_hours"]
+        feature.other_costs = data["other_costs"]
+        feature.horizon = data["horizon"]
+        feature.ttm_weeks = data["ttm_weeks"]
+        feature.ttbv_weeks = data["ttbv_weeks"]
+        feature.ttm_low = data["ttm_low"]
+        feature.ttm_high = data["ttm_high"]
+        feature.ttbv_low = data["ttbv_low"]
+        feature.ttbv_high = data["ttbv_high"]
+        feature.quality_score = data["quality_score"]
 
-        except Exception as e:
-            db.session.rollback()
-            flash(f"Error updating feature: {e}", "danger")
+        feature.roi_percent = calc_roi(
+            feature.extra_revenue,
+            feature.churn_reduction,
+            feature.cost_savings,
+            feature.investment_hours,
+            feature.hourly_rate,
+            feature.opex_hours,
+            feature.other_costs,
+        )
+        feature.ttv_weeks = calc_ttv(feature.ttm_weeks, feature.ttbv_weeks)
 
-    return render_template("edit_feature.html", feature=feature, project=project, company=company)
+        db.session.commit()
+        flash("Feature updated successfully!", "success")
+        return redirect(url_for("main.view_features", project_id=feature.id_project))
+
+    return render_template(
+        "edit_feature.html", feature=feature, project=project, company=company
+    )
+
 
 # ==============================
-# DELETE FEATURE ROUTE
+# DELETE FEATURE
 # ==============================
-
 @main.route("/feature/<uuid:feature_id>/delete", methods=["POST"])
 def delete_feature(feature_id):
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
+
     feature = Features_ideas.query.get_or_404(str(feature_id))
+    project = Project.query.get_or_404(feature.id_project)
+
+    # Only founder/PM + ownership
+    role_redirect = require_role(["founder", "PM"], user)
+    if role_redirect:
+        return role_redirect
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
+
     project_id = feature.id_project
     db.session.delete(feature)
     db.session.commit()
@@ -647,171 +584,103 @@ def delete_feature(feature_id):
 
 
 # ==============================
-# PROJECTS OVERVIEW ROUTE
+# VECTR CHART (WEB)
 # ==============================
-@main.route("/projects")
-def projects():
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+@main.route("/projects/<int:project_id>/vectr-chart", methods=["GET"])
+def vectr_chart(project_id):
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
 
-    user = Profile.query.get(session["user_id"])
-
-    # Project + Company name via join
-    projects = (
-        db.session.query(Project, Company.company_name)
-        .join(Company, Project.id_company == Company.id_company)
-        .filter(Project.id_company == user.id_company)
-        .order_by(Project.id_project.desc())
-        .all()
-    )
-
-    return render_template("projects.html", projects=projects)
-
-
-@main.route("/add_project", methods=["GET", "POST"])
-def add_project():
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
-
-    # Role control: Founder OR PM
-    if session.get("role") not in ["founder", "PM"]:
-        flash(
-            "Only Founders and Project Managers are allowed to add new projects.",
-            "danger",
-        )
-        return redirect(url_for("main.projects"))
-
-    # Get logged in user
-    user = Profile.query.get(session["user_id"])
-    user_company = Company.query.filter_by(id_company=user.id_company).first()
-
-    if request.method == "POST":
-        project_name = request.form.get("project_name")
-        company_id = user_company.id_company  # auto fill
-
-        new_project = Project(project_name=project_name, id_company=company_id)
-
-        db.session.add(new_project)
-        db.session.commit()
-
-        flash("Project added successfully.", "success")
-        return redirect(url_for("main.projects"))
-
-    # ⬇️ Only pass 1 company (from user)
-    return render_template("add_project.html", company=user_company)
-
-
-# ==============================
-# EDIT PROJECT
-# ==============================
-@main.route("/projects/edit/<int:project_id>", methods=["GET", "POST"])
-def edit_project(project_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
-
-    user = Profile.query.get(session["user_id"])
     project = Project.query.get_or_404(project_id)
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
 
-    # Security: only projects from own company
-    if project.id_company != user.id_company:
-        flash("You are not allowed to edit this project.", "danger")
-        return redirect(url_for("main.projects"))
+    features = Features_ideas.query.filter_by(id_project=project_id).all()
 
-    if request.method == "POST":
-        new_name = request.form.get("project_name", "").strip()
+    valid_ttv = []
+    for f in features:
+        if (
+            f.ttm_low is not None
+            and f.ttbv_low is not None
+            and f.ttm_high is not None
+            and f.ttbv_high is not None
+        ):
+            min_ttv = float(f.ttm_low) + float(f.ttbv_low)
+            max_ttv = float(f.ttm_high) + float(f.ttbv_high)
+            valid_ttv.append((min_ttv, max_ttv))
 
-        if not new_name:
-            flash("Project name is required.", "danger")
-            return render_template("edit_project.html", project=project)
+    if valid_ttv:
+        local_TTV_MIN = min(m for m, _ in valid_ttv)
+        local_TTV_MAX = max(M for _, M in valid_ttv)
+    else:
+        local_TTV_MIN, local_TTV_MAX = 0.0, 10.0
 
-        project.project_name = new_name
-        db.session.commit()
+    chart_data = []
+    for f in features:
+        if (
+            f.roi_percent is not None
+            and f.quality_score is not None
+            and f.ttm_weeks is not None
+            and f.ttbv_weeks is not None
+        ):
+            conf = float(f.quality_score)
+            effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
 
-        flash("Project updated successfully.", "success")
-        return redirect(url_for("main.projects"))
+            if local_TTV_MAX > local_TTV_MIN:
+                ttv_norm = (effective_ttv - local_TTV_MIN) / (
+                    local_TTV_MAX - local_TTV_MIN
+                ) * 10
+                ttv_scaled = 10.0 - ttv_norm
+            else:
+                ttv_scaled = 0
 
-    # GET
-    return render_template("edit_project.html", project=project)
+            chart_data.append(
+                {
+                    "name": f.name_feature,
+                    "confidence": conf,
+                    "ttv": ttv_scaled,
+                    "roi": float(f.roi_percent),
+                    "id": f.id_feature,
+                }
+            )
 
-
-# ==============================
-# DELETE PROJECT
-# ==============================
-@main.route("/projects/delete/<int:project_id>", methods=["POST"])
-def delete_project(project_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
-
-    user = Profile.query.get(session["user_id"])
-    project = Project.query.get_or_404(project_id)
-
-    # Security: only own company
-    if project.id_company != user.id_company:
-        flash("You are not allowed to delete this project.", "danger")
-        return redirect(url_for("main.projects"))
-
-    try:
-        db.session.delete(project)
-        db.session.commit()
-        flash("Project deleted successfully.", "success")
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error while deleting project: {e}")
-        flash("An error occurred while deleting the project.", "danger")
-
-    return redirect(url_for("main.projects"))
+    return render_template("vectr_chart.html", project=project, chart_data=chart_data)
 
 
 # ==============================
 # ROADMAP ROUTES
 # ==============================
-
-
 @main.route("/roadmap/add/<int:project_id>", methods=["GET", "POST"])
 def add_roadmap(project_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
 
-    # Only founders
-    if session.get("role") != "founder":
-        flash("Only Founders can create roadmaps.", "danger")
-        return redirect(url_for("main.projects"))
+    # Only founder
+    role_redirect = require_role(["founder"], user)
+    if role_redirect:
+        return role_redirect
 
-    user = Profile.query.get(session["user_id"])
     project = Project.query.get_or_404(project_id)
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
 
-    # Must belong to same company
-    if project.id_company != user.id_company:
-        flash("Not allowed.", "danger")
-        return redirect(url_for("main.projects"))
-
-    # MAX 1 ROADMAP FILTER
     existing = Roadmap.query.filter_by(id_project=project_id).first()
     if existing:
         flash("This project already has a roadmap.", "danger")
         return redirect(url_for("main.roadmap_overview", project_id=project_id))
 
     if request.method == "POST":
-        start_quarter = request.form.get("start_quarter")
-        end_quarter = request.form.get("end_quarter")
-        team_size = request.form.get("team_size")
-        sprint_capacity = request.form.get("sprint_capacity")
-        budget_allocation = request.form.get("budget_allocation")
+        data, errors = parse_roadmap_form(request.form)
+        if errors:
+            for e in errors:
+                flash(e, "danger")
+            return render_template("add_roadmap.html", project=project)
 
-        roadmap = Roadmap(
-            id_project=project_id,
-            start_quarter=start_quarter,
-            end_quarter=end_quarter,
-            team_size=int(team_size),
-            sprint_capacity=int(sprint_capacity),
-            budget_allocation=int(budget_allocation),
-        )
-
+        roadmap = Roadmap(id_project=project_id, **data)
         db.session.add(roadmap)
         db.session.commit()
 
@@ -823,115 +692,94 @@ def add_roadmap(project_id):
 
 @main.route("/roadmap/<int:project_id>")
 def roadmap_overview(project_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
 
-    user = Profile.query.get(session["user_id"])
     project = Project.query.get_or_404(project_id)
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
 
-    # Check company ownership
-    if project.id_company != user.id_company:
-        flash("You are not allowed to view this roadmap.", "danger")
-        return redirect(url_for("main.projects"))
-
-    # Alle roadmaps van dit project ophalen, en SORTEER ZE:
-    # Dit sorteert op de string, wat werkt als het format "Qx YYYY" is.
     roadmaps = (
         Roadmap.query.filter_by(id_project=project_id)
         .order_by(Roadmap.start_quarter.asc())
         .all()
     )
-    # Binnen elke roadmap moeten we ook de milestones sorteren (bijv. op start_date)
 
-    for roadmap in roadmaps:
-        # Sorteer milestones op start_date binnen elke roadmap
-        roadmap.milestones.sort(
+    for r in roadmaps:
+        r.milestones.sort(
             key=lambda m: m.start_date if m.start_date else datetime.date.max
         )
 
-    return render_template(
-        "roadmap_overview.html", project=project, roadmaps=roadmaps  # Nu gesorteerd
-    )
+    return render_template("roadmap_overview.html", project=project, roadmaps=roadmaps)
 
 
 @main.route("/roadmap/edit/<int:roadmap_id>", methods=["GET", "POST"])
 def edit_roadmap(roadmap_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
 
-    # Only founders may edit
-    if session.get("role") != "founder":
-        flash("Only Founders can edit roadmaps.", "danger")
-        return redirect(url_for("main.projects"))
+    # Only founder
+    role_redirect = require_role(["founder"], user)
+    if role_redirect:
+        return role_redirect
 
     roadmap = Roadmap.query.get_or_404(roadmap_id)
     project = Project.query.get_or_404(roadmap.id_project)
-    user = Profile.query.get(session["user_id"])
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
 
-    # Must belong to same company
-    if project.id_company != user.id_company:
-        flash("You are not allowed to edit this roadmap.", "danger")
-        return redirect(url_for("main.projects"))
-
-    # POST → update values
     if request.method == "POST":
+        data, errors = parse_roadmap_form(request.form)
+        if errors:
+            for e in errors:
+                flash(e, "danger")
+            return render_template("edit_roadmap.html", roadmap=roadmap, project=project)
 
-        def to_int(value):
-            try:
-                return int(float(value))
-            except:
-                return None
-
-        roadmap.start_quarter = request.form.get("start_quarter")
-        roadmap.end_quarter = request.form.get("end_quarter")
-        roadmap.team_size = to_int(request.form.get("team_size"))
-        roadmap.sprint_capacity = to_int(request.form.get("sprint_capacity"))
-        roadmap.budget_allocation = to_int(request.form.get("budget_allocation"))
+        roadmap.start_quarter = data["start_quarter"]
+        roadmap.end_quarter = data["end_quarter"]
+        roadmap.team_size = data["team_size"]
+        roadmap.sprint_capacity = data["sprint_capacity"]
+        roadmap.budget_allocation = data["budget_allocation"]
 
         db.session.commit()
-
         flash("Roadmap updated successfully!", "success")
         return redirect(url_for("main.roadmap_overview", project_id=project.id_project))
 
-    # GET → show form
     return render_template("edit_roadmap.html", roadmap=roadmap, project=project)
 
 
 # ==============================
-# MILESTONES ROUTES
+# MILESTONES
 # ==============================
 @main.route("/milestone/add/<int:roadmap_id>", methods=["GET", "POST"])
 def add_milestone(roadmap_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
 
-    user = Profile.query.get(session["user_id"])
+    # founder / PM
+    role_redirect = require_role(["founder", "PM"], user)
+    if role_redirect:
+        return role_redirect
+
     roadmap = Roadmap.query.get_or_404(roadmap_id)
-
-    # Only founders can add
-    if user.role != "founder":
-        flash("Only founders can add milestones.", "danger")
-        return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
+    project = Project.query.get_or_404(roadmap.id_project)
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
 
     if request.method == "POST":
-        name = request.form.get("name")
-        start_date = request.form.get("start_date")
-        end_date = request.form.get("end_date")
-        goal = request.form.get("goal")
-        status = request.form.get("status")
+        data, errors = parse_milestone_form(request.form)
+        if errors:
+            for e in errors:
+                flash(e, "danger")
+            return render_template("add_milestone.html", roadmap=roadmap)
 
-        milestone = Milestone(
-            id_roadmap=roadmap_id,
-            name=name,
-            start_date=start_date,
-            end_date=end_date,
-            goal=goal,
-            status=status,
-        )
-
+        milestone = Milestone(id_roadmap=roadmap_id, **data)
         db.session.add(milestone)
         db.session.commit()
         flash("Milestone added!", "success")
@@ -943,24 +791,34 @@ def add_milestone(roadmap_id):
 
 @main.route("/milestone/edit/<int:milestone_id>", methods=["GET", "POST"])
 def edit_milestone(milestone_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
 
-    user = Profile.query.get(session["user_id"])
+    # founder / PM
+    role_redirect = require_role(["founder", "PM"], user)
+    if role_redirect:
+        return role_redirect
+
     milestone = Milestone.query.get_or_404(milestone_id)
     roadmap = Roadmap.query.get_or_404(milestone.id_roadmap)
-
-    if user.role != "founder":
-        flash("Only founders can edit milestones.", "danger")
-        return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
+    project = Project.query.get_or_404(roadmap.id_project)
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
 
     if request.method == "POST":
-        milestone.name = request.form.get("name")
-        milestone.start_date = request.form.get("start_date")
-        milestone.end_date = request.form.get("end_date")
-        milestone.goal = request.form.get("goal")
-        milestone.status = request.form.get("status")
+        data, errors = parse_milestone_form(request.form)
+        if errors:
+            for e in errors:
+                flash(e, "danger")
+            return render_template("edit_milestone.html", milestone=milestone)
+
+        milestone.name = data["name"]
+        milestone.start_date = data["start_date"]
+        milestone.end_date = data["end_date"]
+        milestone.goal = data["goal"]
+        milestone.status = data["status"]
 
         db.session.commit()
         flash("Milestone updated!", "success")
@@ -971,83 +829,73 @@ def edit_milestone(milestone_id):
 
 @main.route("/milestone/delete/<int:milestone_id>", methods=["POST"])
 def delete_milestone(milestone_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
 
-    user = Profile.query.get(session["user_id"])
+    # founder / PM
+    role_redirect = require_role(["founder", "PM"], user)
+    if role_redirect:
+        return role_redirect
+
     milestone = Milestone.query.get_or_404(milestone_id)
     roadmap = Roadmap.query.get_or_404(milestone.id_roadmap)
-
-    if user.role != "founder":
-        flash("Only founders can delete milestones.", "danger")
-        return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
+    project = Project.query.get_or_404(roadmap.id_project)
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
 
     db.session.delete(milestone)
     db.session.commit()
     flash("Milestone deleted!", "success")
-
     return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
 
-# ==============================
-# ADD EVIDENCE
-# ==============================
 
-
+# ==============================
+# EVIDENCE: ADD
+# ==============================
 @main.route("/feature/<feature_id>/add-evidence", methods=["GET", "POST"])
 def add_evidence(feature_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
 
-    user = Profile.query.get(session["user_id"])
     feature = Features_ideas.query.get_or_404(feature_id)
-
-    if feature.id_company != user.id_company:
-        flash("Not allowed.", "danger")
-        return redirect(url_for("main.projects"))
+    project = Project.query.get_or_404(feature.id_project)
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
 
     if request.method == "POST":
+        data, errors = parse_evidence_form(request.form)
+        if errors:
+            for e in errors:
+                flash(e, "danger")
+            return render_template(
+                "add_evidence.html",
+                feature=feature,
+                CONFIDENCE_LEVELS=CONFIDENCE_LEVELS,
+            )
 
-        # Retrieve basic fields
-        title = request.form.get("title", "").strip()
-        type_select = request.form.get("type_select", "").strip()
-        custom_type = request.form.get("custom_type", "").strip()
-        source = request.form.get("source", "").strip()
-        description = request.form.get("description", "").strip()
-        attachment_url = request.form.get("attachment_url", "").strip()
+        old_conf = feature.quality_score or 0.0
 
-        # Determine evidence type
-        final_type = custom_type if (type_select == "Other" and custom_type) else type_select
-
-        # Get new confidence
-        conf_raw = request.form.get("new_confidence", "").strip()
-        try:
-            new_value = float(conf_raw)
-        except:
-            new_value = 0.0
-
-        # Store old confidence BEFORE change
-        old_value = feature.quality_score or 0
-
-        # Create evidence entry
         ev = Evidence(
             id_company=user.id_company,
             id_feature=feature_id,
-            title=title,
-            type=final_type,
-            source=source,
-            description=description,
-            attachment_url=attachment_url,
-            old_confidence=old_value,
-            new_confidence=new_value
+            title=data["title"],
+            type=data["final_type"],
+            source=data["source"],
+            description=data["description"],
+            attachment_url=data["attachment_url"],
+            old_confidence=old_conf,
+            new_confidence=data["new_confidence"],
         )
-        db.session.add(ev)
 
-        # Update feature confidence
-        # Combine existing evidence + this one
-        all_scores = [e.new_confidence for e in feature.evidence] + [new_value]
-        feature.quality_score = max(all_scores)
+        db.session.add(ev)
+        db.session.flush()  # so feature.evidence includes this one
+
+        new_score = recompute_feature_confidence(feature)
+        feature.quality_score = new_score if new_score is not None else old_conf
 
         db.session.commit()
         flash("Evidence added!", "success")
@@ -1056,70 +904,61 @@ def add_evidence(feature_id):
     return render_template(
         "add_evidence.html",
         feature=feature,
-        CONFIDENCE_LEVELS=CONFIDENCE_LEVELS
+        CONFIDENCE_LEVELS=CONFIDENCE_LEVELS,
     )
 
 
-
-
-
 # ==============================
-# VIEW EVIDENCE LIST
+# EVIDENCE: LIST
 # ==============================
-
 @main.route("/feature/<feature_id>/evidence")
 def view_evidence(feature_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+    user = require_login()
+    if isinstance(user, Response):  # redirect
+        return user
 
     feature = Features_ideas.query.get_or_404(feature_id)
 
-    evidence_list = Evidence.query.filter_by(id_feature=feature_id)\
-                                  .order_by(Evidence.new_confidence.desc())\
-                                  .all()
+    evidence_list = Evidence.query.filter_by(id_feature=feature_id) \
+        .order_by(Evidence.new_confidence.desc()) \
+        .all()
+
+    # Convert [(value, label), ...] → {value: label}
+    CONFIDENCE_LABELS = {v: label for (v, label) in CONFIDENCE_LEVELS}
 
     return render_template(
         "view_evidence.html",
         feature=feature,
         evidence_list=evidence_list,
-        CONFIDENCE_LEVELS=CONFIDENCE_LEVELS
+        CONFIDENCE_LABELS=CONFIDENCE_LABELS
     )
 
 
 
 
 # ==============================
-# DELETE EVIDENCE
+# EVIDENCE: DELETE
 # ==============================
-
-
-
 @main.route("/evidence/<int:evidence_id>/delete", methods=["POST"])
 def delete_evidence(evidence_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for('main.login'))
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
 
-    user = Profile.query.get(session["user_id"])
     ev = Evidence.query.get_or_404(evidence_id)
     feature = Features_ideas.query.get_or_404(ev.id_feature)
+    project = Project.query.get_or_404(feature.id_project)
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
 
-    if ev.id_company != user.id_company:
-        flash("Not allowed.", "danger")
-        return redirect(url_for("main.projects"))
-
-    # Save fallback value before deletion
-    fallback_old = ev.old_confidence or 0
+    fallback_old = ev.old_confidence or 0.0
 
     db.session.delete(ev)
-    db.session.commit()
+    db.session.flush()
 
-    # Recompute remaining confidence
     new_score = recompute_feature_confidence(feature)
-
     if new_score is None:
-        # No remaining evidence → restore old_confidence
         feature.quality_score = fallback_old
     else:
         feature.quality_score = new_score
@@ -1130,62 +969,46 @@ def delete_evidence(evidence_id):
     return redirect(url_for("main.view_evidence", feature_id=feature.id_feature))
 
 
-
-
 # ==============================
-# EDIT EVIDENCE
+# EVIDENCE: EDIT
 # ==============================
-
-
 @main.route("/evidence/<int:evidence_id>/edit", methods=["GET", "POST"])
 def edit_evidence(evidence_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
 
-    user = Profile.query.get(session["user_id"])
     ev = Evidence.query.get_or_404(evidence_id)
     feature = Features_ideas.query.get_or_404(ev.id_feature)
-
-    if ev.id_company != user.id_company:
-        flash("Not allowed.", "danger")
-        return redirect(url_for("main.projects"))
+    project = Project.query.get_or_404(feature.id_project)
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
 
     if request.method == "POST":
+        data, errors = parse_evidence_form(request.form)
+        if errors:
+            for e in errors:
+                flash(e, "danger")
+            return render_template(
+                "edit_evidence.html",
+                evidence=ev,
+                feature=feature,
+                CONFIDENCE_LEVELS=CONFIDENCE_LEVELS,
+            )
 
-        # Update fields
-        title = request.form.get("title")
-        type_select = request.form.get("type_select")
-        custom_type = request.form.get("custom_type")
-        source = request.form.get("source")
-        description = request.form.get("description")
-        attachment_url = request.form.get("attachment_url")
+        ev.title = data["title"]
+        ev.type = data["final_type"]
+        ev.source = data["source"]
+        ev.description = data["description"]
+        ev.attachment_url = data["attachment_url"]
+        ev.new_confidence = data["new_confidence"]
 
-        final_type = custom_type if (type_select == "Other" and custom_type) else type_select
-
-        # new confidence
-        conf_raw = request.form.get("new_confidence", "")
-        try:
-            new_value = float(conf_raw)
-        except:
-            new_value = 0.0
-
-        # Update evidence record
-        ev.title = title
-        ev.type = final_type
-        ev.source = source
-        ev.description = description
-        ev.attachment_url = attachment_url
-        ev.new_confidence = new_value
+        db.session.flush()
+        new_score = recompute_feature_confidence(feature)
+        feature.quality_score = new_score if new_score is not None else 0.0
 
         db.session.commit()
-
-        # Recalculate feature score
-        all_scores = [e.new_confidence for e in feature.evidence]
-        feature.quality_score = max(all_scores) if all_scores else ev.old_confidence
-
-        db.session.commit()
-
         flash("Evidence updated!", "success")
         return redirect(url_for("main.view_evidence", feature_id=feature.id_feature))
 
@@ -1193,161 +1016,158 @@ def edit_evidence(evidence_id):
         "edit_evidence.html",
         evidence=ev,
         feature=feature,
-        CONFIDENCE_LEVELS=CONFIDENCE_LEVELS
+        CONFIDENCE_LEVELS=CONFIDENCE_LEVELS,
     )
 
 
-# ====================================================
-# PDF knop ROUTE (Aangepast voor 6-Zones VECTR)
-# ====================================================
+# ==============================
+# VECTR CHART PDF
+# ==============================
 @main.route("/projects/<int:project_id>/vectr-chart/pdf")
 def vectr_chart_pdf(project_id):
-    if "user_id" not in session:
-        flash("You must log in first.", "danger")
-        return redirect(url_for("main.login"))
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
 
-    user = Profile.query.get(session["user_id"])
     project = Project.query.get_or_404(project_id)
-    if project.id_company != user.id_company:
-        flash("You are not allowed to view this chart.", "danger")
-        return redirect(url_for("main.projects"))
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
 
     features = Features_ideas.query.filter_by(id_project=project_id).all()
 
-    # --- 1. Bereken min/max TTV ---
     valid_ttv = []
     for f in features:
-        if f.ttm_low is not None and f.ttbv_low is not None and f.ttm_high is not None and f.ttbv_high is not None:
+        if (
+            f.ttm_low is not None
+            and f.ttbv_low is not None
+            and f.ttm_high is not None
+            and f.ttbv_high is not None
+        ):
             min_ttv = float(f.ttm_low) + float(f.ttbv_low)
             max_ttv = float(f.ttm_high) + float(f.ttbv_high)
             valid_ttv.append((min_ttv, max_ttv))
 
-    # Globale min/max voor alle features
     if valid_ttv:
-        TTV_MIN = min(m for m, _ in valid_ttv)
-        TTV_MAX = max(M for _, M in valid_ttv)
+        local_TTV_MIN = min(m for m, _ in valid_ttv)
+        local_TTV_MAX = max(M for _, M in valid_ttv)
     else:
-        TTV_MIN, TTV_MAX = 0.0, 10.0  # fallback
+        local_TTV_MIN, local_TTV_MAX = 0.0, 10.0
 
-    # --- 2. Matplotlib Setup ---
     fig, ax = plt.subplots(figsize=(10, 10))
-    ax.set_xlim(0.0, 10.0)   # Confidence altijd 0–10
-    ax.set_ylim(0.0, 10.0)   # TTV herschaald naar 0–10
+    ax.set_xlim(0.0, 10.0)
+    ax.set_ylim(0.0, 10.0)
 
-    # --- 3. Zones ---
     zones = [
-        # Zone 1: Rood (Low/Mid Conf, Slow TtV) → onderaan
-        {"color": (255/255, 0/255, 0/255, 0.25), "x": 0.0, "y": 0.0, "w": 7.0, "h": 5.0},
-
-        # Zone 2: Donker Oranje (Mid Conf, Mid TtV) → bovenaan
-        {"color": (255/255, 140/255, 0/255, 0.25), "x": 1.0, "y": 5.0, "w": 6.0, "h": 5.0},
-
-        # Zone 3: Rood (Very Low Conf, Fast TtV) → bovenaan links
-        {"color": (255/255, 0/255, 0/255, 0.25), "x": 0.0, "y": 5.0, "w": 1.0, "h": 5.0},
-        
-        # Zone 4: Donkergroen (High Conf, Fast TtV) → bovenaan rechts
-        {"color": (0/255, 150/255, 0/255, 0.25), "x": 7.0, "y": 7.0, "w": 3.0, "h": 3.0},
-
-        # Zone 5: Lichtgroen (High Conf, Mid TtV) → midden rechts
+        {"color": (1, 0, 0, 0.25), "x": 0.0, "y": 0.0, "w": 7.0, "h": 5.0},
+        {"color": (1, 140/255, 0, 0.25), "x": 1.0, "y": 5.0, "w": 6.0, "h": 5.0},
+        {"color": (1, 0, 0, 0.25), "x": 0.0, "y": 5.0, "w": 1.0, "h": 5.0},
+        {"color": (0, 150/255, 0, 0.25), "x": 7.0, "y": 7.0, "w": 3.0, "h": 3.0},
         {"color": (144/255, 238/255, 144/255, 0.25), "x": 7.0, "y": 5.0, "w": 3.0, "h": 2.0},
-
-        # Zone 6: Licht Oranje (High Conf, Slow TtV) → onderaan rechts
-        {"color": (255/255, 165/255, 0/255, 0.25), "x": 7.0, "y": 0.0, "w": 3.0, "h": 5.0},
+        {"color": (1, 165/255, 0, 0.25), "x": 7.0, "y": 0.0, "w": 3.0, "h": 5.0},
     ]
-    
-    for zone in zones:
+
+    for z in zones:
         rect = patches.Rectangle(
-            (zone["x"], zone["y"]),
-            zone["w"], zone["h"],
-            facecolor=zone["color"],
+            (z["x"], z["y"]),
+            z["w"],
+            z["h"],
+            facecolor=z["color"],
             edgecolor=(0, 0, 0, 0.4),
             linewidth=0.5,
         )
         ax.add_patch(rect)
 
-    # --- 4. Zone kleur logica ---
-    def get_zone_color_mpl(confidence, ttv):
-        x_low =  CONF_LOW_THRESHOLD
+    def get_zone_color_mpl(confidence, ttv_scaled):
+        x_low = CONF_LOW_THRESHOLD
         x_high = CONF_MID_HIGH_THRESHOLD
         y_slow = TTV_SLOW_THRESHOLD
         y_fast = TTV_MID_THRESHOLD
 
         if confidence >= x_high:
             if ttv_scaled >= y_fast:
-                return (0/255, 150/255, 0/255, 1)
+                return (0, 150/255, 0, 1)
             elif y_slow <= ttv_scaled < y_fast:
                 return (144/255, 238/255, 144/255, 1)
             else:
-                return (255/255, 165/255, 0/255, 1)
+                return (1, 165/255, 0, 1)
         else:
             if ttv_scaled < y_slow:
-                return (255/255, 0/255, 0/255, 1)
+                return (1, 0, 0, 1)
             elif confidence < x_low:
-                return (255/255, 0/255, 0/255, 1)
+                return (1, 0, 0, 1)
             else:
-                return (255/255, 140/255, 0/255, 1)
+                return (1, 140/255, 0, 1)
 
-    # --- 5. Features plotten ---
-    scatter_x, scatter_y, scatter_s, scatter_c, scatter_labels = [], [], [], [], []
+    scatter_x = []
+    scatter_y = []
+    scatter_s = []
+    scatter_c = []
+    scatter_labels = []
+
     for f in features:
-        # Zorg ervoor dat we alleen features met geldige data plotten (inclusief 0)
-        if (f.roi_percent is not None and 
-            f.quality_score is not None and 
-            f.ttm_weeks is not None and 
-            f.ttbv_weeks is not None):
-            
+        if (
+            f.roi_percent is not None
+            and f.quality_score is not None
+            and f.ttm_weeks is not None
+            and f.ttbv_weeks is not None
+        ):
             conf = float(f.quality_score)
             effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
 
-            # Herschalen naar 0–10 en inverteren: Lage TtV (Fast) moet een hoge score (10) krijgen op de Y-as.
-            if TTV_MAX > TTV_MIN:
-                # Bereken de geschaalde waarde (0=snelst, 10=traagst)
-                ttv_normalized_slow_is_high = (effective_ttv - TTV_MIN) / (TTV_MAX - TTV_MIN) * 10
-                # Inverteren: 10 - waarde geeft de score: 10=snelst (hoog op Y-as), 0=traagst (laag op Y-as)
-                ttv_scaled = 10.0 - ttv_normalized_slow_is_high
+            if local_TTV_MAX > local_TTV_MIN:
+                ttv_norm = (effective_ttv - local_TTV_MIN) / (
+                    local_TTV_MAX - local_TTV_MIN
+                ) * 10
+                ttv_scaled = 10.0 - ttv_norm
             else:
                 ttv_scaled = 0
 
-            roiValue = float(f.roi_percent)
-            size_mpl_area = max(50, min(2000, (max(0, roiValue) * 15)))
+            roi_val = float(f.roi_percent)
+            size_mpl_area = max(50, min(2000, max(0, roi_val) * 15))
             color = get_zone_color_mpl(conf, ttv_scaled)
 
             scatter_x.append(conf)
-            scatter_y.append(ttv_scaled)   # gebruik herschaalde waarde!
+            scatter_y.append(ttv_scaled)
             scatter_s.append(size_mpl_area)
             scatter_c.append(color)
             scatter_labels.append(f.name_feature)
 
-    scatter = ax.scatter(
-        scatter_x, scatter_y,
-        s=scatter_s, c=scatter_c,
-        edgecolors="black", linewidths=1.0, alpha=0.8
+    ax.scatter(
+        scatter_x,
+        scatter_y,
+        s=scatter_s,
+        c=scatter_c,
+        edgecolors="black",
+        linewidths=1.0,
+        alpha=0.8,
     )
 
-
-    # --- 6. Labels ---
-        # As-ticks en labels
     ax.set_xticks([0, 1, 3, 5, 7, 8, 10])
     ax.set_xticklabels(["0", "Low", "3", "5", "7", "High", "10"])
     ax.set_yticks([0, 1, 2, 3, 5, 7, 8, 10])
     ax.set_yticklabels(["0", "1", "Slow", "3", "5", "7", "Fast", "10"])
-    
-    # Zet de labels en titel hier
+
     ax.set_xlabel("Confidence")
     ax.set_ylabel("Time-to-Value (TtV)")
     ax.set_title(f"VECTR Prioritization Chart for {project.project_name}")
 
     for i, label in enumerate(scatter_labels):
-        ax.annotate(label, (scatter_x[i], scatter_y[i]),
-                    textcoords="offset points", xytext=(5, -5),
-                    ha="left", fontsize=7)
+        ax.annotate(
+            label,
+            (scatter_x[i], scatter_y[i]),
+            textcoords="offset points",
+            xytext=(5, -5),
+            ha="left",
+            fontsize=7,
+        )
 
-    # --- 7. Exporteren naar PDF ---
     plt.tight_layout()
     buf = BytesIO()
     plt.savefig(buf, format="pdf")
     plt.close(fig)
     buf.seek(0)
+
     return send_file(
         buf,
         as_attachment=True,
@@ -1356,43 +1176,88 @@ def vectr_chart_pdf(project_id):
     )
 
 
-# =============================
-# DECISION ROUTE
-# =============================
-@main.route("/feature/decide/<string:feature_id>", methods=["GET", "POST"])
-def make_decision(feature_id):
+# ==============================
+# FEATURE DECISION ROUTE 
+# ==============================
+@main.route("/set_feature_decision/<string:feature_id>/<string:decision_value>", methods=["POST"])
+def set_feature_decision(feature_id, decision_value):
+    # 1) Login check
+    if "user_id" not in session:
+        flash("U moet inloggen om beslissingen te maken.", "danger")
+        return redirect(url_for("main.login"))
+
+    # 2) Haal user + feature op
+    user = Profile.query.get(session["user_id"])
     feature = Features_ideas.query.get_or_404(feature_id)
 
-    if request.method == "POST":
-        # Let op: de oorspronkelijke code gebruikte 'reques.form.get', dit is gecorrigeerd naar 'request.form.get'
-        decision_type = request.form.get("decision_type")
-        reasoning = request.form.get("reasoning")
+    # 3) Security: feature moet bij dezelfde company horen
+    if feature.id_company != user.id_company:
+        flash("Niet toegestaan.", "danger")
+        return redirect(url_for("main.projects"))
 
-        company_id = feature.id_company
+    # 4) Map Yes/No naar decision types (matcht met je CSS: decision-approved / decision-rejected)
+    if decision_value == "Yes":
+        decision_type = "Approved"
+    elif decision_value == "No":
+        decision_type = "Rejected"
+    else:
+        decision_type = "Pending"
 
-        new_decision = Decision(
-            # FIX 1: Oorspronkelijke fout was id_feature=feature.id_company. Dit is nu gecorrigeerd.
-            id_feature=feature_id,
-            id_company=company_id,
+    # 5) Nieuwe Decision record opslaan
+    try:
+        d = Decision(
+            id_feature=feature.id_feature,
+            id_company=user.id_company,
             decision_type=decision_type,
-            reasoning=reasoning,
+            reasoning=None,
         )
-        db.session.add(new_decision)
+        db.session.add(d)
         db.session.commit()
 
-        # Let op: de oorspronkelijke code gebruikte url_for("ùain.view_decision"), dit is gecorrigeerd naar "main.view_decision"
-        return redirect(url_for("main.view_decision", feature_id=feature_id))
+        flash(f"Beslissing opgeslagen: {decision_type}", "success")
+        return redirect(url_for("main.view_features", project_id=feature.id_project))
 
-    return render_template("make_decision.html", feature=feature)
+    except Exception as e:
+        db.session.rollback()
+        print(f"Fout bij het instellen van de beslissing: {e}")
+        flash("Er is een fout opgetreden bij het verwerken van de beslissing.", "danger")
+        return redirect(url_for("main.view_features", project_id=feature.id_project))
 
 
-# --- Route voor 'View Decision' ---
-@main.route("/feature/<string:feature_id>")
-def view_decision(feature_id):
-    feature = Features_ideas.query.get_or_404(feature_id)
+
+#route voor deraction balk:
+@main.route("/project/<string:project_id>") 
+def project_detail(project_id):
+    # 1. Haal het Project object op
+    project = Project.query.filter_by(id_project=project_id).first_or_404()
     
-    # FIX 2: De relatie heet 'decisions' (lijst), niet 'decision' (enkelvoud).
-    # We halen het eerste item uit de lijst op, of None als de lijst leeg is.
-    decision = feature.decisions[0] if feature.decisions else None
+    # 2. Haal alle features op die bij dit project horen
+    features = Features_ideas.query.filter_by(id_project=project_id).all()
+
+    # 3. Render de view_features template (die je al hebt)
+    # Zorg dat de template de benodigde variabelen krijgt
+    return render_template(
+        "view_features.html", 
+        project=project, 
+        features=features
+    )
+# Dit is een Context Processor. Het injecteert de user_projects variabele in ALLE templates.
+@main.context_processor
+def inject_user_projects():
+    user_projects = []
+    user_id = session.get("user_id")
     
-    return render_template("view_decision.html", feature=feature, decision=decision)
+    if user_id:
+        # Stap 1: Zoek de user zijn Profile om de id_company te vinden
+        # We gaan ervan uit dat id_profile overeenkomt met de user_id in de sessie
+        profile = Profile.query.filter_by(id_profile=user_id).first() 
+        
+        if profile and profile.id_company:
+            company_id = profile.id_company
+            
+            # Stap 2: Haal alle projecten op voor die company_id
+            # Sorteer ze op naam (project_name.asc()) voor een mooie lijst
+            user_projects = Project.query.filter_by(id_company=company_id).order_by(Project.project_name.asc()).all()
+            
+    # Zorgt dat {{ user_projects }} overal beschikbaar is
+    return dict(user_projects=user_projects)

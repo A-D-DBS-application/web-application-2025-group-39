@@ -5,10 +5,6 @@
 
 {% block content %}
 
-<!-- FIXED PROJECTS BUTTON -->
-<div class="top-right-fixed">
-    <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-nav btn-sm">Projects Overview</a>
-</div>
 
 <h2 class="mb-4 text-center">Features Overview: {{ project.project_name }}</h2>
 
@@ -22,10 +18,7 @@
         📈 VECTR Chart
     </a>
 </div>
-<!-- Logged-in info bottom right -->
-<div class="bottom-info">
-    Logged in as: <strong>{{ session['name'] }}</strong> | Role: <strong>{{ session['role'] }}</strong>
-</div>
+
 
 <div class="features-container-card">
 
@@ -115,7 +108,8 @@
 
                     <th>Horizon</th>
                     <!--Decision Column-->
-                    <th>Decision</th>
+                    <th>Decision (set)</th>
+                    <th>Decision (status)</th>
 
                     <!-- Evidence Column -->
                     <th>Evidence</th>
@@ -161,19 +155,38 @@
                     <!-- DECISION BUTTONS-->
                     <td>
                         <div class="d-flex justify-content-center gap-2">
+                            
+                            {# De knop die de beslissing 'Yes' (Approved) via POST verstuurt #}
+                            <form method="POST" action="{{ url_for('main.set_feature_decision', feature_id=feature.id_feature, decision_value='Yes') }}" style="display:inline;">
+                                <button type="submit" class="btn-base table-btn btn-decision-yes" title="Keur de feature goed">
+                                    Ja
+                                </button>
+                            </form>
 
-                            <a href="{{ url_for('main.make_decision', feature_id=feature.id_feature) }}"
-                                class="btn btn-decision-make table-btn btn-sm">
-                                Make Decision
-                            </a>
-
-                            <a href="{{ url_for('main.view_decision', feature_id=feature.id_feature) }}"
-                                class="btn btn-view table-btn btn-sm">
-                                View
-                            </a>
+                            {# De knop die de beslissing 'No' (Rejected) via POST verstuurt #}
+                            <form method="POST" action="{{ url_for('main.set_feature_decision', feature_id=feature.id_feature, decision_value='No') }}" style="display:inline;">
+                                <button type="submit" class="btn-base table-btn btn-danger-custom" title="Keur de feature af">
+                                    Nee
+                                </button>
+                            </form>
 
                         </div>
                     </td>
+
+                    <td>
+                        {# 1. Haal de meest recente beslissing op uit de Decisions lijst. #}
+                        {% set latest_decision = feature.decisions | sort(attribute='created_at', reverse=True) | first %}
+                        
+                        {% if latest_decision %}
+                            {# 2. Toon de beslissing met een CSS klasse voor de styling (bv. decision-approved) #}
+                            <span class="decision-{{ latest_decision.decision_type | lower }}">{{ latest_decision.decision_type }}</span>
+                        {% else %}
+                            {# 3. Toon 'Nog geen beslissing' als er geen Decision records zijn. #}
+                            <span class="decision-pending">Nog geen beslissing</span>
+                        {% endif %}
+                    </td>
+
+
                     <!-- EVIDENCE BUTTONS -->
                     <td>
                         <div class="d-flex justify-content-center gap-2">

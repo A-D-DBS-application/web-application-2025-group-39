@@ -27,6 +27,7 @@
         <div class="mb-3">
             <label class="form-label">Evidence Type</label>
             <select id="evidence_type" name="type_select" class="form-select">
+
                 {% set default_types = [
                     'Customer Feedback', 'Pilot Result', 'Paying Customer',
                     'Market Data', 'Other'
@@ -74,12 +75,14 @@
         <div class="mb-3">
             <label class="form-label">Confidence Level</label>
             <select name="new_confidence" class="form-select" required>
-                {% for value, label in CONFIDENCE_LEVELS.items() %}
+
+                {% for value, label in CONFIDENCE_LEVELS %}
                     <option value="{{ value }}"
                         {% if evidence.new_confidence == value %}selected{% endif %}>
                         {{ label }} — {{ value }}
                     </option>
                 {% endfor %}
+
             </select>
         </div>
 
