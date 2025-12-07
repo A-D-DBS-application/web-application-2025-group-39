@@ -4,17 +4,6 @@
 
 {% block content %}
 
-<div class="top-right-fixed">
-  <a href="{{ url_for('main.view_features', project_id=feature.id_project) }}"
-     class="btn btn-base btn-nav btn-sm">
-    ← Back to Features
-  </a>
-</div>
-
-<div class="bottom-info">
-  Logged in as: <strong>{{ session['name'] }}</strong> |
-  Role: <strong>{{ session['role'] }}</strong>
-</div>
 
 <h2 class="text-center mb-4">Add Evidence for: {{ feature.name_feature }}</h2>
 

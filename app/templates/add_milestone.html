@@ -4,16 +4,6 @@
 
 {% block content %}
 
-<div class="top-right">
-    <a href="{{ url_for('main.roadmap_overview', project_id=roadmap.id_project) }}"
-       class="btn btn-base btn-nav btn-sm">Back</a>
-</div>
-
-<!-- Logged-in info bottom right -->
-<div class="bottom-info">
-  Logged in as: <strong>{{ session['name'] }}</strong> | Role: <strong>{{ session['role'] }}</strong>
-</div>
-
 <h2 class="mb-4 text-center">Add Milestone</h2>
 
 <div class="milestone-form card p-4 shadow mt-3 mx-auto">

@@ -4,18 +4,240 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #bedbf7;
+    font-family: 'Arial', sans-serif;
+    /* Zeer lichte, off-white achtergrond */
+    background-color: #f7f9fc; 
+    color: #333;
 }
 
-/* Flash messages */
+h1, h2, h3, h4, h5, h6 {
+    color: #1E46D0; /* Primaire kleur voor titels */
+    font-weight: 600;
+}
+
+.content h2 {
+    /* Verhoog de ruimte boven de titel */
+    margin-top: 2rem;
+}
+
+/* ==================================== */
+/* NAVIGATIEBALK STYLING (PROFESSIONEEL) */
+/* ==================================== */
+
+.navbar {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff; /* Wit voor een strakke, lichte look */
+    padding: 12px 30px; /* Iets meer verticale padding */
+    /* Zachte, subtiele schaduw */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
+    
+    width: 100%;
+    position: sticky; 
+    top: 0;
+    z-index: 1000; 
+}
+
+/* Linker sectie (VECTR Logo/Naam) */
+.navbar-brand a {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1E46D0; /* Primaire merkkleur */
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
+/* Midden sectie (Dashboard, Projects) */
+.navbar-center {
+    flex-grow: 1; 
+    display: flex;
+    justify-content: flex-start;
+    margin-left: 50px; 
+}
+
+.navbar-center a {
+    position: relative;
+    margin: 0 18px; 
+    color: #4b5563; /* Neutraal donkergrijs */
+    padding: 8px 0;
+    transition: color 0.2s ease, border-bottom 0.2s ease;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.navbar-center a:hover {
+    color: #1E46D0; 
+    /* Duidelijke, strakke onderstreping bij hover */
+    border-bottom: 2px solid #1E46D0; 
+}
+
+/* Rechter sectie */
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+/* De knop in de navbar-center (Projects) */
+.nav-dropdown-btn {
+    display: inline-flex !important;
+    align-items: center;
+}
+
+/* Icoon styling (bi bi-chevron-down) */
+.nav-dropdown-btn i {
+    font-size: 10px;
+    margin-left: 6px;
+    transition: transform 0.2s;
+}
+
+/* Knoppen voor Log in/Register (Nu gestroomlijnd) */
+.btn-login, .btn-register {
+    padding: 8px 18px;
+    margin-left: 15px;
+    border-radius: 6px; 
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+/* Primaire knop (Inloggen/Profiel) */
+.btn-login {
+    color: #ffffff;
+    background-color: #1E46D0; 
+    border: 1px solid #1E46D0;
+}
+
+.btn-login:hover {
+    background-color: #163BA6; 
+    border-color: #163BA6;
+    box-shadow: 0 4px 10px rgba(30, 70, 208, 0.3);
+}
+
+/* Secundaire knop (Registreren) */
+.btn-register {
+    color: #1E46D0; 
+    background-color: transparent;
+    border: 1px solid #1E46D0; 
+}
+
+.btn-register:hover {
+    color: #ffffff;
+    background-color: #1E46D0;
+    box-shadow: 0 2px 5px rgba(30, 70, 208, 0.2);
+}
+
+/* Container voor de hoofd-dropdown */
+.nav-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* De inhoud van de dropdown */
+.nav-dropdown-content {
+    /* Standaard gesloten */
+    display: none; 
+    position: absolute;
+    top: 100%; 
+    left: 50%;
+    transform: translateX(-50%); 
+    background-color: #ffffff; /* Helder wit */
+    min-width: 250px; 
+    box-shadow: 0px 8px 30px 0px rgba(0,0,0,0.15); 
+    z-index: 1010; 
+    border-radius: 8px; 
+    overflow: hidden;
+    padding: 6px 0; 
+}
+
+/* Toon de dropdown bij hover */
+.nav-dropdown:hover .nav-dropdown-content {
+    display: block;
+}
+
+/* ==================================
+   PROJECT COLLAPSE MENU (VERTICAAL)
+   ================================== */
+
+/* Stijl voor de projectnaam link (de trigger) */
+.project-collapse-trigger {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    
+    color: #374151 !important; 
+    padding: 10px 16px !important;
+    text-decoration: none;
+    margin: 0 !important;
+    transition: background-color 0.2s ease;
+    font-weight: 500;
+    width: 100%; 
+    font-size: 15px; 
+}
+
+.project-collapse-trigger:hover {
+    background-color: #f3f4f6; 
+}
+
+/* Draai de pijl wanneer de content is uitgevouwen */
+.project-collapse-trigger[aria-expanded="true"] i {
+    transform: rotate(180deg);
+    color: #1E46D0; 
+}
+
+/* Stijl voor de links in het submenu (View Features, View Roadmap) */
+.project-menu-options {
+    background-color: #fafafa; 
+    padding: 0;
+    margin: 0; 
+    border-top: 1px solid #f3f4f6; 
+}
+
+/* Styling voor de individuele links in het submenu */
+.project-menu-options .project-menu-link {
+    color: #6b7280 !important;
+    padding: 8px 16px 8px 35px !important; 
+    text-decoration: none;
+    display: block;
+    margin: 0 !important;
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.project-menu-options .project-menu-link:hover {
+    background-color: #e5e7eb;
+    color: #1E46D0 !important; 
+}
+
+/* Styling voor de "Project Toevoegen" link */
+.add-project-link {
+    background-color: #ffffff; 
+    font-weight: 600;
+    color: #1E46D0 !important; 
+    border-top: 1px solid #e5e7eb; 
+    padding: 10px 16px !important;
+    text-align: center;
+    display: block;
+}
+
+.add-project-link:hover {
+    background-color: #f3f4f6 !important;
+}
+
+/* ===========================
+   FLASH MESSAGE STYLING (Aangepast aan nieuwe stijl)
+   =========================== */
 .success,
 .error,
 .info {
-    padding: 10px;
-    border-radius: 6px;
+    padding: 15px;
+    border-radius: 8px;
     margin-bottom: 10px;
     font-size: 14px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .success {
@@ -36,108 +258,100 @@ body {
     border: 1px solid #bee5eb;
 }
 
-
 /* ===========================
-   BUTTON STYLING
+   BUTTON STYLING (Aangepast aan nieuwe stijl)
    =========================== */
 
 /* Basis voor alle knoppen */
 .btn-base {
     min-width: 90px;
-    font-weight: 500;
+    font-weight: 600; /* Iets dikker font */
     border-radius: 6px;
+    padding: 8px 16px; /* Uniforme padding */
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
 }
 
-/* Top-right navigatieknoppen */
+/* Top-right navigatieknoppen (nu secundaire/subtiele look) */
 .btn-nav {
-    background-color: #343a40;
-    /* donkergrijs */
-    color: #fff;
+    background-color: #e5e7eb; /* Lichtgrijs */
+    color: #4b5563; /* Donkergrijs tekst */
+    border-color: #d1d5db;
 }
 
 .btn-nav:hover {
-    background-color: #23272b;
-    color: #fff;
+    background-color: #d1d5db;
+    color: #374151;
 }
 
 /* Logout & Delete knoppen */
 .btn-danger-custom {
     background-color: #dc3545;
     color: #fff;
+    border-color: #dc3545;
 }
 
 .btn-danger-custom:hover {
     background-color: #c82333;
-    color: #fff;
+    border-color: #bd2130;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
 }
 
-/* Edit knoppen */
+/* Edit knoppen (nu lichte achtergrond, blauwe tekst) */
 .btn-edit {
-    background-color: #c1429d;
-    color: #fff;
+    color: #1E46D0;
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
 }
 
 .btn-edit:hover {
-    background-color: #b33b91;
-    color: #fff;
+    background-color: #e5e7eb;
+    border-color: #9ca3af;
 }
 
-/* Make Decision */
-.btn-decision-make {
-    background-color: #ffc107;
+/* Make Decision & View knoppen (nu primaire actie) */
+.btn-decision-make,
+.btn-view {
+    background-color: #1E46D0;
     color: #fff;
+    border-color: #1E46D0;
 }
 
 /* Hover state */
-.btn-decision-make:hover {
-    background-color: #e0a800;
-    color: #fff;
-}
-
-.btn-view {
-    background-color: #0dcaf0;
-    color: #fff;
-}
-
+.btn-decision-make:hover,
 .btn-view:hover {
-    background-color: #0bb8db;
-    color: #fff;
+    background-color: #163BA6;
+    border-color: #163BA6;
+    box-shadow: 0 2px 8px rgba(30, 70, 208, 0.4);
 }
 
-/* Specifieke styling voor de VECTR Chart knop */
+/* Specifieke styling voor de VECTR Chart knop (Groen) */
 .btn-vectr {
-    background-color: #00b5ad;
-    /* appelblauwzeegroen basis */
-    border-color: #008c85;
-    /* donkerder randkleur */
+    background-color: #28a745; 
+    border-color: #218838;
     color: #fff;
-    /* tekstkleur */
     font-weight: 600;
-    /* iets dikker font */
-    padding: 0.4rem 1rem;
-    /* ruimte binnenin */
+    padding: 8px 18px;
     border-radius: 6px;
-    /* afgeronde hoeken */
     transition: all 0.2s ease-in-out;
 }
 
 .btn-vectr:hover {
-    background-color: #009c95;
-    /* donkerder bij hover */
-    border-color: #007a74;
-    /* nog donkerder rand */
-    color: #fff
+    background-color: #218838;
+    border-color: #1e7e34;
 }
 
-/* Primary acties (Add, Save, View) */
+/* Primary acties (Add, Save) */
 .btn-primary-custom {
-    background-color: #007bff;
+    background-color: #1E46D0;
     color: #fff;
+    border-color: #1E46D0;
 }
 
 .btn-primary-custom:hover {
-    background-color: #0056b3;
-    color: #fff;
+    background-color: #163BA6;
+    border-color: #163BA6;
 }
 
 
@@ -145,31 +359,24 @@ body {
 .btn-secondary-custom {
     background-color: #6c757d;
     color: #fff;
+    border-color: #6c757d;
 }
 
 .btn-secondary-custom:hover {
     background-color: #5a6268;
-    color: #fff;
+    border-color: #5a6268;
 }
 
 /* Zorgt dat alle knoppen in tabellen dezelfde grootte hebben */
 .table-btn {
     min-width: 100px;
-    /* vaste breedte voor uniformiteit */
     height: 36px;
-    /* vaste hoogte */
     display: flex;
-    /* flexbox voor centreren */
     justify-content: center;
-    /* horizontaal centreren */
     align-items: center;
-    /* verticaal centreren */
     font-size: 14px;
-    /* consistente tekstgrootte */
     border-radius: 6px;
-    /* afgeronde hoeken */
     padding: 0;
-    /* padding weg, flexbox doet het werk */
 }
 
 
@@ -177,27 +384,29 @@ body {
    FLASH MESSAGES POSITIONING
    =========================== */
 .flash-container {
-    margin-top: 60px;
-    width: 90%;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+    /* Gebruik vaste positionering voor betere zichtbaarheid */
+    position: fixed;
+    top: 80px; /* Onder de navbar */
+    right: 20px;
+    z-index: 1050;
+    max-width: 350px;
 }
 
 .flash-container .alert {
-    text-align: center;
+    text-align: left; /* Text links uitlijnen voor betere leesbaarheid */
+    margin-bottom: 10px;
 }
 
 /* ===========================
-   INDEX PAGE
+   INDEX PAGE (Aangepast aan nieuwe stijl)
    =========================== */
 .welcome-container {
     max-width: 700px;
-    background: rgba(255, 255, 255, 0.7);
+    background: #ffffff;
     border-radius: 16px;
     padding: 60px 40px;
     margin: 80px auto;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
@@ -205,21 +414,21 @@ body {
     font-weight: 800;
     font-size: 3.5rem;
     margin-bottom: 10px;
-    color: #111;
+    color: #1E46D0;
 }
 
 .subtitle {
     font-size: 1.5rem;
-    color: #333;
+    color: #4b5563;
     margin-bottom: 40px;
 }
 
 .auth-box {
-    background: #fff;
+    background: #f7f9fc;
     border-radius: 12px;
     display: inline-block;
     padding: 25px 40px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtiele binnenschaduw */
     margin-bottom: 20px;
 }
 
@@ -230,14 +439,13 @@ body {
 
 .btn-login,
 .btn-register {
-    padding: 8px 20px;
-    border-radius: 8px;
+    /* Knoppen hergebruiken van de navbar styling */
     min-width: 120px;
 }
 
 .footer {
     margin-top: 40px;
-    color: #444;
+    color: #6b7280;
     font-size: 0.9rem;
 }
 
@@ -246,14 +454,14 @@ body {
 }
 
 /* ===========================
-   LOGIN PAGE
+   LOGIN PAGE (Aangepast aan nieuwe stijl)
    =========================== */
 .login-container {
     background-color: #ffffff;
     padding: 30px 40px;
     border-radius: 12px;
     width: 380px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
     margin: 0 auto;
     margin-top: 6%;
 }
@@ -262,7 +470,7 @@ body {
     text-align: center;
     margin-bottom: 25px;
     font-weight: 700;
-    color: #333;
+    color: #1E46D0;
 }
 
 .form-group {
@@ -273,7 +481,7 @@ label {
     font-weight: 500;
     margin-bottom: 6px;
     display: block;
-    color: #555;
+    color: #4b5563;
 }
 
 input,
@@ -281,13 +489,21 @@ select {
     width: 100%;
     padding: 10px;
     border-radius: 6px;
-    border: 1px solid #cccccc;
+    border: 1px solid #d1d5db;
     box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus,
+select:focus {
+    border-color: #1E46D0;
+    box-shadow: 0 0 0 3px rgba(30, 70, 208, 0.2);
+    outline: none;
 }
 
 input[type="submit"] {
     margin-top: 10px;
-    background-color: #007bff;
+    background-color: #1E46D0;
     color: white;
     border: none;
     font-weight: 600;
@@ -295,7 +511,7 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-    background-color: #0056b3;
+    background-color: #163BA6;
 }
 
 .register-link {
@@ -305,14 +521,14 @@ input[type="submit"]:hover {
 }
 
 /* ===========================
-   REGISTER PAGE
+   REGISTER PAGE (Aangepast aan nieuwe stijl)
    =========================== */
 .register-container {
     background-color: #ffffff;
     padding: 30px 40px;
     border-radius: 12px;
     width: 420px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
     margin: 0 auto;
     margin-top: 5%;
 }
@@ -321,7 +537,7 @@ input[type="submit"]:hover {
     text-align: center;
     margin-bottom: 25px;
     font-weight: 700;
-    color: #333;
+    color: #1E46D0;
 }
 
 .login-link {
@@ -331,10 +547,10 @@ input[type="submit"]:hover {
 }
 
 /* ===========================
-   DASHBOARD PAGE
+   DASHBOARD PAGE (Aangepast aan nieuwe stijl)
    =========================== */
 .dashboard-wrapper {
-    height: 80vh;
+    min-height: 80vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -343,10 +559,10 @@ input[type="submit"]:hover {
 }
 
 .dashboard-wrapper h1 {
-    font-size: 2.3rem;
-    font-weight: 600;
+    font-size: 2.5rem;
+    font-weight: 700;
     margin-bottom: 25px;
-    color: #222;
+    color: #1E46D0;
 }
 
 .main-buttons {
@@ -356,115 +572,201 @@ input[type="submit"]:hover {
 }
 
 .main-buttons .btn {
-    width: 190px;
-    height: 55px;
+    width: 200px;
+    height: 60px;
     font-size: 17px;
-    border-radius: 10px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: center;
     align-items: center;
     transition: 0.2s ease-in-out;
+    /* Gebruik de primaire button style */
+    background-color: #1E46D0;
+    color: white;
 }
 
 .main-buttons .btn:hover {
     transform: translateY(-3px);
+    background-color: #163BA6;
+    box-shadow: 0 6px 15px rgba(30, 70, 208, 0.3);
 }
 
 .bottom-info {
     position: fixed;
     bottom: 15px;
     right: 20px;
-    font-size: 14px;
-    color: black;
+    font-size: 13px;
+    color: #6b7280;
+    background-color: #ffffff;
+    padding: 8px 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 998;
 }
 
 /* ===========================
-   PROJECTS PAGE
+   PROJECTS PAGE (Aangepast aan nieuwe stijl)
    =========================== */
 .projects-wrapper {
-    max-width: 1000px;
-    /* of 800px, afhankelijk van je layout */
-    margin: 0 auto;
-    /* centreer horizontaal */
-    padding: 1rem;
-    background-color: #fff;
-    /* wit vlak */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-
-.projects-wrapper h2 {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    font-weight: 600;
-}
-
-.top-right-fixed {
-    position: fixed;
-    top: 15px;
-    right: 20px;
-    z-index: 999;
-}
-
-table {
-    text-align: center;
-}
-
-/* ===========================
-   PROFILE PAGE
-   =========================== */
-.profile-wrapper {
-    min-height: 80vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.profile-card {
-    width: 450px;
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     border-radius: 12px;
 }
 
-.top-right {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+/* Container voor de grid van kaarten */
+.projects-grid-container {
+    padding: 30px; /* Binnenruimte in de container */
 }
 
+
+/* Stijl van de Project Kaart (de glass-card simuleren) */
+.project-card {
+    background-color: #ffffff; /* Witte achtergrond */
+    border: 1px solid #e0e0e0; /* Zachte rand */
+    border-radius: 16px; /* Afgeronde hoeken */
+    padding: 24px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    height: 100%; /* Zorgt dat alle kaarten in een rij even hoog zijn */
+}
+
+.project-card:hover {
+    transform: translateY(-4px); /* Lift effect bij hover */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Titel en Statistieken */
+.project-card .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: #1E46D0; /* Primaire kleur voor de titel */
+}
+
+.project-card .card-stats {
+    font-size: 0.85rem;
+    color: #6c757d; /* Grijze tekst */
+    margin: 0;
+}
+
+/* Project Initialen Cirkel (simulatie van de gradient-primary div) */
+.project-initials-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background-color: #1E46D0; /* Primaire kleur */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(30, 70, 208, 0.3);
+    flex-shrink: 0; /* Zorgt ervoor dat de cirkel niet krimpt */
+}
+
+/* Actie Boxen (Features/Roadmap) */
+.card-action-box {
+    padding: 15px;
+    border-radius: 10px;
+    background-color: #f7f9fc; /* Zeer lichte, off-white achtergrond */
+    border: 1px solid #ededed;
+}
+
+.card-action-box:not(:last-child) {
+    margin-bottom: 1rem; /* Afstand tussen Features en Roadmap */
+}
+
+.card-section-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Knoppen binnen de kaartacties */
+.btn-card-action {
+    /* Maak de knoppen iets kleiner en uniformer */
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Knoppen Iconen */
+.icon-sm {
+    font-size: 0.8rem;
+    margin-right: 5px;
+}
+
+
+/* Footer Actions (Edit/Delete) */
+.card-footer-actions {
+    border-color: #ededed !important; /* Lichte scheidingslijn */
+}
+
+/* Custom button overrides voor de kaart */
+.btn-edit-custom {
+    color: #495057;
+    background-color: #f1f1f1;
+    border-color: #e0eeef;
+    transition: background-color 0.2s;
+}
+
+.btn-edit-custom:hover {
+    background-color: #e5e5e5;
+    color: #333;
+}
 /* ===========================
-   EDIT/ADD PROJECT PAGE
+   EDIT/ADD PROJECT PAGE (Aangepast aan nieuwe stijl)
    =========================== */
 .form-card {
     max-width: 650px;
     border-radius: 12px;
     background: #fff;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 40px auto;
 }
 
 /* ===========================
-   ADD FEATURE PAGE
+   ADD FEATURE PAGE (Aangepast aan nieuwe stijl)
    =========================== */
 .feature-form {
     max-width: 1100px;
     border-radius: 12px;
     background: #fff;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 40px auto;
 }
 
 /* ===========================
-   ADD ROADMAP PAGE
+   ADD ROADMAP PAGE (Aangepast aan nieuwe stijl)
    =========================== */
 .roadmap-form {
     max-width: 550px;
     border-radius: 12px;
     background: #fff;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 40px auto;
 }
 
 /* ===========================
-   ROADMAP OVERVIEW PAGE
+   ROADMAP OVERVIEW PAGE (Aangepast aan nieuwe stijl)
    =========================== */
 .card {
     border-radius: 12px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    border: none;
 }
 
 .top-right {
@@ -474,64 +776,98 @@ table {
 }
 
 /* ===========================
-   MILESTONE PAGE
+   MILESTONE PAGE (Aangepast aan nieuwe stijl)
    =========================== */
 .milestone-form {
     max-width: 550px;
     border-radius: 12px;
     background: #fff;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 40px auto;
 }
 
 /* ===========================
-   VECTR Chart Styling
+   VECTR Chart Styling (Aangepast aan nieuwe stijl)
    =========================== */
 
-/* Card container for the chart */
 .vectr-card {
     max-width: 800px;
     margin: 0 auto;
-    /* center horizontally */
     margin-top: 2rem;
-    padding: 1rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
 }
 
-/* Canvas sizing */
 #vectrChart {
     width: 100%;
     height: auto;
     display: block;
 }
 
-/* Description text under the chart */
 .vectr-card p {
     margin-top: 1rem;
     font-size: 0.9rem;
     color: #6c757d;
-    /* Bootstrap muted color */
     text-align: center;
 }
 
 /* ===========================
-   FEATURES OVERVIEW CONTAINER
-   =========================== */
+   FEATURES OVERVIEW CONTAINER (Aangepast aan nieuwe stijl)
+   =========================== */
 .features-container-card {
     width: 100%;
-    /* volle breedte van container-fluid */
     max-width: none;
-    /* geen beperking */
     margin: 40px auto 20px auto;
     background-color: #ffffff;
     padding: 30px 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* ===========================
+   Table Styling (Aangepast aan nieuwe stijl)
+   =========================== */
+.table-responsive{
+  border-radius: 10px;
+  overflow-x: auto;     /* scrollbar terug */
+  overflow-y: hidden;   /* verticaal netjes */
+  -webkit-overflow-scrolling: touch; /* soepel op iPhone/iPad */
 }
 
 
-/* ===========================
-   Table Styling
-   =========================== */
+.table {
+    width: 100%;
+    margin-bottom: 0;
+    background-color: #ffffff;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: #f7f9fc; /* Zeer lichte strepen (body background kleur) */
+}
+
+.table-bordered > :not(caption) > * > * {
+    border-width: 0 0 1px 0; 
+    border-color: #e5e7eb;
+}
+
+.table thead th {
+    /* Gebruik lichte kleur en dikkere rand voor de header */
+    background-color: #f3f4f6;
+    color: #374151;
+    font-weight: 600;
+    border-bottom: 2px solid #d1d5db;
+    padding: 0.75rem 1rem;
+}
+
+.table tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    color: #4b5563;
+}
+
 .col-actions {
     width: 260px;
 }
@@ -544,165 +880,44 @@ table {
     display: inline;
 }
 
-
-/* 1. Algemene Verbeteringen voor de Koptekstcel */
-.table thead th {
-    /* Zorg voor meer padding links en rechts voor een luchtiger gevoel */
-    padding: 0.75rem 1rem;
-}
-
-/* 2. Verbeterde Sorteer Iconen (Pijlen) */
+/* Sorteer Iconen */
 .sort-icon,
 .sort-icon-placeholder {
-    /* Gebruik een iets donkerder grijs voor de niet-actieve toestand, zodat ze niet wegvallen */
-    color: #a0a0a0;
-    /* Zacht grijs */
+    color: #9ca3af; 
     font-size: 13px;
-    /* Iets kleiner voor subtiliteit */
     line-height: 0.5;
     display: block;
     text-decoration: none;
     transition: color 0.15s ease-in-out;
     padding: 1px 0;
-    /* Minimalen padding om klikgebied te verbeteren */
 }
 
-/* 3. De Actieve Sorteerpijl */
 .sort-icon.active {
-    /* Gebruik de primaire tekstkleur voor scherpte */
-    color: #343a40;
-    /* Zeer donkergrijs/bijna zwart */
+    color: #1E46D0; /* Primaire kleur voor actieve pijl */
 }
 
-/* 4. Verbeterde Afstand en Uitlijning */
 .d-flex {
-    /* Zorg dat de tekst op de basislijn van de cel blijft */
     align-items: center;
 }
 
 .me-2 {
-    /* Ruimte tussen de pijlenstapel en de tekst */
     margin-right: 0.6rem;
 }
 
-/* Zorg dat de tekst zelf duidelijk is */
 .table thead th strong {
     font-weight: 600;
-    /* Iets minder hard dan bold */
 }
 
 
-/* ROADMAP CSS*/
 
-.roadmap-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.top-right {
-    text-align: right;
-}
-
-.roadmap-timeline {
-    display: flex;
-    flex-wrap: nowrap;
-    /* Grote marge bovenaan zodat de milestones eronder passen */
-    margin-bottom: 25px;
-    position: relative;
-}
-
-.arrow-block {
-    display: inline-block;
-    /* naast elkaar */
-    background-color: #1e4974;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%);
-    min-width: 120px;
-    text-align: center;
-}
-
-
-.milestones-row {
-    display: flex;
-    color: white;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.milestone-group {
-    flex: 1;
-    min-width: 250px;
-}
-
-.milestone-card {
-    background-color: #1e4974;
-    border: 1px solid #444;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-
-.dark-card {
-    background-color: #1e4974;
-}
-
-.milestone-info {
-    font-size: 0.9rem;
-    color: ivory;
-    margin: 5px 0;
-}
-
-.status-planned {
-    color: orange;
-}
-
-.status-in-progress {
-    color: #00bfff;
-}
-
-.status-done {
-    color: #00ff88;
-}
-
-.edit-btn,
-.delete-btn {
-    margin-right: 10px;
-    background-color: #444;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.edit-btn:hover,
-.delete-btn:hover {
-    background-color: #666;
-}
-
-.btn-add-quarter,
-.btn-add-milestone-small {
-    display: inline-block;
-    margin-top: 10px;
-    background-color: #007bff;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 4px;
-    text-decoration: none;
-}
 
 /* ===========================
-   RESPONSIVE STYLING (MOBIELE APPARATEN)
+   RESPONSIVE STYLING (MOBIELE APPARATEN) - Positie behouden
    =========================== */
 
 @media (max-width: 768px) {
 
-    /* 1. Containers en Formulier Kaarten (Login, Register, Edit, etc.) */
-    /* Vervangt vaste breedtes door percentages voor full-width weergave */
+    /* 1. Containers en Formulier Kaarten */
     .login-container,
     .register-container,
     .profile-card,
@@ -710,12 +925,9 @@ table {
     .roadmap-form,
     .milestone-form,
     .feature-form,
-    /* Nieuw: de feature-form was erg breed */
     .vectr-card {
         width: 95%;
-        /* Neem 95% van de beschikbare breedte in */
         max-width: none;
-        /* Negeer vaste max-breedtes */
         margin: 20px auto;
         padding: 20px 15px;
     }
@@ -728,7 +940,6 @@ table {
 
     .welcome-container h1 {
         font-size: 2.2rem;
-        /* Kleinere titel */
     }
 
     .subtitle {
@@ -738,14 +949,12 @@ table {
     /* 3. Dashboard Knoppen (Verticale stapeling) */
     .dashboard-wrapper {
         justify-content: flex-start;
-        /* Begin bovenaan */
         padding-top: 50px;
         min-height: auto;
     }
 
     .main-buttons {
         flex-direction: column;
-        /* Stapel de knoppen verticaal */
         gap: 15px;
         width: 80%;
         margin: 20px auto;
@@ -753,14 +962,12 @@ table {
 
     .main-buttons .btn {
         width: 100%;
-        /* Maak knoppen volledige breedte */
         height: 50px;
         font-size: 16px;
     }
 
     .bottom-info {
         position: static;
-        /* Plakt niet langer vast aan de onderkant van het scherm */
         text-align: center;
         margin-top: 30px;
     }
@@ -774,14 +981,12 @@ table {
         box-sizing: border-box;
     }
 
-    /* Maak de tabel zelf horizontaal scrollbaar */
     table {
         display: block;
         overflow-x: auto;
         white-space: nowrap;
     }
 
-    /* Knoppen in tabellen kleiner maken */
     .table-btn {
         min-width: 80px;
         height: 30px;
@@ -801,7 +1006,6 @@ table {
     .top-right-fixed,
     .top-right {
         position: absolute;
-        /* Verander 'fixed' naar 'absolute' of behoud 'absolute' */
         top: 10px;
         right: 10px;
         z-index: 1000;
@@ -809,79 +1013,234 @@ table {
         gap: 5px;
     }
 
-    /* 6. Roadmap aanpassingen (zodat alles stapelt) */
-    .roadmap-timeline {
-        flex-wrap: wrap;
-        /* Sta toe dat items naar de volgende regel gaan */
-        overflow-x: auto;
-        /* Zorg voor scrollen als het te lang is */
-    }
+    
+}
 
-    .arrow-block {
-        /* Minder breedte zodat er meer in een rij past of het kan scrollen */
-        min-width: 100px;
-        padding: 8px 15px;
-        margin-right: 5px;
-    }
+/* =====================================
+   ROADMAP PAGE 
+   ===================================== */
 
-    .milestones-row {
-        flex-direction: column;
-        /* Stapel mijlpalen onder elkaar */
-        gap: 0;
-    }
+/* Titel boven de kaart*/
+.roadmap-header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 40px 0 20px 0;
+}
 
-    .milestone-group {
-        min-width: 100%;
-        margin-bottom: 10px;
+.roadmap-header h2 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+    color: #1E46D0;
+}
+
+/* knop "Projects Overview" rechtsboven op dezelfde lijn */
+.roadmap-header .top-right {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* De witte kaart waar de pijlen op staan*/
+.roadmap-container {
+    max-width: 1100px;
+    margin: 0 auto 60px auto;
+    padding: 32px 32px 36px 32px;
+    background-color: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+/* Rij met milestones */
+.milestones-row {
+    display: flex;
+    justify-content: center;
+}
+
+/* Groep milestones (één project) */
+.milestone-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+}
+
+/* Basisstijl voor pijl (milestones + "+ Add Milestone") */
+.milestone-card,
+.btn-add-milestone-small {
+    background-color: #1E46D0;
+    border: 1px solid #1E46D0;
+    color: #ffffff;
+
+    padding: 20px 28px;
+    min-height: 150px;
+
+    border-radius: 12px;
+    clip-path: polygon(
+        0 0,
+        85% 0,
+        100% 50%,
+        85% 100%,
+        0 100%
+    ); 
+
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+
+    flex: 0 0 calc(33.333% - 24px);  /* ongeveer 3 per rij */
+    max-width: 320px;
+    min-width: 260px;
+
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+/* Hover-lift*/
+.milestone-card:hover,
+.btn-add-milestone-small:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 35px rgba(30, 70, 208, 0.35);
+}
+
+/* Tekst binnen de pijl */
+.milestone-name {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.milestone-info {
+    font-size: 0.85rem;
+    line-height: 1.35;
+    margin: 2px 0;
+}
+
+/* Status als duidelijke badge */
+.milestone-info span[class^="status-"] {
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: 0.8rem;
+}
+
+/* Statuskleuren*/
+.status-planned {
+    color: #ffc107;
+    font-weight: 600;
+}
+
+.status-in-progress {
+    color: #0dcaf0;
+    font-weight: 600;
+}
+
+.status-done {
+    color: #28a745;
+    font-weight: 600;
+}
+
+/* Edit/Delete als pill-knopjes */
+.milestone-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+.milestone-card .edit-btn,
+.milestone-card .delete-btn {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    border-radius: 999px;
+    border-width: 1px;
+}
+
+/* Edit = witte outline */
+.milestone-card .edit-btn {
+    background-color: transparent;
+    border: 1px solid #ffffff;
+    color: #ffffff;
+}
+
+.milestone-card .edit-btn:hover {
+    background-color: #ffffff;
+    color: #1E46D0;
+}
+
+/* Delete = subtiele rode outline */
+.milestone-card .delete-btn {
+    background-color: transparent;
+    border: 1px solid #fecaca;
+    color: #fee2e2;
+}
+
+.milestone-card .delete-btn:hover {
+    background-color: #ef4444;
+    border-color: #ef4444;
+    color: #ffffff;
+}
+
+/* "+ Add Milestone"-pijl: tekst gecentreerd,*/
+.btn-add-milestone-small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+
+/* Mobile: pijlen onder elkaar full width */
+@media (max-width: 768px) {
+    .milestone-card,
+    .btn-add-milestone-small {
+        flex: 0 0 100%;
+        max-width: none;
     }
 }
 
 
 /* ===========================
-   SIDEBAR & LAYOUT STYLING 
+   Decision Status Styling
    =========================== */
 
-html,
-body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-}
-
-:root {
-    --color-sidebar-bg: var(--color-blue-mid);
-    --color-sidebar-hover: var(--color-blue-dark);
-}
-
-.sidebar {
-    background-color: var(--color-sidebar-bg);
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-}
-
-.sidebar .nav-link,
-.sidebar a {
-    display: flex;
-    align-items: center;
-    padding: 10px 20px;
-    color: var(--color-sidebar-link);
-    text-decoration: none;
-    font-size: 0.95rem;
-    transition: background-color 0.2s ease;
-}
-
-.sidebar .nav-link:hover,
-.sidebar a:hover {
-    background-color: var(--color-sidebar-hover);
-    color: white;
-}
-
-.sidebar .nav-link.active {
-    background-color: var(--color-primary);
-    color: white;
+/* Groene badge voor JA / Approved */
+.decision-approved, .decision-yes {
     font-weight: 600;
-    border-radius: 6px;
+    color: #1a7e4b; 
+    background-color: #e6f8ef; 
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Rode badge voor NEE / Rejected */
+.decision-rejected, .decision-no {
+    font-weight: 600;
+    color: #a72834; 
+    background-color: #fce7e8; 
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Gele/Oranje badge voor nog geen beslissing */
+.decision-pending {
+    font-weight: 600;
+    color: #9c6800; 
+    background-color: #fff8e6; 
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Stijl voor de 'Ja' knop (gebruikt uw eigen groene kleur) */
+.btn-decision-yes {
+    background-color: #28a745; 
+    color: #fff;
+    border-color: #218838;
+}
+
+.btn-decision-yes:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
 }
