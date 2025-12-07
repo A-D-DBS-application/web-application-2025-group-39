@@ -15,7 +15,7 @@ CONFIDENCE_LEVELS = {
     10.0: "Launch Data"
 }
 
-
+from sqlalchemy import desc 
 
 class Company(db.Model):
     __tablename__ = "company"
@@ -154,6 +154,15 @@ class Features_ideas(db.Model):
 
     # Metadata
     createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    @property
+    def latest_decision(self):
+        """Haalt de meest recente Decision op basis van created_at."""
+        # Query de Decision tabel en filter op deze feature ID
+        # BELANGRIJK: ZORG DAT 'from sqlalchemy import desc' BOVENAAN STAAT
+        return Decision.query.filter_by(id_feature=self.id_feature) \
+                             .order_by(desc(Decision.created_at)) \
+                             .first()
 
     # Relatie terug naar project
     project = db.relationship("Project", back_populates="features_ideas")

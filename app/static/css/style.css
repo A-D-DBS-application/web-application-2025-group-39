@@ -830,10 +830,13 @@ input[type="submit"]:hover {
 /* ===========================
    Table Styling (Aangepast aan nieuwe stijl)
    =========================== */
-.table-responsive {
-    border-radius: 10px;
-    overflow: hidden; 
+.table-responsive{
+  border-radius: 10px;
+  overflow-x: auto;     /* scrollbar terug */
+  overflow-y: hidden;   /* verticaal netjes */
+  -webkit-overflow-scrolling: touch; /* soepel op iPhone/iPad */
 }
+
 
 .table {
     width: 100%;
@@ -1193,4 +1196,51 @@ input[type="submit"]:hover {
         flex: 0 0 100%;
         max-width: none;
     }
+}
+
+
+/* ===========================
+   Decision Status Styling
+   =========================== */
+
+/* Groene badge voor JA / Approved */
+.decision-approved, .decision-yes {
+    font-weight: 600;
+    color: #1a7e4b; 
+    background-color: #e6f8ef; 
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Rode badge voor NEE / Rejected */
+.decision-rejected, .decision-no {
+    font-weight: 600;
+    color: #a72834; 
+    background-color: #fce7e8; 
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Gele/Oranje badge voor nog geen beslissing */
+.decision-pending {
+    font-weight: 600;
+    color: #9c6800; 
+    background-color: #fff8e6; 
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Stijl voor de 'Ja' knop (gebruikt uw eigen groene kleur) */
+.btn-decision-yes {
+    background-color: #28a745; 
+    color: #fff;
+    border-color: #218838;
+}
+
+.btn-decision-yes:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
 }

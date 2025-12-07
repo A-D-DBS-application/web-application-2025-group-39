@@ -42,6 +42,7 @@ from app.constants import (
 )
 
 from app.utils.calculations import calc_roi, calc_ttv, to_numeric
+from app.models import Profile, Features_ideas, Decision
 
 # Blueprint aanmaken
 main = Blueprint("main", __name__)
@@ -1356,46 +1357,53 @@ def vectr_chart_pdf(project_id):
     )
 
 
-# =============================
-# DECISION ROUTE
-# =============================
-@main.route("/feature/decide/<string:feature_id>", methods=["GET", "POST"])
-def make_decision(feature_id):
+# ==============================
+# FEATURE DECISION ROUTE 
+# ==============================
+@main.route("/set_feature_decision/<string:feature_id>/<string:decision_value>", methods=["POST"])
+def set_feature_decision(feature_id, decision_value):
+    # 1) Login check
+    if "user_id" not in session:
+        flash("U moet inloggen om beslissingen te maken.", "danger")
+        return redirect(url_for("main.login"))
+
+    # 2) Haal user + feature op
+    user = Profile.query.get(session["user_id"])
     feature = Features_ideas.query.get_or_404(feature_id)
 
-    if request.method == "POST":
-        # Let op: de oorspronkelijke code gebruikte 'reques.form.get', dit is gecorrigeerd naar 'request.form.get'
-        decision_type = request.form.get("decision_type")
-        reasoning = request.form.get("reasoning")
+    # 3) Security: feature moet bij dezelfde company horen
+    if feature.id_company != user.id_company:
+        flash("Niet toegestaan.", "danger")
+        return redirect(url_for("main.projects"))
 
-        company_id = feature.id_company
+    # 4) Map Yes/No naar decision types (matcht met je CSS: decision-approved / decision-rejected)
+    if decision_value == "Yes":
+        decision_type = "Approved"
+    elif decision_value == "No":
+        decision_type = "Rejected"
+    else:
+        decision_type = "Pending"
 
-        new_decision = Decision(
-            # FIX 1: Oorspronkelijke fout was id_feature=feature.id_company. Dit is nu gecorrigeerd.
-            id_feature=feature_id,
-            id_company=company_id,
+    # 5) Nieuwe Decision record opslaan
+    try:
+        d = Decision(
+            id_feature=feature.id_feature,
+            id_company=user.id_company,
             decision_type=decision_type,
-            reasoning=reasoning,
+            reasoning=None,
         )
-        db.session.add(new_decision)
+        db.session.add(d)
         db.session.commit()
 
-        # Let op: de oorspronkelijke code gebruikte url_for("ùain.view_decision"), dit is gecorrigeerd naar "main.view_decision"
-        return redirect(url_for("main.view_decision", feature_id=feature_id))
+        flash(f"Beslissing opgeslagen: {decision_type}", "success")
+        return redirect(url_for("main.view_features", project_id=feature.id_project))
 
-    return render_template("make_decision.html", feature=feature)
+    except Exception as e:
+        db.session.rollback()
+        print(f"Fout bij het instellen van de beslissing: {e}")
+        flash("Er is een fout opgetreden bij het verwerken van de beslissing.", "danger")
+        return redirect(url_for("main.view_features", project_id=feature.id_project))
 
-
-# --- Route voor 'View Decision' ---
-@main.route("/feature/<string:feature_id>")
-def view_decision(feature_id):
-    feature = Features_ideas.query.get_or_404(feature_id)
-    
-    # FIX 2: De relatie heet 'decisions' (lijst), niet 'decision' (enkelvoud).
-    # We halen het eerste item uit de lijst op, of None als de lijst leeg is.
-    decision = feature.decisions[0] if feature.decisions else None
-    
-    return render_template("view_decision.html", feature=feature, decision=decision)
 
 
 #route voor deraction balk:
