@@ -6,13 +6,21 @@
 {% block content %}
 <div class="milestone-form">
 
-    <h2 class="text-center mb-4">Add Milestone</h2>
+{# =========================
+    PAGINATITEL
+    ========================= #}
+<h2 class="text-center mb-4">Add Milestone</h2>
 
+{# =========================
+    NAVIGATION BACK TO ROADMAP
+    ========================= #}
     <a href="{{ url_for('main.roadmap_overview', project_id=roadmap.id_project) }}"
-       class="btn btn-nav mb-3">
+       class="btn btn-nav mb-3"> {# Link terug naar roadmap-overview van hetzelfde project #}
         ← Back to Roadmap
     </a>
-
+{# =========================
+     FORM (ADD MILESTONE)
+     ========================= #}
     <form method="POST">
 
         <!-- NAME -->
@@ -50,8 +58,8 @@
             </select>
         </div>
 
-        <!-- 🔥 FEATURE MULTI-SELECT -->
-        <hr class="my-4">
+        <!-- FEATURE MULTI-SELECT -->
+        <hr class="my-4"> {# Horizontale lijn als visuele scheiding; my-4 = marge boven én onder #}
         <h4 class="mb-3">Assign Features (recommended by VECTR score)</h4>
 
         <div class="mb-3">
@@ -65,9 +73,9 @@
                         {{ f.name_feature }}
                         — VECTR:
                         {% if f.vectr_score %}
-                            {{ "%.2f"|format(f.vectr_score) }}
+                            {{ "%.2f"|format(f.vectr_score) }} {# Toon vectr_score met 2 decimalen #}
                         {% else %}
-                            N/A
+                            N/A {# Als score ontbreekt #}
                         {% endif %}
                     </option>
                 {% endfor %}
@@ -75,7 +83,7 @@
 
             <small class="text-muted">
                 Hold CTRL (Windows) or CMD (Mac) to select multiple features.
-            </small>
+            </small> {# Helpertekst om multi-select gedrag uit te leggen #}
         </div>
 
         <!-- SUBMIT -->
