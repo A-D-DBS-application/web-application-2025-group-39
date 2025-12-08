@@ -270,50 +270,139 @@ def delete_project(project_id):
 
     return redirect(url_for("main.projects"))
 
+# ==============================
+# ADD_FEATURE ROUTE 
+# ==============================
 
-# ==============================
-# ADD FEATUREIDEA (AANGEPAST)
-# ==============================
 @main.route("/projects/<int:project_id>/add-feature", methods=["GET", "POST"])
 def add_feature(project_id):
-    """Route om een nieuwe Feature/Idee toe te voegen."""
-    user = require_editor_access()
-    if not isinstance(user, Profile):
-        return user
+    # Require login
+    if "user_id" not in session:
+        flash("You must log in first.", "danger")
+        return redirect(url_for("main.login"))
 
+    # Role control: Founder OR PM
+    if session.get("role") not in ["founder", "PM"]:
+        flash("Only Founders or PMs can add new features.", "danger")
+        return redirect(url_for("main.projects"))
+
+    # Haal project en company op
     project = Project.query.get_or_404(project_id)
-    company_redirect = require_company_ownership(project.id_company, user)
-    if company_redirect:
-        return company_redirect
-
-    company = project.company 
+    company = project.company
 
     if request.method == "POST":
-        data, errors = parse_feature_form(request.form) 
+        # Helper to convert safely to int
+        # routes.py (Gecorrigeerde helperfunctie, noem hem to_numeric of to_int)
+
+        # Basic info
+        name_feature = request.form.get("name_feature", "").strip()
+        description = request.form.get("description", "").strip()
+
+        # ROI fields
+        extra_revenue = to_numeric("extra_revenue")  # Was 'revenue', nu 'extra_revenue'
+        churn_reduction = to_numeric("churn_reduction")  # Veld toevoegen voor Churn
+        cost_savings = to_numeric("cost_savings")
+        investment_hours = to_numeric("investment_hours")
+        hourly_rate = to_numeric("hourly_rate")
+        opex_hours = to_numeric("opex_hours")
+        other_costs = to_numeric("other_costs")
+        horizon = to_numeric("horizon")
+        # roi_percent = request.form.get('roi_percent')  # readonly, string/float
+
+        # TTV fields
+        ttm_weeks = to_numeric("ttm_weeks")
+        ttbv_weeks = to_numeric("ttbv_weeks")
+        # TTV min/max fields
+        ttm_low = to_numeric("ttm_low")
+        ttm_high = to_numeric("ttm_high")
+        ttbv_low = to_numeric("ttbv_low")
+        ttbv_high = to_numeric("ttbv_high")
+        ttv_weeks_raw = request.form.get("ttv_weeks", "").strip()
+        try:
+            ttv_weeks = float(ttv_weeks_raw) if ttv_weeks_raw else None
+        except ValueError:
+            # Als het een lege string is, zal het al None zijn. Als het een ongeldige string is,
+            # moet je misschien valideren of None retourneren.
+            ttv_weeks = None
+
+        # Confidence
+        quality_score = request.form.get("quality_score")
+
+        # Validations
+        errors = []
+        if not name_feature:
+            errors.append("Title is required.")
+
+        numeric_fields = {
+            "Title": name_feature,  # De title check blijft
+            "Extra Revenue": extra_revenue,
+            "Churn Reduction": churn_reduction,
+            "Cost savings": cost_savings,
+            "Investment hours": investment_hours,
+            "Hourly rate": hourly_rate,
+            "OPEX hours": opex_hours,
+            "Other costs": other_costs,
+            "Horizon": horizon,
+            "TTM weeks": ttm_weeks,
+            "TTBV weeks": ttbv_weeks,
+            "TTM low": ttm_low,
+            "TTM high": ttm_high,
+            "TTBV low": ttbv_low,
+            "TTBV high": ttbv_high,
+        }
+        for label, value in numeric_fields.items():
+            if value is None:
+                errors.append(f"{label} must be an integer.")
+
         if errors:
             for e in errors:
                 flash(e, "danger")
             return render_template("add_feature.html", project=project, company=company)
 
-        # 1. Maak een leeg Feature object aan om de data en berekeningen in te plaatsen
-        new_feature = Features_ideas(
-            id_feature=str(uuid.uuid4()),
-            id_company=company.id_company,
-            id_project=project.id_project,
-        )
+        # Create a unique ID for the feature
+        new_id = str(uuid.uuid4())
 
-        # 2. Gebruik de helper om alle velden te vullen en ROI/TTV te berekenen (DRY)
-        # De data dictionary is al beschikbaar.
-        update_feature_data(new_feature, data) 
-        
-        # 3. Voeg toe en commit
-        db.session.add(new_feature)
-        db.session.commit()
+        roi_percent = calc_roi(extra_revenue, churn_reduction, cost_savings,
+                                        investment_hours, hourly_rate, opex_hours, other_costs)
+        ttv_weeks = calc_ttv(ttm_weeks, ttbv_weeks)
 
-        flash("Feature saved successfully.", "success")
-        # Stuurt naar de features-lijst van het zojuist gebruikte project (Best Practice)
-        return redirect(url_for("main.view_features", project_id=project_id)) 
+        try:
+            feature = Features_ideas(
+                id_feature=new_id,  # primary key
+                id_company=company.id_company,
+                id_project=project.id_project,
+                name_feature=name_feature,
+                description=description,
+                extra_revenue=extra_revenue,
+                churn_reduction=churn_reduction,
+                cost_savings=cost_savings,
+                investment_hours=investment_hours,
+                opex_hours=opex_hours,
+                other_costs=other_costs,
+                horizon=horizon,
+                roi_percent=roi_percent,  # Berekende waarde opslaan
+                ttm_weeks=ttm_weeks,
+                ttbv_weeks=ttbv_weeks,
+                ttv_weeks=ttv_weeks,  # Berekende waarde opslaan
+                quality_score=quality_score,
+                ttm_low=ttm_low,
+                ttm_high=ttm_high,
+                ttbv_low=ttbv_low,
+                ttbv_high=ttbv_high,
+            )
+            db.session.add(feature)
+            db.session.commit()
 
+            flash("Feature saved successfully.", "success")
+            return redirect(url_for("main.projects"))
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error while saving feature: {e}")
+            flash("An error occurred while saving.", "danger")
+            return render_template("add_feature.html", project=project, company=company)
+
+    # GET
     return render_template("add_feature.html", project=project, company=company)
 
 
