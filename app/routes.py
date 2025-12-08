@@ -658,7 +658,7 @@ def add_roadmap(project_id):
     if not isinstance(user, Profile):
         return user
 
-    # Only founder
+    # Only founders can create roadmaps
     role_redirect = require_role(["founder"], user)
     if role_redirect:
         return role_redirect
@@ -668,6 +668,7 @@ def add_roadmap(project_id):
     if company_redirect:
         return company_redirect
 
+    # MAX 1 ROADMAP PER PROJECT
     existing = Roadmap.query.filter_by(id_project=project_id).first()
     if existing:
         flash("This project already has a roadmap.", "danger")
@@ -701,18 +702,24 @@ def roadmap_overview(project_id):
     if company_redirect:
         return company_redirect
 
+    # Roadmaps sorted by start_quarter (string sort works for "Qn YYYY")
     roadmaps = (
         Roadmap.query.filter_by(id_project=project_id)
         .order_by(Roadmap.start_quarter.asc())
         .all()
     )
 
-    for r in roadmaps:
-        r.milestones.sort(
+    # Sort milestones inside each roadmap by start_date
+    for roadmap in roadmaps:
+        roadmap.milestones.sort(
             key=lambda m: m.start_date if m.start_date else datetime.date.max
         )
 
-    return render_template("roadmap_overview.html", project=project, roadmaps=roadmaps)
+    return render_template(
+        "roadmap_overview.html",
+        project=project,
+        roadmaps=roadmaps,
+    )
 
 
 @main.route("/roadmap/edit/<int:roadmap_id>", methods=["GET", "POST"])
@@ -721,7 +728,7 @@ def edit_roadmap(roadmap_id):
     if not isinstance(user, Profile):
         return user
 
-    # Only founder
+    # Only founders may edit
     role_redirect = require_role(["founder"], user)
     if role_redirect:
         return role_redirect
@@ -746,6 +753,7 @@ def edit_roadmap(roadmap_id):
         roadmap.budget_allocation = data["budget_allocation"]
 
         db.session.commit()
+
         flash("Roadmap updated successfully!", "success")
         return redirect(url_for("main.roadmap_overview", project_id=project.id_project))
 
@@ -753,40 +761,84 @@ def edit_roadmap(roadmap_id):
 
 
 # ==============================
-# MILESTONES
+# MILESTONES ROUTES
 # ==============================
+
 @main.route("/milestone/add/<int:roadmap_id>", methods=["GET", "POST"])
 def add_milestone(roadmap_id):
     user = require_login()
     if not isinstance(user, Profile):
         return user
 
-    # founder / PM
+    # founder / PM only
     role_redirect = require_role(["founder", "PM"], user)
     if role_redirect:
         return role_redirect
 
     roadmap = Roadmap.query.get_or_404(roadmap_id)
     project = Project.query.get_or_404(roadmap.id_project)
+
+    # Company check
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
         return company_redirect
 
+    # Load all features for this project
+    features = Features_ideas.query.filter_by(id_project=project.id_project).all()
+
+    # Compute VECTR score for each feature
+    for f in features:
+        ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
+        roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
+        confidence_score = f.quality_score if f.quality_score is not None else 0.0
+        vectr_score = ttv_weeks * roi_percent * confidence_score
+        setattr(f, "vectr_score", round(vectr_score, 2))
+
+    # Sort features descending by score
+    features = sorted(features, key=lambda x: getattr(x, "vectr_score", 0), reverse=True)
+
     if request.method == "POST":
         data, errors = parse_milestone_form(request.form)
+
         if errors:
             for e in errors:
                 flash(e, "danger")
-            return render_template("add_milestone.html", roadmap=roadmap)
 
-        milestone = Milestone(id_roadmap=roadmap_id, **data)
+            return render_template(
+                "add_milestone.html",
+                roadmap=roadmap,
+                features=features,
+                selected_features=request.form.getlist("features"),
+            )
+
+        milestone = Milestone(
+            id_roadmap=roadmap_id,
+            name=data["name"],
+            start_date=data["start_date"],
+            end_date=data["end_date"],
+            goal=data["goal"],
+            status=data["status"],
+        )
+
+        selected = request.form.getlist("features")
+        milestone.features = Features_ideas.query.filter(
+            Features_ideas.id_feature.in_(selected)
+        ).all()
+
         db.session.add(milestone)
         db.session.commit()
-        flash("Milestone added!", "success")
 
+        flash("Milestone added!", "success")
         return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
 
-    return render_template("add_milestone.html", roadmap=roadmap)
+    return render_template(
+        "add_milestone.html",
+        roadmap=roadmap,
+        features=features,
+        selected_features=[],
+    )
+
+
 
 
 @main.route("/milestone/edit/<int:milestone_id>", methods=["GET", "POST"])
@@ -795,7 +847,7 @@ def edit_milestone(milestone_id):
     if not isinstance(user, Profile):
         return user
 
-    # founder / PM
+    # founder / PM only
     role_redirect = require_role(["founder", "PM"], user)
     if role_redirect:
         return role_redirect
@@ -803,16 +855,41 @@ def edit_milestone(milestone_id):
     milestone = Milestone.query.get_or_404(milestone_id)
     roadmap = Roadmap.query.get_or_404(milestone.id_roadmap)
     project = Project.query.get_or_404(roadmap.id_project)
+
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
         return company_redirect
 
+    # Load features for this project
+    features = Features_ideas.query.filter_by(id_project=project.id_project).all()
+
+    # Compute VECTR score for features
+    for f in features:
+        ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
+        roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
+        confidence_score = f.quality_score if f.quality_score is not None else 0.0
+        vectr_score = ttv_weeks * roi_percent * confidence_score
+        setattr(f, "vectr_score", round(vectr_score, 2))
+
+    # Sort features descending
+    features = sorted(features, key=lambda x: getattr(x, "vectr_score", 0), reverse=True)
+
+    # Get selected features for prefill
+    existing_selected = [f.id_feature for f in milestone.features]
+
     if request.method == "POST":
         data, errors = parse_milestone_form(request.form)
+
         if errors:
             for e in errors:
                 flash(e, "danger")
-            return render_template("edit_milestone.html", milestone=milestone)
+
+            return render_template(
+                "edit_milestone.html",
+                milestone=milestone,
+                features=features,
+                selected_features=request.form.getlist("features"),
+            )
 
         milestone.name = data["name"]
         milestone.start_date = data["start_date"]
@@ -820,11 +897,23 @@ def edit_milestone(milestone_id):
         milestone.goal = data["goal"]
         milestone.status = data["status"]
 
+        selected = request.form.getlist("features")
+        milestone.features = Features_ideas.query.filter(
+            Features_ideas.id_feature.in_(selected)
+        ).all()
+
         db.session.commit()
         flash("Milestone updated!", "success")
         return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
 
-    return render_template("edit_milestone.html", milestone=milestone)
+    return render_template(
+        "edit_milestone.html",
+        milestone=milestone,
+        features=features,
+        selected_features=existing_selected,
+    )
+
+
 
 
 @main.route("/milestone/delete/<int:milestone_id>", methods=["POST"])
@@ -833,14 +922,10 @@ def delete_milestone(milestone_id):
     if not isinstance(user, Profile):
         return user
 
-    # founder / PM
-    role_redirect = require_role(["founder", "PM"], user)
-    if role_redirect:
-        return role_redirect
-
     milestone = Milestone.query.get_or_404(milestone_id)
     roadmap = Roadmap.query.get_or_404(milestone.id_roadmap)
     project = Project.query.get_or_404(roadmap.id_project)
+
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
         return company_redirect
@@ -848,6 +933,7 @@ def delete_milestone(milestone_id):
     db.session.delete(milestone)
     db.session.commit()
     flash("Milestone deleted!", "success")
+
     return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
 
 

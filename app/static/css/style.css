@@ -788,6 +788,27 @@ input[type="submit"]:hover {
 }
 
 /* ===========================
+   Milestone Feature Multiselect
+   =========================== */
+select[multiple] {
+    height: auto;
+    min-height: 150px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+select[multiple] option {
+    padding: 6px;
+    border-radius: 4px;
+}
+
+select[multiple] option:checked {
+    background-color: #1E46D0 !important;
+    color: #ffffff;
+}
+
+
+/* ===========================
    VECTR Chart Styling (Aangepast aan nieuwe stijl)
    =========================== */
 
