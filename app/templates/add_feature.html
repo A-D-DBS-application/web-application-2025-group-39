@@ -43,6 +43,7 @@
       </div>
     </div>
 
+
     <!-- ROI sectie: velden voor financiële baten en kosten -->
     <div class="mb-4">
       <h4 class="mb-3">Return on Investment (ROI)</h4>
@@ -54,6 +55,10 @@
 
       <div class="row g-3">
 
+        <!-- Horizon (maanden) — bepaalt hoe lang vooruit de ROI berekend wordt -->
+        <div class="col-md-6">
+          <label class="form-label">
+            Horizon (months)
             <!--aanmaken van het i icoontje -->
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The number of months we look ahead to estimate the impact of this feature. During this period, we calculate expected revenue, churn reduction, and cost savings.">
@@ -61,7 +66,6 @@
           </label>
           <input type="number" class="form-control" name="horizon" min="0">
         </div>
-
         <!-- Extra inkomsten -->
         <div class="col-md-6">
           <label class="form-label">
@@ -149,12 +153,13 @@
       </div>
     </div>
 
+
+
     <!-- TTV: Time to Value (Time-to-Market + Time-to-Business-Value) --> 
     <div class="mb-4">
       <h4 class="mb-3">Time to Value (TTV)</h4>
 
       <div class="row g-3">
-
         <!-- Linker kolom: alle Time-to-Market velden -->
         <div class="col-md-6">
 
@@ -259,11 +264,13 @@
 </div>
 
 <script>
+
   // Initialiseer alle Bootstrap Popovers op de pagina
   document.addEventListener('DOMContentLoaded', function () {
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
     var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
       // Gebruik de 'html: true' optie als je HTML in de Popover content wilt, maar hier niet nodig
+
       return new bootstrap.Popover(popoverTriggerEl)
     })
   });
