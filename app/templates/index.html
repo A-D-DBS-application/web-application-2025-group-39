@@ -4,16 +4,28 @@
 {% block body_class %}index-body{% endblock %}
 
 {% block content %}
+
+<!-- Hoofdcontainer van de welkomstpagina -->
 <div class="welcome-container">
+
+  <!-- Hoofdtitel -->
   <h1>Welcome To VECTR</h1>
+
+  <!-- Ondertitel -->
   <p class="subtitle">Your smart feature-prioritization assistant.</p>
 
+  <!-- Login/Register knoppen -->
   <div class="auth-box">
     <p>Select an option to continue:</p>
+
+    <!-- Link naar loginpagina -->
     <a href="{{ url_for('main.login') }}" class="btn btn-base btn-primary-custom me-2">Log in</a>
+
+    <!-- Link naar registratiepagina -->
     <a href="{{ url_for('main.register') }}" class="btn btn-base btn-secondary-custom">Register</a>
   </div>
 
+  <!-- Introductietekst over het platform -->
   <p><i>
     VECTR helps founders and product managers make confident, data-driven decisions.
     Add your ideas, connect evidence, and instantly see which features bring the highest return with the least risk.
@@ -21,8 +33,11 @@
 
   <p><i>Clear your roadmap with clarity and confidence.</i></p>
 
+  <!-- Footer met branding -->
   <div class="footer">
     <span class="brand">VECTR</span> – Prioritize Features.
   </div>
+
 </div>
+
 {% endblock %}
