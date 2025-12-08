@@ -5,35 +5,50 @@
 
 {% block content %}
   
+{# =========================
+   PAGINATITEL
+   ========================= #}
   <h2 class="mb-4 text-center">Add New Project</h2>
 
+{# =========================
+   FORM CONTAINER
+   ========================= #}
   <div class="form-card shadow-sm p-4 mx-auto">
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
+    
+    {# =========================
+      FLASH MESSAGES (VALIDATIE/FEEDBACK)
+      ========================= #}
+    {% with messages = get_flashed_messages(with_categories=true) %} {# Haalt flashed messages op uit Flask (met category + message) #}
+      {% if messages %} {# Toon alleen de container als er effectief messages zijn #}
+        {% for category, message in messages %} {# Loop door elke (category, message) pair #}
           <div class="alert alert-{{ 'danger' if category in ['danger','error'] else category }} alert-dismissible fade show" role="alert">
-            {{ message }}
+            {{ message }} {# Toon de message tekst #}
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
           </div>
         {% endfor %}
       {% endif %}
     {% endwith %}
 
+    {# =========================
+      FORM (ADD PROJECT)
+      ========================= #}
     <form method="POST" action="{{ url_for('main.add_project') }}">
       <h5 class="mb-3 fw-semibold">Project Info</h5>
 
+      <!-- Project Name -->
       <div class="mb-3">
         <label class="form-label">Project Name</label>
         <input type="text" name="project_name" class="form-control" required>
       </div>
 
+      <!-- Company -->
       <div class="mb-3">
         <label class="form-label">Company</label>
-        <input type="text" class="form-control" value="{{ company.company_name }}" readonly>
-        <input type="hidden" name="company_id" value="{{ company.id_company }}">
+        <input type="text" class="form-control" value="{{ company.company_name }}" readonly> {# Toon de bedrijfsnaam ter info; readonly = niet aanpasbaar maar blijft “leesbaar” #}
+        <input type="hidden" name="company_id" value="{{ company.id_company }}"> {# Belangrijk: ID wordt meegestuurd in POST om project correct aan company te koppelen #}
       </div>
 
+      <!-- Submit Button -->
       <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">Save Project</button>
     </form>
   </div>
