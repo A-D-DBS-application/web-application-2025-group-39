@@ -54,15 +54,9 @@
 
       <div class="row g-3">
 
-        <!-- Horizon (maanden) — bepaalt hoe lang vooruit de ROI berekend wordt -->
-        <div class="col-md-6">
-          <label class="form-label">
-            Horizon (months)
-            <i class="bi bi-info-circle" 
-               data-bs-toggle="popover"
-               data-bs-trigger="hover focus"
-               data-bs-placement="top"
-               data-bs-content="The number of months we look ahead to estimate the impact of this feature.">
+            <!--aanmaken van het i icoontje -->
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The number of months we look ahead to estimate the impact of this feature. During this period, we calculate expected revenue, churn reduction, and cost savings.">
             </i>
           </label>
           <input type="number" class="form-control" name="horizon" min="0">
@@ -72,25 +66,29 @@
         <div class="col-md-6">
           <label class="form-label">
             Extra Revenue
-            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-placement="top"></i>
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The additional money this feature is expected to bring in during the selected time period. Use realistic estimates based on benchmarks or results from previous releases.">
+            </i>
           </label>
           <input type="number" class="form-control" name="extra_revenue" min="0">
         </div>
 
         <!-- Geld bespaard door minder churn -->
         <div class="col-md-6">
-          <label class="form-label">
-            Churn Reduction Savings
-            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-placement="top"></i>
+          <label class="form-label">            Churn Reduction Savings
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The amount of money saved because fewer customers leave. If possible, use metrics like customer lifetime value or retention rates to estimate this.">
+            </i>
           </label>
           <input type="number" class="form-control" name="churn_reduction" min="0">
         </div>
 
         <!-- Kostenbesparing door het feature -->
         <div class="col-md-6">
-          <label class="form-label">
-            Cost Savings
-            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-placement="top"></i>
+          <label class="form-label">            Cost Savings
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The direct costs that go down thanks to this feature. Examples include fewer support tickets, automation that replaces manual work, or lower operational overhead.">
+            </i>
           </label>
           <input type="number" class="form-control" name="cost_savings" min="0">
         </div>
@@ -104,16 +102,20 @@
         <div class="col-md-6">
           <label class="form-label">
             Development Effort (hours)
-            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-placement="top"></i>
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="How much time the team needs to build this feature, expressed in hours or person-days. This number is used to calculate the investment cost — keep it honest and consistent.">
+            </i>
           </label>
           <input type="number" class="form-control" name="investment_hours" min="0">
         </div>
 
         <!-- Uurtarief -->
         <div class="col-md-6">
-          <label class="form-label">
+          <label class="form-label">            
             Cost per Hour (€)
-            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-placement="top"></i>
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The hourly cost of development. This can be internal cost or external billing rate.">
+            </i>
           </label>
           <input type="number" class="form-control" name="hourly_rate" min="0">
         </div>
@@ -122,7 +124,9 @@
         <div class="col-md-6">
           <label class="form-label">
             OPEX (operational costs)
-            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-placement="top"></i>
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The ongoing costs required after the feature is launched. This could be hosting, subscriptions, monitoring, or maintenance. Only include the extra costs specifically caused by this feature.">
+            </i>
           </label>
           <input type="number" class="form-control" name="opex_hours" min="0">
         </div>
@@ -131,7 +135,9 @@
         <div class="col-md-6">
           <label class="form-label">
             Other Costs (optional)
-            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-placement="top"></i>
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="A category for any costs that do not fit elsewhere.This could include licensing fees, integration costs or opportunity costs.">
+            </i>
           </label>
           <input type="number" class="form-control" name="other_costs" min="0">
         </div>
@@ -257,7 +263,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
     var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-      // HTML in popovers kan, maar is hier niet nodig
+      // Gebruik de 'html: true' optie als je HTML in de Popover content wilt, maar hier niet nodig
       return new bootstrap.Popover(popoverTriggerEl)
     })
   });
