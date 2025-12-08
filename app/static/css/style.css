@@ -1,13 +1,13 @@
 /* ===========================
    GLOBAL STYLING
    =========================== */
+
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Arial', sans-serif;
-    /* Zeer lichte, off-white achtergrond */
-    background-color: #f7f9fc;
-    color: #333;
+    margin: 0;                                           /* Definieert de buitenmarge rondom een element */
+    padding: 0;                                          /* Definieert de binnenmarge (ruimte) binnen een element */
+    font-family: 'Arial', sans-serif;                    /* Gebruik Arial als lettertype, met sans-serif als fallback */
+    background-color: #f7f9fc;                         /* Definieert de achtergrondkleur van een element */
+    color: #333;                                       /* Definieert de tekstkleur van een element */
 }
 
 h1,
@@ -17,72 +17,56 @@ h4,
 h5,
 h6 {
     color: #1E46D0;
-    /* Primaire kleur voor titels */
-    font-weight: 600;
+    font-weight: 600;                                    /* Bepaalt de dikte van het lettertype (600 is semi-vet) */
 }
 
 .content h2 {
-    /* Verhoog de ruimte boven de titel */
-    margin-top: 2rem;
+    margin-top: 2rem;                                    /* Verhoog de ruimte boven de titel */
 }
 
-/* ==================================== */
-/* NAVIGATIEBALK STYLING (PROFESSIONEEL) */
-/* ==================================== */
+/* ======================================
+    NAVIGATIEBALK STYLING (PROFESSIONEEL)
+   ====================================== */
 
 .navbar {
-    display: flex;
-    align-items: center;
+    display: flex;                                       /* Schakelt flexbox lay-out in voor de container */
+    align-items: center;                                 /* Lijn flex-items verticaal in het midden uit */
     background-color: #ffffff;
-    /* Wit voor een strakke, lichte look */
     padding: 12px 30px;
-    /* Iets meer verticale padding */
-    /* Zachte, subtiele schaduw */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-
-    width: 100%;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-
-    /* BELANGRIJKE WIJZIGINGEN VOOR 1 RIJ */
-    flex-direction: row;
-    /* Zorg ervoor dat het een enkele rij is */
-    justify-content: space-between;
-    /* Verdeel de ruimte tussen links, midden, rechts */
-    gap: 0;
-    /* Verwijder de gap indien aanwezig */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);          /* Voegt een schaduw toe aan de box */
+    width: 100%;                                         /* Definieert de breedte van een element */
+    position: sticky;                                    /* Maakt het element "sticky" bij scrollen */
+    top: 0;                                              /* Bepaalt de positie t.o.v. de bovenkant van de viewport (alleen bij position: sticky/fixed/absolute) */
+    z-index: 1000;                                       /* Bepaalt de stapelvolgorde (hoger = meer naar voren) */
+    flex-direction: row;                                 /* Definieert de hoofd-as als horizontaal */
+    justify-content: space-between;                      /* Verdeelt de ruimte tussen flex-items */
+    gap: 0;                                              /* Definieert de ruimte (tussenruimte) tussen flex-items */
 }
 
-/* Linker sectie (VECTR Logo/Naam) */
+/* Linker sectie (VECTR logo/naam) */
 .navbar-brand a {
-    font-size: 26px;
+    font-size: 26px;                                     /* Definieert de grootte van het lettertype */
     font-weight: 700;
     color: #1E46D0;
-    /* Primaire merkkleur */
-    text-decoration: none;
-    letter-spacing: -0.5px;
+    text-decoration: none;                               /* Definieert de decoratie van de tekst (hier: geen onderstreping) */
+    letter-spacing: -0.5px;                              /* Definieert de ruimte tussen de letters */
 }
 
-/* Midden sectie (Dashboard, Projects) */
+/* Midden sectie (Dashboard + Projects) */
 .navbar-center {
-    flex-grow: 1;
+    flex-grow: 1;                                        /* Bepaalt hoe een flex-item groeit om de beschikbare ruimte te vullen */
     display: flex;
-    justify-content: flex-start;
+    justify-content: flex-start;                         /* Lijn flex-items uit aan het begin van de hoofd-as */
     margin-left: 50px;
-
-    /* Zorg ervoor dat de items links van het midden beginnen */
     width: auto;
-    /* Overrule de 100% breedte die was ingesteld */
 }
 
 .navbar-center a {
-    position: relative;
+    position: relative;                                  /* Stelt de positioneringsmethode in (relatief aan de normale positie) */
     margin: 0 18px;
     color: #4b5563;
-    /* Neutraal donkergrijs */
     padding: 8px 0;
-    transition: color 0.2s ease, border-bottom 0.2s ease;
+    transition: color 0.2s ease, border-bottom 0.2s ease;/* Maakt overgangen tussen CSS-eigenschappen vloeiend */
     text-decoration: none;
     font-weight: 500;
     font-size: 15px;
@@ -90,55 +74,49 @@ h6 {
 
 .navbar-center a:hover {
     color: #1E46D0;
-    /* Duidelijke, strakke onderstreping bij hover */
-    border-bottom: 2px solid #1E46D0;
+    border-bottom: 2px solid #1E46D0;                    /* Definieert de rand aan de onderkant van een element */
 }
 
-/* Rechter sectie */
+/* Rechter sectie (Profiel/Logout knoppen) */
 .navbar-right {
     display: flex;
     align-items: center;
-
-    /* Zorg ervoor dat de items rechts blijven */
     width: auto;
-    /* Overrule de 100% breedte die was ingesteld */
-    display: flex;
-    justify-content: flex-end;
+    justify-content: flex-end;                           /* Lijn flex-items uit aan het einde van de hoofd-as */
     gap: 0;
-    /* Gebruik de margin-left op de knoppen */
 }
 
-/* De knop in de navbar-center (Projects) */
+/* Dropdown trigger (Projects knop) */
 .nav-dropdown-btn {
-    display: inline-flex !important;
+    display: inline-flex !important;                     /* Toon als inline-level flex container */
     align-items: center;
 }
 
-/* Icoon styling (bi bi-chevron-down) */
+/* Chevron icoon naast Projects */
 .nav-dropdown-btn i {
     font-size: 10px;
     margin-left: 6px;
     transition: transform 0.2s;
 }
 
-/* Knoppen voor Log in/Register (Nu gestroomlijnd) */
+/* Knoppen rechts (Login/Register/Profiel/Logout) */
 .btn-login,
 .btn-register {
     padding: 8px 18px;
     margin-left: 15px;
-    border-radius: 6px;
+    border-radius: 6px;                                  /* Voegt afgeronde hoeken toe aan een element */
     font-weight: 600;
-    text-align: center;
+    text-align: center;                                  /* Lijn de tekst horizontaal in het midden uit */
     transition: all 0.2s ease;
     text-decoration: none;
     font-size: 14px;
 }
 
-/* Primaire knop (Inloggen/Profiel) */
+/* Primaire knop (Login/Profiel) */
 .btn-login {
     color: #ffffff;
     background-color: #1E46D0;
-    border: 1px solid #1E46D0;
+    border: 1px solid #1E46D0;                           /* Definieert de rand rondom een element */
 }
 
 .btn-login:hover {
@@ -147,10 +125,10 @@ h6 {
     box-shadow: 0 4px 10px rgba(30, 70, 208, 0.3);
 }
 
-/* Secundaire knop (Registreren) */
+/* Secundaire knop (Register/Logout) */
 .btn-register {
     color: #1E46D0;
-    background-color: transparent;
+    background-color: transparent;                       /* Maakt de achtergrond transparant */
     border: 1px solid #1E46D0;
 }
 
@@ -160,33 +138,31 @@ h6 {
     box-shadow: 0 2px 5px rgba(30, 70, 208, 0.2);
 }
 
-/* Container voor de hoofd-dropdown */
+/* Dropdown container (Projects) */
 .nav-dropdown {
     position: relative;
-    display: inline-block;
+    display: inline-block;                               /* Toon als inline-level container die zich gedraagt als een blok */
 }
 
-/* De inhoud van de dropdown */
+/* Dropdown inhoud (lijst met projecten) */
 .nav-dropdown-content {
-    /* Standaard gesloten */
-    display: none;
-    position: absolute;
+    display: none;                                       /* Verbergt het element volledig */
+    position: absolute;                                  /* Stelt de positioneringsmethode in (t.o.v. dichtstbijzijnde gepositioneerde voorouder) */
     top: 100%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%);                         /* Past een 2D-transformatie toe (hier: horizontaal verschuiven) */
     background-color: #ffffff;
-    /* Helder wit */
-    min-width: 250px;
+    min-width: 250px;                                    /* Definieert de minimale breedte van een element */
     box-shadow: 0px 8px 30px 0px rgba(0, 0, 0, 0.15);
     z-index: 1010;
     border-radius: 8px;
-    overflow: hidden;
+    overflow: hidden;                                    /* Definieert hoe de inhoud wordt behandeld wanneer deze te groot is voor het element */
     padding: 6px 0;
 }
 
-/* Toon de dropdown bij hover */
+/* Dropdown zichtbaar bij hover */
 .nav-dropdown:hover .nav-dropdown-content {
-    display: block;
+    display: block;                                      /* Toon het element als een blok-level element */
 }
 
 /* ==================================
@@ -198,7 +174,7 @@ h6 {
     display: flex !important;
     justify-content: space-between;
     align-items: center;
-    cursor: pointer;
+    cursor: pointer;                                     /* Definieert de muisaanwijzer die getoond wordt (hier: handje) */
 
     color: #374151 !important;
     padding: 10px 16px !important;
@@ -216,7 +192,7 @@ h6 {
 
 /* Draai de pijl wanneer de content is uitgevouwen */
 .project-collapse-trigger[aria-expanded="true"] i {
-    transform: rotate(180deg);
+    transform: rotate(180deg);                           /* Draait het element 180 graden */
     color: #1E46D0;
 }
 
@@ -298,10 +274,8 @@ h6 {
 .btn-base {
     min-width: 90px;
     font-weight: 600;
-    /* Iets dikker font */
     border-radius: 6px;
     padding: 8px 16px;
-    /* Uniforme padding */
     text-decoration: none;
     transition: all 0.2s ease;
     border: 1px solid transparent;
@@ -310,9 +284,7 @@ h6 {
 /* Top-right navigatieknoppen (nu secundaire/subtiele look) */
 .btn-nav {
     background-color: #e5e7eb;
-    /* Lichtgrijs */
     color: #4b5563;
-    /* Donkergrijs tekst */
     border-color: #d1d5db;
 }
 
@@ -406,7 +378,7 @@ h6 {
 /* Zorgt dat alle knoppen in tabellen dezelfde grootte hebben */
 .table-btn {
     min-width: 100px;
-    height: 36px;
+    height: 36px;                                        /* Definieert de hoogte van een element */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -420,18 +392,15 @@ h6 {
    FLASH MESSAGES POSITIONING
    =========================== */
 .flash-container {
-    /* Gebruik vaste positionering voor betere zichtbaarheid */
-    position: fixed;
+    position: fixed;                                     /* Stelt de positioneringsmethode in (t.o.v. de viewport) */
     top: 80px;
-    /* Onder de navbar */
-    right: 20px;
+    right: 20px;                                         /* Bepaalt de positie t.o.v. de rechterkant van de viewport */
     z-index: 1050;
-    max-width: 350px;
+    max-width: 350px;                                    /* Definieert de maximale breedte van een element */
 }
 
 .flash-container .alert {
     text-align: left;
-    /* Text links uitlijnen voor betere leesbaarheid */
     margin-bottom: 10px;
 }
 
@@ -466,8 +435,7 @@ h6 {
     border-radius: 12px;
     display: inline-block;
     padding: 25px 40px;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-    /* Subtiele binnenschaduw */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);      /* Voegt een binnenschaduw toe */
     margin-bottom: 20px;
 }
 
@@ -478,7 +446,6 @@ h6 {
 
 .btn-login,
 .btn-register {
-    /* Knoppen hergebruiken van de navbar styling */
     min-width: 120px;
 }
 
@@ -519,7 +486,7 @@ h6 {
 label {
     font-weight: 500;
     margin-bottom: 6px;
-    display: block;
+    display: block;                                      /* Zorgt dat het element de volledige breedte inneemt */
     color: #4b5563;
 }
 
@@ -529,7 +496,7 @@ select {
     padding: 10px;
     border-radius: 6px;
     border: 1px solid #d1d5db;
-    box-sizing: border-box;
+    box-sizing: border-box;                              /* Verandert hoe de breedte en hoogte worden berekend (inclusief padding/border) */
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -537,7 +504,7 @@ input:focus,
 select:focus {
     border-color: #1E46D0;
     box-shadow: 0 0 0 3px rgba(30, 70, 208, 0.2);
-    outline: none;
+    outline: none;                                       /* Verwijdert de standaard focus-rand van de browser */
 }
 
 input[type="submit"] {
@@ -589,7 +556,7 @@ input[type="submit"]:hover {
    DASHBOARD PAGE (Aangepast aan nieuwe stijl)
    =========================== */
 .dashboard-wrapper {
-    min-height: 80vh;
+    min-height: 80vh;                                    /* Definieert de minimale hoogte van een element (vh = viewport height) */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -620,7 +587,6 @@ input[type="submit"]:hover {
     justify-content: center;
     align-items: center;
     transition: 0.2s ease-in-out;
-    /* Gebruik de primaire button style */
     background-color: #1E46D0;
     color: white;
 }
@@ -633,7 +599,7 @@ input[type="submit"]:hover {
 
 .bottom-info {
     position: fixed;
-    bottom: 15px;
+    bottom: 15px;                                        /* Bepaalt de positie t.o.v. de onderkant van de viewport */
     right: 20px;
     font-size: 13px;
     color: #6b7280;
@@ -659,28 +625,22 @@ input[type="submit"]:hover {
 /* Container voor de grid van kaarten */
 .projects-grid-container {
     padding: 30px;
-    /* Binnenruimte in de container */
 }
 
 
 /* Stijl van de Project Kaart (de glass-card simuleren) */
 .project-card {
     background-color: #ffffff;
-    /* Witte achtergrond */
     border: 1px solid #e0e0e0;
-    /* Zachte rand */
     border-radius: 16px;
-    /* Afgeronde hoeken */
     padding: 24px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    height: 100%;
-    /* Zorgt dat alle kaarten in een rij even hoog zijn */
+    height: 100%;                                        /* Definieert de hoogte van een element */
 }
 
 .project-card:hover {
     transform: translateY(-4px);
-    /* Lift effect bij hover */
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
@@ -690,13 +650,11 @@ input[type="submit"]:hover {
     font-weight: 600;
     margin-bottom: 0;
     color: #1E46D0;
-    /* Primaire kleur voor de titel */
 }
 
 .project-card .card-stats {
     font-size: 0.85rem;
     color: #6c757d;
-    /* Grijze tekst */
     margin: 0;
 }
 
@@ -706,7 +664,6 @@ input[type="submit"]:hover {
     height: 40px;
     border-radius: 12px;
     background-color: #1E46D0;
-    /* Primaire kleur */
     color: white;
     display: flex;
     align-items: center;
@@ -714,8 +671,7 @@ input[type="submit"]:hover {
     font-weight: bold;
     font-size: 14px;
     box-shadow: 0 2px 8px rgba(30, 70, 208, 0.3);
-    flex-shrink: 0;
-    /* Zorgt ervoor dat de cirkel niet krimpt */
+    flex-shrink: 0;                                      /* Bepaalt de krimpfactor van een flex-item */
 }
 
 /* Actie Boxen (Features/Roadmap) */
@@ -723,13 +679,11 @@ input[type="submit"]:hover {
     padding: 15px;
     border-radius: 10px;
     background-color: #f7f9fc;
-    /* Zeer lichte, off-white achtergrond */
     border: 1px solid #ededed;
 }
 
 .card-action-box:not(:last-child) {
     margin-bottom: 1rem;
-    /* Afstand tussen Features en Roadmap */
 }
 
 .card-section-title {
@@ -740,7 +694,6 @@ input[type="submit"]:hover {
 
 /* Knoppen binnen de kaartacties */
 .btn-card-action {
-    /* Maak de knoppen iets kleiner en uniformer */
     padding: 6px 10px;
     font-size: 0.8rem;
     font-weight: 500;
@@ -760,7 +713,6 @@ input[type="submit"]:hover {
 /* Footer Actions (Edit/Delete) */
 .card-footer-actions {
     border-color: #ededed !important;
-    /* Lichte scheidingslijn */
 }
 
 /* Custom button overrides voor de kaart */
@@ -823,7 +775,7 @@ input[type="submit"]:hover {
 }
 
 .top-right {
-    position: absolute;
+    position: absolute;                                  /* Stelt de positioneringsmethode in (t.o.v. dichtstbijzijnde gepositioneerde voorouder) */
     top: 15px;
     right: 20px;
 }
@@ -906,12 +858,9 @@ select[multiple] option:checked {
    =========================== */
 .table-responsive {
     border-radius: 10px;
-    overflow-x: auto;
-    /* scrollbar terug */
-    overflow-y: hidden;
-    /* verticaal netjes */
-    -webkit-overflow-scrolling: touch;
-    /* soepel op iPhone/iPad */
+    overflow-x: auto;                                    /* Toont een horizontale schuifbalk indien nodig */
+    overflow-y: hidden;                                  /* Verbergt een verticale schuifbalk */
+    -webkit-overflow-scrolling: touch;                   /* Bepaalt de scroll-inertie op iOS-apparaten */
 }
 
 
@@ -923,7 +872,6 @@ select[multiple] option:checked {
 
 .table-striped>tbody>tr:nth-of-type(odd)>* {
     background-color: #f7f9fc;
-    /* Zeer lichte strepen (body background kleur) */
 }
 
 .table-bordered> :not(caption)>*>* {
@@ -932,7 +880,6 @@ select[multiple] option:checked {
 }
 
 .table thead th {
-    /* Gebruik lichte kleur en dikkere rand voor de header */
     background-color: #f3f4f6;
     color: #374151;
     font-weight: 600;
@@ -942,7 +889,7 @@ select[multiple] option:checked {
 
 .table tbody td {
     padding: 12px 15px;
-    vertical-align: middle;
+    vertical-align: middle;                              /* Lijn de inhoud verticaal in het midden uit */
     color: #4b5563;
 }
 
@@ -963,7 +910,7 @@ select[multiple] option:checked {
 .sort-icon-placeholder {
     color: #9ca3af;
     font-size: 13px;
-    line-height: 0.5;
+    line-height: 0.5;                                    /* Definieert de hoogte van een regel tekst */
     display: block;
     text-decoration: none;
     transition: color 0.15s ease-in-out;
@@ -972,7 +919,6 @@ select[multiple] option:checked {
 
 .sort-icon.active {
     color: #1E46D0;
-    /* Primaire kleur voor actieve pijl */
 }
 
 .d-flex {
@@ -1046,7 +992,7 @@ select[multiple] option:checked {
     }
 
     .bottom-info {
-        position: static;
+        position: static;                                    /* Stelt de positioneringsmethode in (normaal in de flow van de pagina) */
         text-align: center;
         margin-top: 30px;
     }
@@ -1063,7 +1009,7 @@ select[multiple] option:checked {
     table {
         display: block;
         overflow-x: auto;
-        white-space: nowrap;
+        white-space: nowrap;                                 /* Voorkomt dat de tekst van cellen afbreekt en dwingt horizontale scroll */
     }
 
     .table-btn {
@@ -1142,7 +1088,7 @@ select[multiple] option:checked {
 /* Groep milestones (één project) */
 .milestone-group {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: wrap;                                     /* Bepaalt of flex-items op meerdere regels mogen staan */
     justify-content: center;
     gap: 24px;
 }
@@ -1162,12 +1108,11 @@ select[multiple] option:checked {
             85% 0,
             100% 50%,
             85% 100%,
-            0 100%);
+            0 100%);                                     /* Creëert een uitsnede in de vorm van een afgeschuinde pijl */
 
     box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
 
-    flex: 0 0 calc(33.333% - 24px);
-    /* ongeveer 3 per rij */
+    flex: 0 0 calc(33.333% - 24px);                      /* Bepaalt de flexibele eigenschappen: flex-grow, flex-shrink, basisgrootte */
     max-width: 320px;
     min-width: 260px;
 
@@ -1196,7 +1141,7 @@ select[multiple] option:checked {
 
 /* Status als duidelijke badge */
 .milestone-info span[class^="status-"] {
-    text-transform: uppercase;
+    text-transform: uppercase;                           /* Converteert tekst naar hoofdletters */
     letter-spacing: 0.03em;
     font-size: 0.8rem;
 }
@@ -1282,7 +1227,7 @@ select[multiple] option:checked {
    Decision Status Styling
    =========================== */
 
-/* Groene badge voor JA / Approved */
+/* Groene badge voor Yes / Approved */
 .decision-approved,
 .decision-yes {
     font-weight: 600;
@@ -1293,7 +1238,7 @@ select[multiple] option:checked {
     display: inline-block;
 }
 
-/* Rode badge voor NEE / Rejected */
+/* Rode badge voor No / Rejected */
 .decision-rejected,
 .decision-no {
     font-weight: 600;
@@ -1329,7 +1274,6 @@ select[multiple] option:checked {
 
 /* Navbar layout in 2 rijen */
 .navbar {
-    /* OUDE STYLING VERWIJDERD OM 1 RIJ TE KRIJGEN */
     flex-direction: row;
     justify-content: space-between;
     gap: 0;
@@ -1338,9 +1282,7 @@ select[multiple] option:checked {
 /* De nav-top is niet meer nodig in de HTML, maar als hij er is, moet hij zich gedragen als een rij */
 .nav-top {
     width: auto;
-    /* Zorg dat het de items in zich omvat */
-    display: contents;
-    /* Zorgt dat de kinderen direct onder de .navbar komen */
+    display: contents;                                   /* Zorgt dat de kinderen direct onder de .navbar komen in de flex-context */
 }
 
 
@@ -1349,7 +1291,6 @@ select[multiple] option:checked {
     width: auto;
     margin-left: 50px;
     flex-grow: 1;
-    /* Laat het de resterende ruimte innemen */
     justify-content: flex-start;
 }
 
@@ -1368,12 +1309,10 @@ select[multiple] option:checked {
     }
 
     .navbar-brand {
-        /* Zorg dat de brand links blijft op mobiel */
         flex-grow: 0;
     }
 
     .navbar-right {
-        /* Zorg dat de knoppen van de rechter sectie onder de brand komen op mobiel */
         width: 100%;
         display: flex;
         justify-content: flex-start;
@@ -1390,6 +1329,5 @@ select[multiple] option:checked {
 
     .navbar-center a {
         margin: 0 12px 0 0;
-        /* minder ruimte */
     }
 }

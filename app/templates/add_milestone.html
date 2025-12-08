@@ -6,21 +6,21 @@
 {% block content %}
 <div class="milestone-form">
 
-{# =========================
+    {# =========================
     PAGINATITEL
     ========================= #}
-<h2 class="text-center mb-4">Add Milestone</h2>
+    <h2 class="text-center mb-4">Add Milestone</h2>
 
-{# =========================
+    {# =========================
     NAVIGATION BACK TO ROADMAP
     ========================= #}
-    <a href="{{ url_for('main.roadmap_overview', project_id=roadmap.id_project) }}"
-       class="btn btn-nav mb-3"> {# Link terug naar roadmap-overview van hetzelfde project #}
+    <a href="{{ url_for('main.roadmap_overview', project_id=roadmap.id_project) }}" class="btn btn-nav mb-3">
+        {# Link terug naar roadmap-overview van hetzelfde project #}
         ← Back to Roadmap
     </a>
-{# =========================
-     FORM (ADD MILESTONE)
-     ========================= #}
+    {# =========================
+    FORM (ADD MILESTONE)
+    ========================= #}
     <form method="POST">
 
         <!-- NAME -->
@@ -67,17 +67,15 @@
 
             <select name="features" multiple class="form-select" size="8">
                 {% for f in features %}
-                    <option value="{{ f.id_feature }}"
-                        {% if f.id_feature in selected_features %}selected{% endif %}
-                    >
-                        {{ f.name_feature }}
-                        — VECTR:
-                        {% if f.vectr_score %}
-                            {{ "%.2f"|format(f.vectr_score) }} {# Toon vectr_score met 2 decimalen #}
-                        {% else %}
-                            N/A {# Als score ontbreekt #}
-                        {% endif %}
-                    </option>
+                <option value="{{ f.id_feature }}" {% if f.id_feature in selected_features %}selected{% endif %}>
+                    {{ f.name_feature }}
+                    — VECTR:
+                    {% if f.vectr_score %}
+                    {{ "%.2f"|format(f.vectr_score) }} {# Toon vectr_score met 2 decimalen #}
+                    {% else %}
+                    N/A {# Als score ontbreekt #}
+                    {% endif %}
+                </option>
                 {% endfor %}
             </select>
 
