@@ -641,6 +641,7 @@ def vectr_chart(project_id):
                     "name": f.name_feature,
                     "confidence": conf,
                     "ttv": ttv_scaled,
+                    "ttv_weeks": effective_ttv,
                     "roi": float(f.roi_percent),
                     "id": f.id_feature,
                 }
