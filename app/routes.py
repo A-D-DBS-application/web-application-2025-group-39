@@ -22,24 +22,23 @@ def require_editor_access():
     # 1. Login check
     user = require_login()
     if not isinstance(user, Profile):
-        return user  # Retourneert direct de redirect response
+        return user                                                 # Retourneert direct de redirect response
 
     # 2. Role check
     role_redirect = require_role(["founder", "PM"], user)
     if role_redirect:
-        return role_redirect # Retourneert direct de redirect response
+        return role_redirect                                        # Retourneert direct de redirect response
         
     return user
 
 # ==============================
 # INDEX
 # ==============================
-@main.route("/", methods=["GET"])
+@main.route("/", methods=["GET"])                                   # Toon de landingspagina of, indien ingelogd, ga direct naar het dashboard.
 def index():
     if "user_id" in session:
         return redirect(url_for("main.dashboard"))
-    return render_template("index.html")
-
+    return render_template("index.html")                            # Toon de index pagina
 
 # ==============================
 # LOGIN, REGISTER, LOGOUT
@@ -49,32 +48,33 @@ def login():
     if request.method == "POST":
         email = (request.form.get("email") or "").lower().strip()
         password = request.form.get("password") 
-        #zoek gebruiker op basis van email
-        user = Profile.query.filter_by(email=email).first()
+        
+        user = Profile.query.filter_by(email=email).first()         #zoek gebruiker op basis van email
+        
         #controleer of gebruiker bestaat
         if user and user.check_password(password):                  #controleer of wachtwoord overeenkomt
-            session["user_id"] = user.id_profile                    
+            session["user_id"] = user.id_profile                    # Sla essentiële info op in de sessie             
             session["name"] = user.name
             session["role"] = user.role
             flash("Successfully logged in!", "success")
             return redirect(url_for("main.dashboard"))
 
-        flash("Invalid email or password.", "danger")
+        flash("Invalid email or password.", "danger")               # Foutmelding bij incorrecte gegevens
 
-    return render_template("login.html")
+    return render_template("login.html")                            # Toon het inlogformulier
 
 @main.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         #haal de gegevens op 
         name = request.form.get("name")
-        email = (request.form.get("email") or "").lower().strip()
+        email = (request.form.get("email") or "").lower().strip()   # email adress lower en strippen, zodat als gebruiker met hoofdletter typt het nog steeds juist is 
         password = request.form.get("password")
         role = request.form.get("role")
         company_name = request.form.get("company_name")
 
         if not all([name, email, password, role, company_name]):
-            flash("All fields are required.", "danger")
+            flash("All fields are required.", "danger")             #foutmelding voor als iets niet is ingevult 
             return render_template("register.html")
         
         #controleer of de gebruiker al bestaat op basis van email 
@@ -108,7 +108,7 @@ def register():
             return redirect(url_for("main.login"))
 
         except Exception as e:
-            db.session.rollback()
+            db.session.rollback()                                               # Rollback bij fout, en toon een generieke foutmeldin
             print(f"Registration error: {e}")
             flash("An error occurred during registration.", "danger")
     #bij een GET-verzoek toon het registratieformulier
@@ -130,8 +130,10 @@ def dashboard():
         flash("You must log in first.", "danger")
         return redirect(url_for("main.login"))
 
+    # Haal de nodige data uit de sessie
     name = session.get("name")
     role = session.get("role")
+
     return render_template("dashboard.html", name=name, role=role)
 
 
@@ -145,7 +147,7 @@ def profile():
     if not isinstance(user, Profile):
         return user  # redirect
 
-    company = Company.query.get(user.id_company)
+    company = Company.query.get(user.id_company)                    # Gebruik de relatie user.company om het bedrijf te krijgen
     return render_template(
         "profile.html",
         name=user.name,
@@ -158,12 +160,13 @@ def profile():
 # ==============================
 # PROJECTS OVERVIEW
 # ==============================
-@main.route("/projects")
+@main.route("/projects")                                                # Toont een lijst van alle projecten van het bedrijf van de gebruiker.
 def projects():
     user = require_login()
     if not isinstance(user, Profile):
         return user
 
+    # haal alle Project objecten op die horen bij de id_company van de gebruiker.
     projects = (
         db.session.query(Project, Company.company_name)
         .join(Company, Project.id_company == Company.id_company)
@@ -178,22 +181,22 @@ def projects():
 # ==============================
 # ADD PROJECT
 # ==============================
-@main.route("/add_project", methods=["GET", "POST"])
+@main.route("/add_project", methods=["GET", "POST"])                                #Route om een nieuw project toe te voegen (vereist editor-toegang).
 def add_project():
     user = require_editor_access()
     if not isinstance(user, Profile):
-        return user # Afgevangen door helper: retourneert redirect/error
+        return user                                                                 # Afgevangen door helper: retourneert redirect/error
 
     user_company = Company.query.get(user.id_company)
 
     if request.method == "POST":
-        data, errors = parse_project_form(request.form)
+        data, errors = parse_project_form(request.form)                             # Helper-functie valideert en parseert het formulier
         if errors:
             for e in errors:
                 flash(e, "danger")
             return render_template("add_project.html", company=user_company)
 
-        new_project = Project(
+        new_project = Project(                                                      # Maak nieuw Project object aan
             project_name=data["project_name"],
             id_company=user_company.id_company,
         )
@@ -212,7 +215,7 @@ def add_project():
 def edit_project(project_id):
     user = require_editor_access()
     if not isinstance(user, Profile):
-        return user # Afgevangen door helper: retourneert redirect/error
+        return user                                                                 # Afgevangen door helper: retourneert redirect/error
 
     project = Project.query.get_or_404(project_id)
 
@@ -228,7 +231,7 @@ def edit_project(project_id):
                 flash(e, "danger")
             return render_template("edit_project.html", project=project)
 
-        project.project_name = data["project_name"]
+        project.project_name = data["project_name"]                                 # Update het ORM-object
         db.session.commit()
 
         flash("Project updated successfully.", "success")
@@ -257,7 +260,7 @@ def delete_project(project_id):
         return company_redirect
 
     try:
-        db.session.delete(project)
+        db.session.delete(project)                                                  # Delete het ORM-object
         db.session.commit()
         flash("Project deleted successfully.", "success")
     except Exception as e:
@@ -269,67 +272,47 @@ def delete_project(project_id):
 
 
 # ==============================
-# ADD FEATURE
+# ADD FEATUREIDEA (AANGEPAST)
 # ==============================
 @main.route("/projects/<int:project_id>/add-feature", methods=["GET", "POST"])
 def add_feature(project_id):
+    """Route om een nieuwe Feature/Idee toe te voegen."""
     user = require_editor_access()
+    if not isinstance(user, Profile):
+        return user
 
     project = Project.query.get_or_404(project_id)
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
         return company_redirect
 
-    company = project.company
+    company = project.company 
 
     if request.method == "POST":
-        data, errors = parse_feature_form(request.form)
+        data, errors = parse_feature_form(request.form) 
         if errors:
             for e in errors:
                 flash(e, "danger")
             return render_template("add_feature.html", project=project, company=company)
 
-        roi_percent = calc_roi(
-            data["extra_revenue"],
-            data["churn_reduction"],
-            data["cost_savings"],
-            data["investment_hours"],
-            data["hourly_rate"],
-            data["opex_hours"],
-            data["other_costs"],
-        )
-        ttv_weeks = calc_ttv(data["ttm_weeks"], data["ttbv_weeks"])
-
+        # 1. Maak een leeg Feature object aan om de data en berekeningen in te plaatsen
         new_feature = Features_ideas(
             id_feature=str(uuid.uuid4()),
             id_company=company.id_company,
             id_project=project.id_project,
-            name_feature=data["name_feature"],
-            description=data["description"],
-            extra_revenue=data["extra_revenue"],
-            churn_reduction=data["churn_reduction"],
-            cost_savings=data["cost_savings"],
-            investment_hours=data["investment_hours"],
-            hourly_rate=data["hourly_rate"],
-            opex_hours=data["opex_hours"],
-            other_costs=data["other_costs"],
-            horizon=data["horizon"],
-            ttm_weeks=data["ttm_weeks"],
-            ttbv_weeks=data["ttbv_weeks"],
-            ttm_low=data["ttm_low"],
-            ttm_high=data["ttm_high"],
-            ttbv_low=data["ttbv_low"],
-            ttbv_high=data["ttbv_high"],
-            roi_percent=roi_percent,
-            ttv_weeks=ttv_weeks,
-            quality_score=data["quality_score"],
         )
 
+        # 2. Gebruik de helper om alle velden te vullen en ROI/TTV te berekenen (DRY)
+        # De data dictionary is al beschikbaar.
+        update_feature_data(new_feature, data) 
+        
+        # 3. Voeg toe en commit
         db.session.add(new_feature)
         db.session.commit()
 
         flash("Feature saved successfully.", "success")
-        return redirect(url_for("main.projects"))
+        # Stuurt naar de features-lijst van het zojuist gebruikte project (Best Practice)
+        return redirect(url_for("main.view_features", project_id=project_id)) 
 
     return render_template("add_feature.html", project=project, company=company)
 
@@ -350,7 +333,8 @@ def features_calc_roi():
     )
 
     roi_percent = roi_percent_raw if roi_percent_raw is not None else 0.0
-    return render_template("features/_roi_partial.html", roi_percent=roi_percent)
+    # Rendert een klein HTML-fragment (_roi_partial.html) om de waarde in de UI bij te werken.
+    return render_template("features/_roi_partial.html", roi_percent=roi_percent)   
 
 
 # ==================================
@@ -363,6 +347,7 @@ def features_calc_ttv():
         request.form.get("ttbv_weeks"),
     )
     ttv_weeks_result = ttv_weeks_raw if ttv_weeks_raw is not None else 0.0
+    # Rendert een klein HTML-fragment (_ttv_partial.html)
     return render_template("features/_ttv_partial.html", ttv_weeks=ttv_weeks_result)
 
 
@@ -384,19 +369,19 @@ def view_features(project_id):
     company = project.company
 
     user_role = session.get("role")
-    can_sort = user_role == "PM"
+    can_sort = user_role == "PM"                                                # Alleen PM's mogen sorteren op berekende scores
 
     if can_sort:
         sort_by = request.args.get("sort_by", "roi")
-        direction = request.args.get("direction", "desc")
+        direction = request.args.get("direction", "desc")                       # Haal de sorteerrichting op uit de URL
     else:
-        sort_by = "name"
-        direction = "asc"
+        sort_by = "name"                                                        # Als GEEN PM: De gebruiker mag de sorteerparameters niet bepalen.
+        direction = "asc"                                                       # De sortering wordt vastgezet op een neutrale, standaardkolom (naam) in oplopende volgorde.
 
     features_query = Features_ideas.query.filter_by(id_project=project_id)
 
     if sort_by == "roi":
-        column = Features_ideas.roi_percent
+        column = Features_ideas.roi_percent                                     # Sorteren op de berekende ROI in percentage
     elif sort_by == "ttv":
         column = Features_ideas.ttm_weeks
     elif sort_by == "confidence":
@@ -405,9 +390,10 @@ def view_features(project_id):
         column = Features_ideas.name_feature
 
     if direction == "desc":
-        features = features_query.order_by(column.desc()).all()
+        features = features_query.order_by(column.desc()).all()                 # Order By DESC (Descending): Hoogste waarde eerst
     else:
-        features = features_query.order_by(column.asc()).all()
+        features = features_query.order_by(column.asc()).all()                  # Order By ASC (Ascending): Laagste waarde eerst
+
 
     # Compute VECTR score
     for f in features:
@@ -429,19 +415,21 @@ def view_features(project_id):
 
 
 # ==============================
-# EDIT FEATURE
+# EDIT FEATURE (AANGEPAST)
 # ==============================
 @main.route("/feature/<uuid:feature_id>/edit", methods=["GET", "POST"])
 def edit_feature(feature_id):
-    user = require_login()
+    """Route om een bestaande Feature/Idee te bewerken (gebruikt DRY helper)."""
+    user = require_editor_access() # Controleert op login en rol (PM/Founder)
     if not isinstance(user, Profile):
         return user
 
     feature = Features_ideas.query.get_or_404(str(feature_id))
-    project = Project.query.get_or_404(feature.id_project)
-    company = Company.query.get(project.id_company)
+    # Gebruik de relaties (Best Practice)
+    project = feature.project
+    company = project.company
 
-    # Only founder/PM + ownership
+    # Autoriseer: Rolverificatie en Eigendomsverificatie
     role_redirect = require_role(["founder", "PM"], user)
     if role_redirect:
         return role_redirect
@@ -455,40 +443,11 @@ def edit_feature(feature_id):
             for e in errors:
                 flash(e, "danger")
             return render_template(
-                "edit_feature.html",
-                feature=feature,
-                project=project,
-                company=company,
+                "edit_feature.html", feature=feature, project=project, company=company,
             )
 
-        feature.name_feature = data["name_feature"]
-        feature.description = data["description"]
-        feature.extra_revenue = data["extra_revenue"]
-        feature.churn_reduction = data["churn_reduction"]
-        feature.cost_savings = data["cost_savings"]
-        feature.investment_hours = data["investment_hours"]
-        feature.hourly_rate = data["hourly_rate"]
-        feature.opex_hours = data["opex_hours"]
-        feature.other_costs = data["other_costs"]
-        feature.horizon = data["horizon"]
-        feature.ttm_weeks = data["ttm_weeks"]
-        feature.ttbv_weeks = data["ttbv_weeks"]
-        feature.ttm_low = data["ttm_low"]
-        feature.ttm_high = data["ttm_high"]
-        feature.ttbv_low = data["ttbv_low"]
-        feature.ttbv_high = data["ttbv_high"]
-        feature.quality_score = data["quality_score"]
-
-        feature.roi_percent = calc_roi(
-            feature.extra_revenue,
-            feature.churn_reduction,
-            feature.cost_savings,
-            feature.investment_hours,
-            feature.hourly_rate,
-            feature.opex_hours,
-            feature.other_costs,
-        )
-        feature.ttv_weeks = calc_ttv(feature.ttm_weeks, feature.ttbv_weeks)
+        # Gebruik de helper om alle toewijzing en berekening af te handelen (DRY)
+        update_feature_data(feature, data) 
 
         db.session.commit()
         flash("Feature updated successfully!", "success")
