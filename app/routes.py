@@ -998,154 +998,171 @@ def edit_evidence(evidence_id):
 # ==============================
 @main.route("/projects/<int:project_id>/vectr-chart/pdf")
 def vectr_chart_pdf(project_id):
+    # 1) Login check: gebruiker moet ingelogd zijn
     user = require_login()
     if not isinstance(user, Profile):
-        return user
+        return user  # Als require_login een redirect of error geeft, meteen terugsturen
 
-    project = Project.query.get_or_404(project_id)
+    # 2) Haal project op en check company ownership
+    project = Project.query.get_or_404(project_id)  # 404 als project niet bestaat
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
-        return company_redirect
+        return company_redirect  # Redirect als user niet eigenaar is van company
 
+    # 3) Haal alle features van dit project op
     features = Features_ideas.query.filter_by(id_project=project_id).all()
 
+    # 4) Bereken min/max TTV (time-to-value) uit de features
     valid_ttv = []
     for f in features:
+        # Controleer of alle 4 waarden aanwezig zijn (low/high voor TTM en TTBV)
         if (
             f.ttm_low is not None
             and f.ttbv_low is not None
             and f.ttm_high is not None
             and f.ttbv_high is not None
         ):
+            # Bereken de minimum en maximum TTV
             min_ttv = float(f.ttm_low) + float(f.ttbv_low)
             max_ttv = float(f.ttm_high) + float(f.ttbv_high)
+            # Voeg dit paar toe aan de lijst
             valid_ttv.append((min_ttv, max_ttv))
 
     if valid_ttv:
-        local_TTV_MIN = min(m for m, _ in valid_ttv)
-        local_TTV_MAX = max(M for _, M in valid_ttv)
+        local_TTV_MIN = min(m for m, _ in valid_ttv)        # Neem het kleinste min_ttv uit alle features -> globale minimum TTV
+        local_TTV_MAX = max(M for _, M in valid_ttv)        # Analoog
     else:
-        local_TTV_MIN, local_TTV_MAX = 0.0, 10.0
+        local_TTV_MIN, local_TTV_MAX = 0.0, 10.0  # fallback range
 
-    fig, ax = plt.subplots(figsize=(10, 10))
+    # 5) Setup matplotlib figuur
+    fig, ax = plt.subplots(figsize=(10, 10))                # Maak een figuur en een as-object van 10x10 inch
     ax.set_xlim(0.0, 10.0)
     ax.set_ylim(0.0, 10.0)
 
+    # 6) Definieer zones (kleurvlakken op de chart)
     zones = [
-        {"color": (1, 0, 0, 0.25), "x": 0.0, "y": 0.0, "w": 7.0, "h": 5.0},
-        {"color": (1, 140/255, 0, 0.25), "x": 1.0, "y": 5.0, "w": 6.0, "h": 5.0},
-        {"color": (1, 0, 0, 0.25), "x": 0.0, "y": 5.0, "w": 1.0, "h": 5.0},
-        {"color": (0, 150/255, 0, 0.25), "x": 7.0, "y": 7.0, "w": 3.0, "h": 3.0},
-        {"color": (144/255, 238/255, 144/255, 0.25), "x": 7.0, "y": 5.0, "w": 3.0, "h": 2.0},
-        {"color": (1, 165/255, 0, 0.25), "x": 7.0, "y": 0.0, "w": 3.0, "h": 5.0},
+        {"color": (1, 0, 0, 0.25), "x": 0.0, "y": 0.0, "w": 7.0, "h": 5.0},   # rood zone
+        {"color": (1, 140/255, 0, 0.25), "x": 1.0, "y": 5.0, "w": 6.0, "h": 5.0}, # oranje zone
+        {"color": (1, 0, 0, 0.25), "x": 0.0, "y": 5.0, "w": 1.0, "h": 5.0},   # rood smalle zone
+        {"color": (0, 150/255, 0, 0.25), "x": 7.0, "y": 7.0, "w": 3.0, "h": 3.0}, # groen zone
+        {"color": (144/255, 238/255, 144/255, 0.25), "x": 7.0, "y": 5.0, "w": 3.0, "h": 2.0}, # lichtgroen zone
+        {"color": (1, 165/255, 0, 0.25), "x": 7.0, "y": 0.0, "w": 3.0, "h": 5.0}, # oranje zone
     ]
 
+    # 7) Voeg zones toe als rechthoeken
     for z in zones:
         rect = patches.Rectangle(
-            (z["x"], z["y"]),
-            z["w"],
-            z["h"],
-            facecolor=z["color"],
-            edgecolor=(0, 0, 0, 0.4),
-            linewidth=0.5,
+            (z["x"], z["y"]),           # startpositie (linkeronderhoek)
+            z["w"],                     # breedte van de rechthoek
+            z["h"],                     # hoogte van de rechthoek
+            facecolor=z["color"],       # vulkleur (RGBA)
+            edgecolor=(0, 0, 0, 0.4),   # randkleur (zwart, transparant)
+            linewidth=0.5,              # dikte van de rand
         )
-        ax.add_patch(rect)
+        ax.add_patch(rect)              # voeg de rechthoek toe aan de grafiek
 
+    # 8) Helperfunctie: bepaal kleur van een feature op basis van confidence + TTV
     def get_zone_color_mpl(confidence, ttv_scaled):
-        x_low = CONF_LOW_THRESHOLD
-        x_high = CONF_MID_HIGH_THRESHOLD
-        y_slow = TTV_SLOW_THRESHOLD
-        y_fast = TTV_MID_THRESHOLD
+        x_low = CONF_LOW_THRESHOLD        # drempel voor lage confidence
+        x_high = CONF_MID_HIGH_THRESHOLD  # drempel voor hoge confidence
+        y_slow = TTV_SLOW_THRESHOLD       # drempel voor trage TTV
+        y_fast = TTV_MID_THRESHOLD        # drempel voor snelle TTV
 
+        # Logica: kies kleur afhankelijk van confidence en TTV
         if confidence >= x_high:
             if ttv_scaled >= y_fast:
-                return (0, 150/255, 0, 1)
+                return (0, 150/255, 0, 1)  # groen
             elif y_slow <= ttv_scaled < y_fast:
-                return (144/255, 238/255, 144/255, 1)
+                return (144/255, 238/255, 144/255, 1)  # lichtgroen
             else:
-                return (1, 165/255, 0, 1)
+                return (1, 165/255, 0, 1)  # oranje
         else:
-            if ttv_scaled < y_slow:
-                return (1, 0, 0, 1)
-            elif confidence < x_low:
-                return (1, 0, 0, 1)
+            if ttv_scaled < y_slow or confidence < x_low:
+                return (1, 0, 0, 1)  # rood
             else:
-                return (1, 140/255, 0, 1)
+                return (1, 140/255, 0, 1)  # oranje
 
-    scatter_x = []
-    scatter_y = []
-    scatter_s = []
-    scatter_c = []
-    scatter_labels = []
+    # 9) Verzamel scatter data (punten op de chart)
+    scatter_x = []       # x-waarden: confidence waarden
+    scatter_y = []       # y-waarden: TTV waarden
+    scatter_s = []       # grootte van de cirkel (ROI)
+    scatter_c = []       # kleur van de cirkel
+    scatter_labels = []  # naam van de feature
 
     for f in features:
+        # Alleen features met alle nodige waarden worden getoond
         if (
             f.roi_percent is not None
             and f.quality_score is not None
             and f.ttm_weeks is not None
             and f.ttbv_weeks is not None
         ):
-            conf = float(f.quality_score)
-            effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
+            conf = float(f.quality_score)                               # confidence score
+            effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)    # totale TTV
 
+            # Normaliseer TTV naar schaal 0-10
             if local_TTV_MAX > local_TTV_MIN:
-                ttv_norm = (effective_ttv - local_TTV_MIN) / (
-                    local_TTV_MAX - local_TTV_MIN
-                ) * 10
-                ttv_scaled = 10.0 - ttv_norm
+                ttv_norm = (effective_ttv - local_TTV_MIN) / (local_TTV_MAX - local_TTV_MIN) * 10
+                ttv_scaled = 10.0 - ttv_norm  # omgekeerde schaal
             else:
                 ttv_scaled = 0
 
-            roi_val = float(f.roi_percent)
-            size_mpl_area = max(50, min(2000, max(0, roi_val) * 15))
-            color = get_zone_color_mpl(conf, ttv_scaled)
-
+            roi_val = float(f.roi_percent)                            # ROI waarde
+            size_mpl_area = max(50, min(2000, max(0, roi_val) * 15))  # bubble size
+            color = get_zone_color_mpl(conf, ttv_scaled)              # kleur bepalen via helperfunctie
+            
+            # Voegt data toe aan de lijsten
             scatter_x.append(conf)
             scatter_y.append(ttv_scaled)
             scatter_s.append(size_mpl_area)
             scatter_c.append(color)
             scatter_labels.append(f.name_feature)
 
+    # 10) Plot scatter chart
     ax.scatter(
         scatter_x,
         scatter_y,
-        s=scatter_s,
-        c=scatter_c,
-        edgecolors="black",
+        s=scatter_s,        # grootte van de cirkel
+        c=scatter_c,        # kleur van de cirkel
+        edgecolors="black", # zwarte rand
         linewidths=1.0,
-        alpha=0.8,
+        alpha=0.8,          # transparantie
     )
 
+    # 11) Labels en ticks (custom tekst op assen)
     ax.set_xticks([0, 1, 3, 5, 7, 8, 10])
     ax.set_xticklabels(["0", "Low", "3", "5", "7", "High", "10"])
     ax.set_yticks([0, 1, 2, 3, 5, 7, 8, 10])
     ax.set_yticklabels(["0", "1", "Slow", "3", "5", "7", "Fast", "10"])
 
-    ax.set_xlabel("Confidence")
-    ax.set_ylabel("Time-to-Value (TtV)")
-    ax.set_title(f"VECTR Prioritization Chart for {project.project_name}")
+    ax.set_xlabel("Confidence")                                             # x-as label
+    ax.set_ylabel("Time-to-Value (TtV)")                                    # y-as label
+    ax.set_title(f"VECTR Prioritization Chart for {project.project_name}")  # titel met projectnaam
 
+    # 12) Annotaties (labels bij de punten)
     for i, label in enumerate(scatter_labels):
         ax.annotate(
-            label,
-            (scatter_x[i], scatter_y[i]),
-            textcoords="offset points",
-            xytext=(5, -5),
-            ha="left",
-            fontsize=7,
+            label,                        # tekst (feature naam)
+            (scatter_x[i], scatter_y[i]), # positie van de cirkel
+            textcoords="offset points",   # offset in pixels
+            xytext=(5, -5),               # verschuiving van label
+            ha="left",                    # horizontale uitlijning
+            fontsize=7,                   # lettergrootte
         )
 
-    plt.tight_layout()
-    buf = BytesIO()
-    plt.savefig(buf, format="pdf")
-    plt.close(fig)
-    buf.seek(0)
+    # 13) Opslaan als PDF in geheugenbuffer
+    plt.tight_layout()              # layout netjes maken
+    buf = BytesIO()                 # buffer in geheugen (om data tijdelijk op te slaan zonder dat er iets op de schijft terecht komt) )
+    plt.savefig(buf, format="pdf")  # figuur opslaan als PDF in buffer
+    plt.close(fig)                  # figuur sluiten om geheugen vrij te maken
+    buf.seek(0)                     # cursor terug naar begin van buffer
 
+    # 14) Stuur PDF terug als download
     return send_file(
         buf,
-        as_attachment=True,
-        download_name=f"vectr_chart_{project.project_name}.pdf",
-        mimetype="application/pdf",
+        as_attachment=True,                                             # forceer download
+        download_name=f"vectr_chart_{project.project_name}.pdf",        # bestandsnaam
+        mimetype="application/pdf",                                     # soort bestand waarin het wordt gedownload
     )
 
 
