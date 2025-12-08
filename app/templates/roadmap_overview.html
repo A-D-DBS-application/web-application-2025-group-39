@@ -5,87 +5,115 @@
 
 {% block content %}
 
-<div class="roadmap-header">
+{# =========================
+   HEADER + TOP-RIGHT NAV
+   ========================= #}
+<div class="roadmap-header"> {# Wrapper voor de paginaheader (layout/styling in CSS) #}
   <h2>Roadmap for {{ project.project_name }}</h2>
-  <div class="top-right">
-    <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-nav btn-sm">Projects Overview</a>
-  </div>
+  <div class="top-right"> {# Container om knop rechtsboven te positioneren (via CSS) #}
+    <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-nav btn-sm">Projects Overview</a> {# Link terug naar projecten-overzicht #}
+  </div> 
 </div>
 
-{% if roadmaps|length == 0 %}
+{# =========================
+   EMPTY STATE (GEEN ROADMAPS)
+   ========================= #}
+{% if roadmaps|length == 0 %} {# Als er geen roadmaps bestaan voor dit project #}
   <div class="card p-4 mx-auto" style="max-width: 700px;">
     <div class="alert alert-info mb-0">
       No roadmap has been created for this project yet.
     </div>
-    {% if session['role'] == 'founder' %}
+    {% if session['role'] == 'founder' %} {# Alleen founders mogen de eerste roadmap aanmaken #}
       <div class="mt-3 text-center">
         <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}"
            class="btn btn-primary-custom">
           + Add First Roadmap
-        </a>
+        </a> {# Link naar add_roadmap route met project_id parameter #}
       </div>
     {% endif %}
   </div>
 {% else %}
 
-  <div class="roadmap-container">
+  {# =========================
+     ROADMAPS CONTAINER
+     ========================= #}
+  <div class="roadmap-container"> {# Wrapper voor alle roadmap blokken #}
 
     {% for r in roadmaps %}
       <!-- Single Roadmap Block -->
       <div class="mb-4">
 
-        <!-- Roadmap Meta Card -->
+        {# =========================
+           ROADMAP META CARD
+           ========================= #}
         <div class="card mb-3 p-3">
           <div class="d-flex flex-wrap justify-content-between align-items-center">
             <div>
+              <!-- Roadmap Period -->
               <h5 class="mb-1">
                 {{ r.start_quarter }} → {{ r.end_quarter }}
-              </h5>
+              </h5> 
+
+              <!-- Creationdate -->
               <small class="text-muted">
                 Created {{ r.createdat.strftime('%d/%m/%Y') if r.createdat }}
-              </small>
+              </small> 
             </div>
 
             <div class="d-flex flex-wrap gap-3 mt-2 mt-md-0">
+
+              <!-- Team Size -->
               <div>
                 <span class="text-muted">Team size</span><br>
-                <strong>{{ r.team_size }}</strong>
+                <strong>{{ r.team_size }}</strong> {# Toont team size #}
               </div>
+
+              <!-- Sprint Capacity -->
               <div>
                 <span class="text-muted">Sprint capacity</span><br>
-                <strong>{{ r.sprint_capacity }}</strong>
+                <strong>{{ r.sprint_capacity }}</strong> {# Toont sprint capacity #}
               </div>
+
+              <!-- Budget Allocation -->
               <div>
                 <span class="text-muted">Budget allocation</span><br>
                 <strong>{{ r.budget_allocation }}</strong>
               </div>
             </div>
 
-            {% if session['role'] == 'founder' %}
+            {% if session['role'] == 'founder' %} {# Alleen founders mogen roadmaps editen #}
               <div class="mt-3 mt-md-0">
                 <a href="{{ url_for('main.edit_roadmap', roadmap_id=r.id_roadmap) }}"
                    class="btn btn-edit btn-sm">
                   Edit Roadmap
-                </a>
+                </a> {# Link naar edit_roadmap route met roadmap_id #}
               </div>
             {% endif %}
           </div>
         </div>
 
-        <!-- Milestones Row -->
+        {# =========================
+           MILESTONES ROW
+           ========================= #}
         <div class="milestones-row">
-          <div class="milestone-group">
+          <div class="milestone-group"> {# Groepeert alle milestone cards binnen deze roadmap #}
 
             {% if r.milestones|length == 0 %}
-              <p class="text-muted-small">No milestones yet for this roadmap.</p>
+              <p class="text-muted-small">No milestones yet for this roadmap.</p> {# Empty-state tekst als er nog geen milestones zijn #}
             {% endif %}
 
+            {# =========================
+               MILESTONE CARDS
+               ========================= #}
             {% for m in r.milestones %}
               <div class="milestone-card">
+
+                <!-- Milestone Name -->
                 <div class="milestone-name">
                   {{ m.name }}
                 </div>
 
+                <!-- Milestone Info -->
                 <div class="milestone-info">
                   <strong>Start:</strong>
                   {{ m.start_date.strftime("%d/%m/%Y") if m.start_date else 'N/A' }}
@@ -98,47 +126,57 @@
                   <strong>Goal:</strong> {{ m.goal or 'N/A' }}
                 </div>
 
-                <!-- Status Badge -->
+                {# =========================
+                   STATUS BADGE
+                   ========================= #}
                 <div class="milestone-info">
                   <strong>Status:</strong>
                   {% set status_class = (m.status or 'pending') | lower | replace(' ', '-') %}
                   <span class="status-{{ status_class }}">{{ m.status or 'Pending' }}</span>
                 </div>
 
-                <!-- Features List -->
-                {% if m.features|length > 0 %}
+                {# =========================
+                   FEATURES LIST
+                   ========================= #}
+                {% if m.features|length > 0 %} {# Toon dit blok enkel als er gekoppelde features zijn #}
                   <div class="milestone-info">
                     <strong>Features:</strong>
                     <ul style="margin: 0; padding-left: 18px; font-size: 0.8rem;">
                       {% for feat in m.features %}
-                        <li>{{ feat.name_feature }}</li>
+                        <li>{{ feat.name_feature }}</li> {# Toon elke feature naam binnen deze milestone #}
                       {% endfor %}
                     </ul>
                   </div>
                 {% endif %}
-
-                {% if session['role'] in ['founder', 'PM'] %}
+                
+                {# =========================
+                   ACTION BUTTONS (ROLE-BASED)
+                   ========================= #}
+                {% if session['role'] in ['founder', 'PM'] %} {# Alleen founder en PM mogen milestones aanpassen/verwijderen #}
                   <div class="milestone-actions">
                     <a href="{{ url_for('main.edit_milestone', milestone_id=m.id_milestone) }}"
                        class="edit-btn">
                       Edit
-                    </a>
+                    </a> {# Link naar edit_milestone met milestone_id #}
                     <form method="POST"
                           action="{{ url_for('main.delete_milestone', milestone_id=m.id_milestone) }}"
                           onsubmit="return confirm('Are you sure you want to delete this milestone?')"
-                          style="display:inline;">
-                      <button class="delete-btn" type="submit">Delete</button>
+                          style="display:inline;"> {# POST form om te verwijderen; confirm() voorkomt per ongeluk delete #}
+                      <button class="delete-btn" type="submit">Delete</button> {# Submit knop die delete triggert #}
                     </form>
                   </div>
                 {% endif %}
               </div>
             {% endfor %}
-
+            
+            {# =========================
+               ADD MILESTONE (PER ROADMAP) - ROLE-BASED
+               ========================= #}
             {% if session['role'] in ['founder', 'PM'] %}
               <a href="{{ url_for('main.add_milestone', roadmap_id=r.id_roadmap) }}"
                  class="btn btn-add-milestone-small">
                 + Add Milestone
-              </a>
+              </a> {# Link om een milestone toe te voegen aan deze roadmap (via roadmap_id) #}
             {% endif %}
 
           </div>
