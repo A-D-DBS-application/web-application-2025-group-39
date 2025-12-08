@@ -4,20 +4,30 @@
 
 {% block content %}
 
-
+{# =========================
+   PAGINATITEL
+   ========================= #}
 <h2 class="text-center mb-4">Edit Evidence for: {{ feature.name_feature }}</h2>
 
+{# =========================
+   FORM CONTAINER
+   ========================= #}
 <div class="card p-4 mx-auto" style="max-width: 700px;">
     <form method="POST">
 
-        <!-- Title -->
+        {# =========================
+            TITLE
+            ========================= #}
+        {{ form.csrf_token }}
         <div class="mb-3">
             <label class="form-label">Title</label>
             <input type="text" name="title" class="form-control"
                    value="{{ evidence.title }}" required>
         </div>
 
-        <!-- Evidence Type -->
+        {# =========================
+            EVIDENCE TYPE
+            ========================= #}
         <div class="mb-3">
             <label class="form-label">Evidence Type</label>
             <select id="evidence_type" name="type_select" class="form-select">
@@ -25,7 +35,7 @@
                 {% set default_types = [
                     'Customer Feedback', 'Pilot Result', 'Paying Customer',
                     'Market Data', 'Other'
-                ] %}
+                ] %}  {# Lijst met standaard types die in de dropdown verschijnen #}
 
                 {% for t in default_types %}
                     <option value="{{ t }}"
@@ -36,39 +46,54 @@
             </select>
         </div>
 
-        <!-- Custom Type -->
+        {# =========================
+            CUSTOM EVIDENCE TYPE
+            ========================= #}
         <div class="mb-3" id="custom_type_group"
-             style="display: {% if evidence.type not in default_types %}block{% else %}none{% endif %};">
+             style="display: {% if evidence.type not in default_types %}block{% else %}none{% endif %};"> 
+             {# Dit veld verschijnt als evidence.type NIET in de default_types lijst zit #}
+             {# display block/none wordt meteen correct gezet bij het laden van de pagina #}
             <label class="form-label">Custom Evidence Type</label>
             <input type="text" name="custom_type" id="custom_type"
                    class="form-control"
                    value="{% if evidence.type not in default_types %}{{ evidence.type }}{% endif %}">
+            {# custom_type: wordt gebruikt als gebruiker een eigen type invult #}
+            {# value vult alleen in wanneer het huidige type een custom type is #}
         </div>
 
-        <!-- Source -->
+        {# =========================
+            SOURCE
+            ========================= #}
         <div class="mb-3">
             <label class="form-label">Source</label>
             <input type="text" name="source" class="form-control"
                    value="{{ evidence.source }}" required>
+            {# Bron van het bewijs (bv. klant, rapport, link, meeting) #}
+            {# required: moet ingevuld zijn #}
         </div>
 
-        <!-- Description -->
+        {# =========================
+            DESCRIPTION
+            ========================= #}
         <div class="mb-3">
             <label class="form-label">Description</label>
-            <textarea name="description" class="form-control" rows="3" required>{{ evidence.description }}</textarea>
+            <textarea name="description" class="form-control" rows="3" required>{{ evidence.description }}</textarea> {# required: moet ingevuld zijn #}
         </div>
 
-        <!-- Attachment -->
+        {# =========================
+            ATTACHMENT
+            ========================= #}
         <div class="mb-3">
             <label class="form-label">Attachment URL</label>
-            <input type="text" name="attachment_url" class="form-control"
-                   value="{{ evidence.attachment_url }}">
+            <input type="text" name="attachment_url" class="form-control" value="{{ evidence.attachment_url }}"> {# Optionele link naar bijlage (drive link, doc, screenshot, ...) #}
         </div>
 
-        <!-- NEW CONFIDENCE -->
+        {# =========================
+            NEW CONFIDENCE
+            ========================= #}
         <div class="mb-3">
             <label class="form-label">Confidence Level</label>
-            <select name="new_confidence" class="form-select" required>
+            <select name="new_confidence" class="form-select" required> {# required: moet gekozen zijn #}
 
                 {% for value, label in CONFIDENCE_LEVELS %}
                     <option value="{{ value }}"
@@ -80,24 +105,30 @@
             </select>
         </div>
 
+        {# =========================
+            SUBMIT BUTTON
+            ========================= #}
         <button class="btn btn-primary w-100">Save Changes</button>
 
     </form>
 </div>
 
+{# =========================
+   UI LOGICA: TOON/VERBERG CUSTOM TYPE
+   ========================= #}
 <script>
-const typeSelect = document.getElementById("evidence_type");
-const customGroup = document.getElementById("custom_type_group");
-const customInput = document.getElementById("custom_type");
+    const typeSelect = document.getElementById("evidence_type"); // Dropdown element
+    const customGroup = document.getElementById("custom_type_group"); // Div met custom input
+    const customInput = document.getElementById("custom_type"); // Het inputveld zelf
 
-typeSelect.addEventListener("change", () => {
-    if (typeSelect.value === "Other") {
-        customGroup.style.display = "block";
-    } else {
-        customGroup.style.display = "none";
-        customInput.value = "";
-    }
-});
+    typeSelect.addEventListener("change", () => { // Luister naar veranderingen in de dropdown
+        if (typeSelect.value === "Other") { // Als "Other" gekozen is
+            customGroup.style.display = "block"; // Toon het custom input veld
+        } else {
+            customGroup.style.display = "none"; // Verberg het custom input veld
+            customInput.value = ""; // Maak de waarde van het custom input veld leeg
+        }
+    });
 </script>
 
 {% endblock %}
