@@ -2,7 +2,6 @@
 
 from flask import session, flash, redirect, url_for
 from app.models import Profile, CONFIDENCE_LEVELS, Features_ideas
-from app.utils.calculations import calc_roi, calc_ttv
 
 # -----------------------------------
 # LOGIN / ROLE / OWNERSHIP HELPERS
@@ -172,54 +171,6 @@ def parse_feature_form(form):
     }
 
     return data, errors
-
-def update_feature_data(feature_object: Features_ideas, data: dict):
-    """
-    Werkt het Features_ideas object bij met geparste formulierdata en berekent
-    ROI en TTV opnieuw.
-
-    Dit centraliseert de toewijzings- en berekeningslogica, wat duplicatie
-    tussen 'add_feature' en 'edit_feature' voorkomt (DRY Best Practice).
-    
-    :param feature_object: De Features_ideas (FeatureIdea) instantie (nieuw of bestaand).
-    :param data: Een dictionary met geparste formuliergegevens van parse_feature_form.
-    """
-    # 1. Toewijzen van alle inputvelden
-    feature_object.name_feature = data["name_feature"]
-    feature_object.description = data["description"]
-    
-    # ROI VELDEN
-    feature_object.extra_revenue = data["extra_revenue"]
-    feature_object.churn_reduction = data["churn_reduction"]
-    feature_object.cost_savings = data["cost_savings"]
-    feature_object.investment_hours = data["investment_hours"]
-    feature_object.hourly_rate = data["hourly_rate"]
-    feature_object.opex_hours = data["opex_hours"]
-    feature_object.other_costs = data["other_costs"]
-    feature_object.horizon = data["horizon"]
-    
-    # TTV VELDEN
-    feature_object.ttm_weeks = data["ttm_weeks"]
-    feature_object.ttbv_weeks = data["ttbv_weeks"]
-    feature_object.ttm_low = data["ttm_low"]
-    feature_object.ttm_high = data["ttm_high"]
-    feature_object.ttbv_low = data["ttbv_low"]
-    feature_object.ttbv_high = data["ttbv_high"]
-    
-    # CONFIDENCE VELD
-    feature_object.quality_score = data["quality_score"]
-
-    # 2. Herbereken afgeleide waarden (ROI en TTV)
-    feature_object.roi_percent = calc_roi(
-        feature_object.extra_revenue,
-        feature_object.churn_reduction,
-        feature_object.cost_savings,
-        feature_object.investment_hours,
-        feature_object.hourly_rate,
-        feature_object.opex_hours,
-        feature_object.other_costs,
-    )
-    feature_object.ttv_weeks = calc_ttv(feature_object.ttm_weeks, feature_object.ttbv_weeks)
 
 
 def parse_roadmap_form(form):

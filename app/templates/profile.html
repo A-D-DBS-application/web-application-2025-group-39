@@ -5,22 +5,15 @@
 
 {% block content %}
 
-<!-- Wrapper om de profielkaart mooi te centreren -->
-<div class="profile-wrapper">
+  <div class="profile-wrapper">
+    <div class="card shadow-lg p-4 profile-card">
+      <h3 class="text-center mb-4">Your Profile</h3>
 
-  <!-- Kaart waarin alle profielgegevens worden weergegeven -->
-  <div class="card shadow-lg p-4 profile-card">
+      <p><strong>Name:</strong><br>{{ name }}</p>
+      <p><strong>E-mail:</strong><br>{{ email }}</p>
+      <p><strong>Company:</strong><br>{{ company }}</p>
+      <p><strong>Role:</strong><br>{{ role }}</p>
 
-    <!-- Titel van de profielpagina -->
-    <h3 class="text-center mb-4">Your Profile</h3>
-
-    <!-- Weergave van de naam van de gebruiker, email, bedrijfsnaam, rol -->
-    <p><strong>Name:</strong><br>{{ name }}</p>
-    <p><strong>E-mail:</strong><br>{{ email }}</p>
-    <p><strong>Company:</strong><br>{{ company }}</p>
-    <p><strong>Role:</strong><br>{{ role }}</p>
-
+    </div>
   </div>
-</div>
-
 {% endblock %}

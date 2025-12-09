@@ -4,23 +4,18 @@
 {% block body_class %}projects-body{% endblock %}
 
 {% block content %}
-  <!-- Terugknop naar projectenoverzicht -->
+  <!-- Right-top button -->
+  <div class="top-right">
     <a href="{{ url_for('main.projects') }}" 
       class="btn btn-base btn-nav btn-sm">
       Projects Overview
-
     </a>
   </div>
 
   <h2 class="mb-4 text-center">Edit Project</h2>
-  <!-- Formulierkaart om projectgegevens aan te passen -->
+
   <div class="form-card shadow-sm p-4 mx-auto">
-
-
-    <!-- Formulier voor projectbewerking -->
     <form method="post">
-      
-      <!-- Projectnaam aanpassen -->
       <div class="mb-3">
         <label class="form-label">Project Name</label>
         <input type="text" 
@@ -29,7 +24,7 @@
                value="{{ project.project_name }}"
                required>
       </div>
-    <!-- Opslaan en annuleren knoppen -->
+
       <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">Save</button>
       <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-secondary-custom w-100 mt-2">
         Cancel
