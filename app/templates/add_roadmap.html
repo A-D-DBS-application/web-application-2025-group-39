@@ -6,20 +6,14 @@
 {% block content %}
   
 
-{# =========================
-   PAGINATITEL
-   ========================= #}
+<!-- PAGETITLE -->
 <h2>Add Roadmap for Project: {{ project.project_name }}</h2>
 
-{# =========================
-   FORM CONTAINER
-   ========================= #}
+<!-- FORM CONTAINER -->
   <div class="roadmap-form card p-4 shadow mt-3 mx-auto">
     <form method="POST">
       
-      {# =========================
-       START QUARTER
-       ========================= #}
+      <!-- START QUARTER -->
       <div class="mb-3">
         <label class="form-label">Start Quarter</label>
         <select name="start_quarter" class="form-select" required>
@@ -32,9 +26,7 @@
         </select>
       </div>
 
-      {# =========================
-       END QUARTER
-       ========================= #}
+      <!-- END QUARTER -->
       <div class="mb-3">
         <label class="form-label">End Quarter</label>
         <select name="end_quarter" class="form-select" required>
@@ -47,33 +39,25 @@
         </select>
       </div>
 
-      {# =========================
-       TEAM SIZE
-       ========================= #}
+      <!-- TEAM SIZE -->
       <div class="mb-3">
         <label class="form-label">Team Size</label>
         <input type="number" name="team_size" class="form-control" required>
       </div>
 
-      {# =========================
-       SPRINT CAPACITY
-       ========================= #}
+      <!-- SPRINT CAPACITY -->
       <div class="mb-3">
         <label class="form-label">Sprint Capacity</label>
         <input type="number" name="sprint_capacity" class="form-control" required>
       </div>
 
-      {# =========================
-       BUDGET ALLOCATION
-       ========================= #}
+      <!-- BUDGET ALLOCATION -->
       <div class="mb-3">
         <label class="form-label">Budget Allocation</label>
         <input type="number" name="budget_allocation" class="form-control" required>
       </div>
 
-      {# =========================
-       SUBMIT BUTTON
-       ========================= #}
+      <!-- SUBMIT BUTTON -->
       <button class="btn btn-primary">Save Roadmap</button>
       <a href="{{ url_for('main.projects') }}" class="btn btn-secondary">Cancel</a>
     </form>
