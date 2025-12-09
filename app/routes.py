@@ -504,26 +504,27 @@ def edit_feature(feature_id):
 # ==============================
 @main.route("/feature/<uuid:feature_id>/delete", methods=["POST"])
 def delete_feature(feature_id):
-    user = require_login()
-    if not isinstance(user, Profile):
+    user = require_login()                      # Controleer of gebruiker ingelogd is; anders redirect
+    if not isinstance(user, Profile):           # require_login() kan Response teruggeven → direct teruggeven
         return user
 
-    feature = Features_ideas.query.get_or_404(str(feature_id))
-    project = Project.query.get_or_404(feature.id_project)
+    feature = Features_ideas.query.get_or_404(str(feature_id))  # Haalt feature op; 404 als niet gevonden
+    project = Project.query.get_or_404(feature.id_project)      # Haalt project op waar feature toe behoort
 
     # Only founder/PM + ownership
-    role_redirect = require_role(["founder", "PM"], user)
-    if role_redirect:
+    role_redirect = require_role(["founder", "PM"], user)       # Enkel Founder/PM mogen features verwijderen
+    if role_redirect:                                           # require_role() geeft redirect als ongeldig
         return role_redirect
-    company_redirect = require_company_ownership(project.id_company, user)
+
+    company_redirect = require_company_ownership(project.id_company, user)  # Check dat user van juiste company is
     if company_redirect:
         return company_redirect
 
-    project_id = feature.id_project
-    db.session.delete(feature)
-    db.session.commit()
-    flash("Feature deleted successfully!", "success")
-    return redirect(url_for("main.view_features", project_id=project_id))
+    project_id = feature.id_project               # Project ID opslaan zodat we na delete kunnen redirecten
+    db.session.delete(feature)                    # Feature verwijderen uit database
+    db.session.commit()                           # Veranderingen opslaan
+    flash("Feature deleted successfully!", "success")  # Succesbericht tonen
+    return redirect(url_for("main.view_features", project_id=project_id))  # Terug naar feature-lijst
 
 
 
@@ -532,22 +533,26 @@ def delete_feature(feature_id):
 # ==============================
 @main.route("/projects/<int:project_id>/vectr-chart", methods=["GET"])
 def vectr_chart(project_id):
-    user = require_login()
-    if not isinstance(user, Profile):
+    user = require_login()                    # Check login
+    if not isinstance(user, Profile):         # Als niet ingelogd → redirect
         return user
 
-    project = Project.query.get_or_404(project_id)
+    project = Project.query.get_or_404(project_id)  # Haal project op of toon 404
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
-        return company_redirect
+        return company_redirect               # Blokkeer toegang tot projecten van andere companies
 
-    # Gebruik ORM relatie om features op te halen
-    features = Features_ideas.query.filter_by(id_project=project_id).all()
+    features = Features_ideas.query.filter_by(id_project=project_id).all()   # Alle features voor dit project ophalen
 
-    #De hele TtV-normalisatie en chart_data-constructie is verplaatst
-    chart_data = prepare_vectr_chart_data(features) 
+    # De volledige berekening wordt uitgevoerd in een aparte helperfunctie voor overzichtelijkheid
+    chart_data = prepare_vectr_chart_data(features)
 
-    return render_template("vectr_chart.html", project=project, chart_data=chart_data)
+    return render_template(
+        "vectr_chart.html",                   # Template dat de grafiek tekent
+        project=project,                      # Project-info naar de template sturen
+        chart_data=chart_data                 # Computed chart data naar template
+    )
+
 
 
 # ==============================
@@ -555,66 +560,68 @@ def vectr_chart(project_id):
 # ==============================
 @main.route("/roadmap/add/<int:project_id>", methods=["GET", "POST"])
 def add_roadmap(project_id):
-    user = require_login()
+    user = require_login()                     # Eerst check: is de gebruiker ingelogd?
     if not isinstance(user, Profile):
-        return user
+        return user                            # require_login kan Response teruggeven (redirect)
 
     # Only founders can create roadmaps
-    role_redirect = require_role(["founder"], user)
+    role_redirect = require_role(["founder"], user)  # Enkel founders mogen roadmaps maken
     if role_redirect:
         return role_redirect
 
-    project = Project.query.get_or_404(project_id)
+    project = Project.query.get_or_404(project_id)   # Project ophalen (404 als niet gevonden)
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
-        return company_redirect
+        return company_redirect                       # Users mogen alleen roadmaps maken in eigen company
 
     # MAX 1 ROADMAP PER PROJECT
     existing = Roadmap.query.filter_by(id_project=project_id).first()
-    if existing:
+    if existing:                                      # Als er al een roadmap bestaat
         flash("This project already has a roadmap.", "danger")
         return redirect(url_for("main.roadmap_overview", project_id=project_id))
 
-    if request.method == "POST":
-        data, errors = parse_roadmap_form(request.form)
-        if errors:
+    if request.method == "POST":                      # Wanneer formulier verstuurd is:
+        data, errors = parse_roadmap_form(request.form)   # Validatie via helper
+        if errors:                                     # Validatiefouten → opnieuw formulier tonen
             for e in errors:
                 flash(e, "danger")
             return render_template("add_roadmap.html", project=project)
 
-        roadmap = Roadmap(id_project=project_id, **data)
-        db.session.add(roadmap)
-        db.session.commit()
+        roadmap = Roadmap(id_project=project_id, **data)  # Nieuwe Roadmap aanmaken
+        db.session.add(roadmap)                      # Toevoegen aan DB
+        db.session.commit()                          # Opslaan
 
         flash("Roadmap created successfully!", "success")
         return redirect(url_for("main.roadmap_overview", project_id=project_id))
 
+    # GET → pagina tonen
     return render_template("add_roadmap.html", project=project)
+
 
 
 @main.route("/roadmap/<int:project_id>")
 def roadmap_overview(project_id):
-    user = require_login()
+    user = require_login()                          # Login check
     if not isinstance(user, Profile):
         return user
 
-    project = Project.query.get_or_404(project_id)
+    project = Project.query.get_or_404(project_id)   # Project ophalen
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
-        return company_redirect
+        return company_redirect                     # Geen toegang buiten eigen bedrijf
 
     # Roadmaps sorted by start_quarter (string sort works for "Qn YYYY")
     roadmaps = (
         Roadmap.query.filter_by(id_project=project_id)
-        .order_by(Roadmap.start_quarter.asc())
+        .order_by(Roadmap.start_quarter.asc())      # Roadmaps chronologisch sorteren
         .all()
     )
 
-    # Sort milestones inside each roadmap by start_date
+    # Milestones binnen roadmaps sorteren op startdatum
     for roadmap in roadmaps:
         roadmap.milestones.sort(
             key=lambda m: m.start_date if m.start_date else datetime.date.max
-        )
+        )                                           # Milestones zonder datum helemaal onderaan
 
     return render_template(
         "roadmap_overview.html",
@@ -623,42 +630,47 @@ def roadmap_overview(project_id):
     )
 
 
+
 @main.route("/roadmap/edit/<int:roadmap_id>", methods=["GET", "POST"])
 def edit_roadmap(roadmap_id):
-    user = require_login()
+    user = require_login()                           # Login check
     if not isinstance(user, Profile):
         return user
 
     # Only founders may edit
-    role_redirect = require_role(["founder"], user)
+    role_redirect = require_role(["founder"], user)  # Enkel Founder mag roadmap aanpassen
     if role_redirect:
         return role_redirect
 
-    roadmap = Roadmap.query.get_or_404(roadmap_id)
+    roadmap = Roadmap.query.get_or_404(roadmap_id)   # Roadmap ophalen
     project = Project.query.get_or_404(roadmap.id_project)
+
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
-        return company_redirect
+        return company_redirect                      # Blokkeer toegang tot andere companies
 
     if request.method == "POST":
-        data, errors = parse_roadmap_form(request.form)
-        if errors:
+        data, errors = parse_roadmap_form(request.form)   # Validatie helper
+        if errors:                                       # Bij fouten → formulier opnieuw tonen
             for e in errors:
                 flash(e, "danger")
             return render_template("edit_roadmap.html", roadmap=roadmap, project=project)
 
+        # Velden aanpassen
         roadmap.start_quarter = data["start_quarter"]
         roadmap.end_quarter = data["end_quarter"]
         roadmap.team_size = data["team_size"]
         roadmap.sprint_capacity = data["sprint_capacity"]
         roadmap.budget_allocation = data["budget_allocation"]
 
-        db.session.commit()
+        db.session.commit()                           # Opgeslagen wijzigingen
 
         flash("Roadmap updated successfully!", "success")
         return redirect(url_for("main.roadmap_overview", project_id=project.id_project))
 
+    # GET → formulier tonen
     return render_template("edit_roadmap.html", roadmap=roadmap, project=project)
+
 
 
 # ==============================
@@ -667,37 +679,36 @@ def edit_roadmap(roadmap_id):
 
 @main.route("/milestone/add/<int:roadmap_id>", methods=["GET", "POST"])
 def add_milestone(roadmap_id):
-    user = require_editor_access()
+    user = require_editor_access()  # Controle: enkel Founder/PM mogen milestones toevoegen.
 
-    roadmap = Roadmap.query.get_or_404(roadmap_id)
-    project = Project.query.get_or_404(roadmap.id_project)
+    roadmap = Roadmap.query.get_or_404(roadmap_id)  # Haal de roadmap op; 404 bij fout.
+    project = Project.query.get_or_404(roadmap.id_project)  # Project van de roadmap ophalen.
 
-    # Company check
+    # Check of user toegang heeft tot dit bedrijf
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
-        return company_redirect
+        return company_redirect  # Blokkeert toegang als user niet van dezelfde company is.
 
-    # Load all features for this project
+    # Alle features van dit project ophalen
     features = Features_ideas.query.filter_by(id_project=project.id_project).all()
 
-    # Compute VECTR score for each feature
+    # VECTR score berekenen voor sortering
     for f in features:
-        ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
+        ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5  # Default TtV waarde
         roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
         confidence_score = f.quality_score if f.quality_score is not None else 0.0
-        vectr_score = ttv_weeks * roi_percent * confidence_score
-        setattr(f, "vectr_score", round(vectr_score, 2))
+        vectr_score = ttv_weeks * roi_percent * confidence_score  # Basis VECTR-formule
+        setattr(f, "vectr_score", round(vectr_score, 2))  # Dynamisch attribuut toevoegen.
 
-    # Sort features descending by score
+    # Features sorteren op VECTR score (beste eerst)
     features = sorted(features, key=lambda x: getattr(x, "vectr_score", 0), reverse=True)
 
-    if request.method == "POST":
-        data, errors = parse_milestone_form(request.form)
+    if request.method == "POST":  # Wanneer het formulier verzonden is:
+        data, errors = parse_milestone_form(request.form)  # Validatie
 
         if errors:
             for e in errors:
-                flash(e, "danger")
-
+                flash(e, "danger")  # Toon alle errors bovenaan
             return render_template(
                 "add_milestone.html",
                 roadmap=roadmap,
@@ -705,6 +716,7 @@ def add_milestone(roadmap_id):
                 selected_features=request.form.getlist("features"),
             )
 
+        # Nieuwe milestone aanmaken
         milestone = Milestone(
             id_roadmap=roadmap_id,
             name=data["name"],
@@ -714,17 +726,19 @@ def add_milestone(roadmap_id):
             status=data["status"],
         )
 
-        selected = request.form.getlist("features")
+        # 🎯 Meerdere features koppelen (via de associatietabel milestone_features)
+        selected = request.form.getlist("features")  # IDs van geselecteerde features
         milestone.features = Features_ideas.query.filter(
             Features_ideas.id_feature.in_(selected)
         ).all()
 
-        db.session.add(milestone)
-        db.session.commit()
+        db.session.add(milestone)  # Toevoegen aan DB
+        db.session.commit()        # Wijzigingen opslaan
 
         flash("Milestone added!", "success")
         return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
 
+    # GET → pagina tonen
     return render_template(
         "add_milestone.html",
         roadmap=roadmap,
@@ -737,20 +751,20 @@ def add_milestone(roadmap_id):
 
 @main.route("/milestone/edit/<int:milestone_id>", methods=["GET", "POST"])
 def edit_milestone(milestone_id):
-    user = require_editor_access()
+    user = require_editor_access()  # PM/Founder check
 
-    milestone = Milestone.query.get_or_404(milestone_id)
+    milestone = Milestone.query.get_or_404(milestone_id)  # Bestaande milestone ophalen
     roadmap = Roadmap.query.get_or_404(milestone.id_roadmap)
     project = Project.query.get_or_404(roadmap.id_project)
 
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
-        return company_redirect
+        return company_redirect  # Toegang beperken tot eigen company
 
-    # Load features for this project
+    # Alle features van dit project ophalen
     features = Features_ideas.query.filter_by(id_project=project.id_project).all()
 
-    # Compute VECTR score for features
+    # VECTR score berekenen (zoals bij add_milestone)
     for f in features:
         ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
         roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
@@ -758,10 +772,9 @@ def edit_milestone(milestone_id):
         vectr_score = ttv_weeks * roi_percent * confidence_score
         setattr(f, "vectr_score", round(vectr_score, 2))
 
-    # Sort features descending
     features = sorted(features, key=lambda x: getattr(x, "vectr_score", 0), reverse=True)
 
-    # Get selected features for prefill
+    # IDs van features die al gekoppeld zijn aan deze milestone (prefill)
     existing_selected = [f.id_feature for f in milestone.features]
 
     if request.method == "POST":
@@ -775,21 +788,24 @@ def edit_milestone(milestone_id):
                 "edit_milestone.html",
                 milestone=milestone,
                 features=features,
-                selected_features=request.form.getlist("features"),
+                selected_features=request.form.getlist("features"),  # Prefill vanuit form
             )
 
+        # Velden aanpassen
         milestone.name = data["name"]
         milestone.start_date = data["start_date"]
         milestone.end_date = data["end_date"]
         milestone.goal = data["goal"]
         milestone.status = data["status"]
 
+        # Nieuwe selectie van features koppelen
         selected = request.form.getlist("features")
         milestone.features = Features_ideas.query.filter(
             Features_ideas.id_feature.in_(selected)
         ).all()
 
-        db.session.commit()
+        db.session.commit()  # Opslaan in database
+
         flash("Milestone updated!", "success")
         return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
 
@@ -803,25 +819,27 @@ def edit_milestone(milestone_id):
 
 
 
+
 @main.route("/milestone/delete/<int:milestone_id>", methods=["POST"])
 def delete_milestone(milestone_id):
-    user = require_login()
+    user = require_login()  # Login check
     if not isinstance(user, Profile):
         return user
 
-    milestone = Milestone.query.get_or_404(milestone_id)
+    milestone = Milestone.query.get_or_404(milestone_id)  # Opzoeken of 404
     roadmap = Roadmap.query.get_or_404(milestone.id_roadmap)
     project = Project.query.get_or_404(roadmap.id_project)
 
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
-        return company_redirect
+        return company_redirect  # Veiligheidscheck: mag je dit milestone wel verwijderen?
 
-    db.session.delete(milestone)
-    db.session.commit()
+    db.session.delete(milestone)  # Milestone verwijderen
+    db.session.commit()           # Permanent opslaan
+
     flash("Milestone deleted!", "success")
-
     return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
+
 
 
 # ==============================
@@ -829,34 +847,31 @@ def delete_milestone(milestone_id):
 # ==============================
 @main.route("/feature/<feature_id>/add-evidence", methods=["GET", "POST"])
 def add_evidence(feature_id):
-    user = require_login()
+    user = require_login()                     # Login check
     if not isinstance(user, Profile):
         return user
 
-    feature = Features_ideas.query.get_or_404(feature_id)
+    feature = Features_ideas.query.get_or_404(feature_id)  # Feature ophalen
     project = Project.query.get_or_404(feature.id_project)
+
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
-        return company_redirect
+        return company_redirect  # Voorkomt dat users bij andere companies evidence toevoegen
 
     if request.method == "POST":
-        data, errors = parse_evidence_form(request.form)
+        data, errors = parse_evidence_form(request.form)  # Form validatie
         if errors:
             for e in errors:
                 flash(e, "danger")
-            return render_template(
-                "add_evidence.html",
-                feature=feature,
-                CONFIDENCE_LEVELS=CONFIDENCE_LEVELS,
-            )
+            return render_template("add_evidence.html", feature=feature, CONFIDENCE_LEVELS=CONFIDENCE_LEVELS)
 
-        old_conf = feature.quality_score or 0.0
+        old_conf = feature.quality_score or 0.0  # Bewaar oude confidence
 
         ev = Evidence(
             id_company=user.id_company,
             id_feature=feature_id,
             title=data["title"],
-            type=data["final_type"],
+            type=data["final_type"],           # Standaard type of custom type
             source=data["source"],
             description=data["description"],
             attachment_url=data["attachment_url"],
@@ -865,20 +880,18 @@ def add_evidence(feature_id):
         )
 
         db.session.add(ev)
-        db.session.flush()  # so feature.evidence includes this one
+        db.session.flush()  # Flush slaat tijdelijk ev op zodat het beschikbaar is in sessie voor de helperfunctie
 
-        new_score = recompute_feature_confidence(feature)
+        new_score = recompute_feature_confidence(feature)  # Confidence herberekenen via helper functie
         feature.quality_score = new_score if new_score is not None else old_conf
 
         db.session.commit()
+
         flash("Evidence added!", "success")
         return redirect(url_for("main.view_evidence", feature_id=feature_id))
 
-    return render_template(
-        "add_evidence.html",
-        feature=feature,
-        CONFIDENCE_LEVELS=CONFIDENCE_LEVELS,
-    )
+    return render_template("add_evidence.html", feature=feature, CONFIDENCE_LEVELS=CONFIDENCE_LEVELS)
+
 
 
 # ==============================
@@ -887,23 +900,26 @@ def add_evidence(feature_id):
 @main.route("/feature/<feature_id>/evidence")
 def view_evidence(feature_id):
     user = require_login()
-    if isinstance(user, Response):  # redirect
+    if isinstance(user, Response):  # require_login() kan redirect teruggeven
         return user
 
     feature = Features_ideas.query.get_or_404(feature_id)
 
-    evidence_list = Evidence.query.filter_by(id_feature=feature_id) \
-        .order_by(Evidence.new_confidence.desc()) \
+    # Evidence oplijsten: hoogste confidence eerst
+    evidence_list = (
+        Evidence.query.filter_by(id_feature=feature_id)
+        .order_by(Evidence.new_confidence.desc())
         .all()
+    )
 
-    # Convert [(value, label), ...] → {value: label}
+    # Maak dictionary: {confidence_value: label}
     CONFIDENCE_LABELS = {v: label for (v, label) in CONFIDENCE_LEVELS}
 
     return render_template(
         "view_evidence.html",
         feature=feature,
         evidence_list=evidence_list,
-        CONFIDENCE_LABELS=CONFIDENCE_LABELS
+        CONFIDENCE_LABELS=CONFIDENCE_LABELS,
     )
 
 
@@ -918,28 +934,27 @@ def delete_evidence(evidence_id):
     if not isinstance(user, Profile):
         return user
 
-    ev = Evidence.query.get_or_404(evidence_id)
+    ev = Evidence.query.get_or_404(evidence_id)  # Evidence ophalen
     feature = Features_ideas.query.get_or_404(ev.id_feature)
     project = Project.query.get_or_404(feature.id_project)
+
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
         return company_redirect
 
-    fallback_old = ev.old_confidence or 0.0
+    fallback_old = ev.old_confidence or 0.0  # Oude waarde gebruiken als fallback
 
     db.session.delete(ev)
-    db.session.flush()
+    db.session.flush()                        # Verwijderen verwerken voordat score herberekend wordt
 
     new_score = recompute_feature_confidence(feature)
-    if new_score is None:
-        feature.quality_score = fallback_old
-    else:
-        feature.quality_score = new_score
+    feature.quality_score = new_score if new_score is not None else fallback_old
 
     db.session.commit()
 
     flash("Evidence deleted!", "success")
     return redirect(url_for("main.view_evidence", feature_id=feature.id_feature))
+
 
 
 # ==============================
@@ -954,6 +969,7 @@ def edit_evidence(evidence_id):
     ev = Evidence.query.get_or_404(evidence_id)
     feature = Features_ideas.query.get_or_404(ev.id_feature)
     project = Project.query.get_or_404(feature.id_project)
+
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
         return company_redirect
@@ -970,6 +986,7 @@ def edit_evidence(evidence_id):
                 CONFIDENCE_LEVELS=CONFIDENCE_LEVELS,
             )
 
+        # Velden actualiseren
         ev.title = data["title"]
         ev.type = data["final_type"]
         ev.source = data["source"]
@@ -977,11 +994,13 @@ def edit_evidence(evidence_id):
         ev.attachment_url = data["attachment_url"]
         ev.new_confidence = data["new_confidence"]
 
-        db.session.flush()
+        db.session.flush()  # Score opnieuw kunnen berekenen
+
         new_score = recompute_feature_confidence(feature)
         feature.quality_score = new_score if new_score is not None else 0.0
 
         db.session.commit()
+
         flash("Evidence updated!", "success")
         return redirect(url_for("main.view_evidence", feature_id=feature.id_feature))
 
@@ -991,6 +1010,7 @@ def edit_evidence(evidence_id):
         feature=feature,
         CONFIDENCE_LEVELS=CONFIDENCE_LEVELS,
     )
+
 
 
 # ==============================

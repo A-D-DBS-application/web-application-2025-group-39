@@ -3,69 +3,120 @@
 {% block title %}Edit Roadmap{% endblock %}
 
 {% block content %}
+
+<!-- ==============================================
+     RECHTSBOVEN NAVIGATIEKNOP
+     ============================================== -->
 <div class="top-right">
     <a href="{{ url_for('main.projects', project_id=project.id_project) }}"
-      class="btn btn-base btn-nav btn-sm">
-      Projects Overview
+       class="btn btn-base btn-nav btn-sm">
+        Projects Overview
     </a>
-  </div>
+</div>
 
-<h2>Edit Roadmap – {{ project.project_name }}</h2>
+<h2 class="text-center mb-4">Edit Roadmap – {{ project.project_name }}</h2>
 
+<!-- ==============================================
+     FORM CONTAINER – visuele kaart voor nettere UI
+     ============================================== -->
 <div class="roadmap-form card p-4 shadow mt-3 mx-auto">
 
-<form method="POST">
+<form method="POST"> <!--  Methode: POST → verstuurt data naar de server.  De ingevulde velden worden opgeslagen in de roadmap. -->
 
-    <!-- start_Quarter -->
-      <div class="mb-3">
-        <label class="form-label">Start Quarter</label>
-        <select name="start_quarter" class="form-select" required>
-          <option value="">Select quarter</option>
-          <option value="Q1 2025">Q4 2025</option>
-          <option value="Q1 2026">Q1 2026</option>
-          <option value="Q2 2026">Q2 2026</option>
-          <option value="Q3 2026">Q3 2026</option>
-          <option value="Q4 2026">Q4 2026</option>
-        </select>
-      </div>
-
-      <!-- end_Quarter -->
-      <div class="mb-3">
-        <label class="form-label">End Quarter</label>
-        <select name="end_quarter" class="form-select" required>
-          <option value="">Select quarter</option>
-          <option value="Q1 2025">Q4 2025</option>
-          <option value="Q1 2026">Q1 2026</option>
-          <option value="Q2 2026">Q2 2026</option>
-          <option value="Q3 2026">Q3 2026</option>
-          <option value="Q4 2026">Q4 2026</option>
-        </select>
-      </div>
-
+    <!-- ==============================================
+         START QUARTER SELECTIE
+         ============================================== -->
     <div class="mb-3">
-        <label class="form-label">Team Size</label>
-        <input type="number" name="team_size" class="form-control"
-               value="{{ roadmap.team_size }}">
+        <label class="form-label">Start Quarter</label>
+
+        <!-- Select dropdown: toont lijst van opties -->
+        <select name="start_quarter" class="form-select" required> <!-- required = browser haalt fout op bij leeg -->
+            <option value="">Select quarter</option>
+
+            <!-- Dynamische selectie: optie wordt "selected" als roadmap.start_quarter gelijk is aan deze waarde -->
+            <option value="Q4 2025" {% if roadmap.start_quarter == "Q4 2025" %}selected{% endif %}>Q4 2025</option> <!-- 'selected' markeert standaardkeuze -->
+            <option value="Q1 2026" {% if roadmap.start_quarter == "Q1 2026" %}selected{% endif %}>Q1 2026</option>
+            <option value="Q2 2026" {% if roadmap.start_quarter == "Q2 2026" %}selected{% endif %}>Q2 2026</option>
+            <option value="Q3 2026" {% if roadmap.start_quarter == "Q3 2026" %}selected{% endif %}>Q3 2026</option>
+            <option value="Q4 2026" {% if roadmap.start_quarter == "Q4 2026" %}selected{% endif %}>Q4 2026</option>
+        </select>
     </div>
 
+
+    <!-- ==============================================
+         END QUARTER SELECTIE
+         ============================================== -->
+    <div class="mb-3">
+        <label class="form-label">End Quarter</label>
+
+        <select name="end_quarter" class="form-select" required>
+            <option value="">Select quarter</option>
+
+            <!-- 'selected' zorgt dat de juiste waarde wordt voorgeselecteerd -->
+            <option value="Q4 2025" {% if roadmap.end_quarter == "Q4 2025" %}selected{% endif %}>Q4 2025</option>
+            <option value="Q1 2026" {% if roadmap.end_quarter == "Q1 2026" %}selected{% endif %}>Q1 2026</option>
+            <option value="Q2 2026" {% if roadmap.end_quarter == "Q2 2026" %}selected{% endif %}>Q2 2026</option>
+            <option value="Q3 2026" {% if roadmap.end_quarter == "Q3 2026" %}selected{% endif %}>Q3 2026</option>
+            <option value="Q4 2026" {% if roadmap.end_quarter == "Q4 2026" %}selected{% endif %}>Q4 2026</option>
+        </select>
+    </div>
+
+
+    <!-- ==============================================
+         TEAM SIZE INPUT
+         ============================================== -->
+    <div class="mb-3">
+        <label class="form-label">Team Size</label>
+
+        <!-- value="{{ roadmap.team_size }}" → vult huidige databasewaarde automatisch in -->
+        <input type="number"
+               name="team_size"
+               class="form-control"
+               value="{{ roadmap.team_size }}"> <!-- toont huidige waarde -->
+    </div>
+
+
+    <!-- ==============================================
+         SPRINT CAPACITY INPUT
+         ============================================== -->
     <div class="mb-3">
         <label class="form-label">Sprint Capacity</label>
-        <input type="number" name="sprint_capacity" class="form-control"
+
+        <input type="number"
+               name="sprint_capacity"
+               class="form-control"
                value="{{ roadmap.sprint_capacity }}">
     </div>
 
+
+    <!-- ==============================================
+         BUDGET INPUT
+         ============================================== -->
     <div class="mb-3">
         <label class="form-label">Budget Allocation</label>
-        <input type="number" name="budget_allocation" class="form-control"
+
+        <input type="number"
+               name="budget_allocation"
+               class="form-control"
                value="{{ roadmap.budget_allocation }}">
     </div>
 
-    <button class="btn btn-primary">Save Changes</button>
-    <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}"
-       class="btn btn-secondary">Cancel</a>
 
+    <!-- ==============================================
+         FORM KNOPPEN: OPSLAAN EN ANNULEREN
+         ============================================== -->
+    <button class="btn btn-base btn-primary-custom w-100 mt-3">
+        Save Changes
+    </button>
+
+    <!-- Cancel → link i.p.v. button zodat er niets wordt gepost -->
+    <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}"
+       class="btn btn-base btn-secondary-custom w-100 mt-2">
+        Cancel
+    </a>
 
 </form>
 
 </div>
+
 {% endblock %}
