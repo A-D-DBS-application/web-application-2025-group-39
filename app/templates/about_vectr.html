@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}About VECTR{% endblock %}
+{% block body_class %}about-vectr-body{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">VECTR: Prioritize What Really Matters</h1>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card p-4 shadow-lg mb-5 border-0">
+                <h2 class="card-title text-center text-secondary mb-3">A Lightweight Prioritization Framework</h2>
+                <p class="lead text-center">
+                    VECTR is a prioritization framework specifically designed to help software startups make critical product roadmap decisions, even under severe resource constraints. It integrates three core criteria that are highly relevant to early-stage company success.
+                </p>
+                <p class="text-center text-muted">
+                    VECTR has been validated by 17 practitioners (including Founders, Product Managers, and Technical Leads) and is valued for being intuitive, visually clear, and useful for structuring product discussions.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="text-center mb-4 text-primary">The Three Core VECTR Criteria</h2>
+
+    <div class="row g-4">
+        
+        <div class="col-md-4">
+            <div class="card h-100 p-4 shadow-sm border-success">
+                <h3 class="card-title text-success"><i class="bi bi-currency-dollar me-2"></i> 1. Return on Investment (ROI)</h3>
+                <hr>
+                <p class="card-text">
+                    ROI measures the expected financial gain a feature will generate relative to its cost (time, development effort, resources).
+                </p>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check-circle-fill text-success me-1"></i> Goal: Quantify the potential business value.</li>
+                    <li><i class="bi bi-check-circle-fill text-success me-1"></i> Focus: Maximize financial returns and profitability.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 p-4 shadow-sm border-warning">
+                <h3 class="card-title text-warning"><i class="bi bi-clock me-2"></i> 2. Time-to-Value (TtV)</h3>
+                <hr>
+                <p class="card-text">
+                    TtV represents how quickly a feature can be developed, launched, and begin delivering real value to the user or business.
+                </p>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check-circle-fill text-warning me-1"></i> Goal: Prioritize features with a low TtV.</li>
+                    <li><i class="bi bi-check-circle-fill text-warning me-1"></i> Focus: Enable fast market validation and rapid feedback loops, essential for startups.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 p-4 shadow-sm border-info">
+                <h3 class="card-title text-info"><i class="bi bi-patch-check me-2"></i> 3. Confidence Level</h3>
+                <hr>
+                <p class="card-text">
+                    The Confidence Level measures the reliability of the assumptions underlying the feature based on the quality and quantity of supporting evidence.
+                </p>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check-circle-fill text-info me-1"></i> Goal: Drive data-driven decision-making.</li>
+                    <li><i class="bi bi-check-circle-fill text-info me-1"></i> Hierarchy: Evidence like 'Launch Data' (10.0) is considered much stronger than 'Self Conviction' (0.01).</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}

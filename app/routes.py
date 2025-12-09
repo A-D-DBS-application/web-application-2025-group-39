@@ -136,6 +136,18 @@ def dashboard():
     return render_template("dashboard.html", name=name, role=role)
 
 
+# ==============================
+# ABOUT VECTR
+# ==============================
+@main.route("/about-vectr") 
+def about_vectr():
+    """Renders the About VECTR information page."""
+    # Deze pagina vereist geen specifieke database-informatie
+    return render_template(
+        "about_vectr.html",
+    )
+
+
 
 # ==============================
 # PROFILE
