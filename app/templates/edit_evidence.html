@@ -76,7 +76,7 @@
 
         <!-- NEW CONFIDENCE -->
         <div class="mb-3">
-            <label class="form-label">Confidence Level</label>
+            <label class="form-label">New Confidence Level</label>
             <select name="new_confidence" class="form-select" required> {# required: moet gekozen zijn #}
 
                 {% for value, label in CONFIDENCE_LEVELS %}
@@ -89,8 +89,15 @@
             </select>
         </div>
 
-        <!-- SUBMIT BUTTON -->
-        <button class="btn btn-primary w-100">Save Changes</button>
+        <!-- safe and sumit button-->
+        <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">
+        Save Changes
+        </button>
+
+        <a href="{{ url_for('main.projects') }}"
+        class="btn btn-base btn-secondary-custom w-100 mt-2">
+        Cancel
+        </a>
 
     </form>
 </div>

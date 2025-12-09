@@ -12,12 +12,6 @@
 
     <h2 class="text-center mb-4">Edit Milestone</h2>
 
-    <!-- Terugknop → link i.p.v. button zodat geen POST gebeurt -->
-    <a href="{{ url_for('main.roadmap_overview', project_id=milestone.roadmap.id_project) }}"
-       class="btn btn-nav mb-3">
-        ← Back to Roadmap
-    </a>
-
     <!-- Formulier verstuurt data terug naar dezelfde route (POST handler) -->
     <form method="POST">
 
@@ -135,12 +129,16 @@
         <!-- ==============================================
              SUBMIT KNOP – verstuurt formulier naar server
              ============================================== -->
-        <div class="text-center mt-4">
-            <button type="submit"
-                    class="btn btn-primary-custom px-4">
-                Save Changes
-            </button>
-        </div>
+        
+        <button type="submit" class="btn btn-base btn-primary-custom w-100 mb-2">
+        Save Changes
+        </button>
+
+        <a href="{{ url_for('main.roadmap_overview', project_id=milestone.roadmap.id_project) }}"
+        class="btn btn-base btn-secondary-custom w-100 mt-2">
+        Cancel
+        </a>
+        
 
     </form>
 </div>
