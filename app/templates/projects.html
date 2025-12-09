@@ -5,34 +5,48 @@
 
 {% block content %}
 
+<!-- Titel van de pagina -->
 <h2 class="mb-4 text-center">Projects Overview</h2>
 
+<!-- Knop om een nieuw project toe te voegen -->
 <div class="mb-5 d-flex justify-content-center">
   <a href="{{ url_for('main.add_project') }}" class="btn btn-base btn-primary-custom">+ Add Project</a>
 </div>
 
+<!-- Container voor de gridweergave van projecten -->
 <div class="projects-grid-container container">
 
+  <!-- Als er nog geen projecten bestaan -->
   {% if projects|length == 0 %}
   <div class="text-center py-5 text-muted">
     No projects yet — add one soon!
   </div>
+
   {% else %}
+  <!-- Projecten aanwezig → toon ze in een responsive grid -->
 
   <div class="row g-4">
+
+    <!-- Loop door alle projecten + gekoppelde bedrijfsnaam -->
     {% for project, company_name in projects %}
 
+    <!-- Kolom voor elke projectkaart -->
     <div class="col-12 col-md-6 col-lg-4">
 
+      <!-- Visuele projectkaart -->
       <div class="project-card shadow-lg">
 
+        <!-- Header van de kaart: initialen + projectnaam -->
         <div class="d-flex align-items-center justify-content-between mb-4">
+
           <div class="d-flex align-items-center gap-3">
 
+            <!-- Cirkel met eerste letter van de projectnaam -->
             <div class="project-initials-circle">
               <span class="text-uppercase">{{ project.project_name[0] }}</span>
             </div>
 
+            <!-- Projectnaam -->
             <div>
               <h3 class="card-title">{{ project.project_name }}</h3>
             </div>
@@ -40,39 +54,56 @@
           </div>
         </div>
 
+        <!-- Acties gelinkt aan de inhoud van het project -->
         <div class="card-action-sections">
 
+          <!-- Sectie: Features -->
           <div class="card-action-box mb-3">
+
+            <!-- Titel + icoon voor Features -->
             <div class="d-flex align-items-center gap-2 mb-3">
               <i class="bi bi-stars icon-sm text-primary-custom"></i>
               <span class="card-section-title">Features</span>
             </div>
 
+            <!-- Knoppen: Feature toevoegen + bekijken -->
             <div class="d-flex gap-2">
+
+              <!-- Feature toevoegen -->
               <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}"
                 class="btn btn-base btn-primary-custom btn-card-action flex-grow-1">
                 <i class="bi bi-plus-lg icon-sm"></i> Add
               </a>
 
+              <!-- Features bekijken -->
               <a href="{{ url_for('main.view_features', project_id=project.id_project) }}"
                 class="btn btn-base btn-primary-custom btn-card-action flex-grow-1">
                 <i class="bi bi-eye-fill icon-sm"></i> View
               </a>
+
             </div>
           </div>
 
+          <!-- Sectie: Roadmap -->
           <div class="card-action-box">
+
+            <!-- Titel + icoon voor Roadmap -->
             <div class="d-flex align-items-center gap-2 mb-3">
               <i class="bi bi-signpost-2-fill icon-sm text-info-custom"></i>
               <span class="card-section-title">Roadmap</span>
             </div>
 
+            <!-- Knoppen voor Roadmap afhankelijk van of er al één bestaat -->
             <div class="d-flex gap-2">
+
+              <!-- Roadmap bestaat niet → Toon Add-knop -->
               {% if project.roadmaps|length == 0 %}
               <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}"
                 class="btn btn-base btn-primary-custom btn-card-action flex-grow-1">
                 <i class="bi bi-plus-lg icon-sm"></i> Add
               </a>
+
+              <!-- Roadmap bestaat wel → Toon Edit-knop voor de eerste roadmap -->
               {% else %}
               <a href="{{ url_for('main.edit_roadmap', roadmap_id=project.roadmaps[0].id_roadmap) }}"
                 class="btn btn-outline-primary btn-info-custom btn-card-action flex-grow-1">
@@ -80,22 +111,27 @@
               </a>
               {% endif %}
 
+              <!-- Roadmap altijd kunnen bekijken -->
               <a href="{{ url_for('main.roadmap_overview', project_id=project.id_project) }}"
                 class="btn btn-base btn-primary-custom btn-card-action flex-grow-1">
                 <i class="bi bi-eye-fill icon-sm"></i> View
               </a>
+
             </div>
           </div>
 
         </div>
 
+        <!-- Footer met projectacties: bewerken & verwijderen -->
         <div class="d-flex gap-2 mt-4 pt-3 border-top card-footer-actions">
 
+          <!-- Project bewerken -->
           <a href="{{ url_for('main.edit_project', project_id=project.id_project) }}"
             class="btn btn-edit-custom btn-sm flex-grow-1">
             <i class="bi bi-pencil-fill icon-sm"></i> Edit
           </a>
 
+          <!-- Project verwijderen (met bevestiging) -->
           <form action="{{ url_for('main.delete_project', project_id=project.id_project) }}" method="post"
             class="flex-grow-1">
             <button type="submit" onclick="return confirm('Are you sure you want to delete this project?');"
@@ -108,10 +144,12 @@
 
       </div>
     </div>
+
     {% endfor %}
   </div>
 
   {% endif %}
 </div>
 
+{% endblock %}
 {% endblock %}
