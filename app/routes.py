@@ -22,23 +22,23 @@ def require_editor_access():
     # 1. Login check
     user = require_login()
     if not isinstance(user, Profile):
-        return user  # Retourneert direct de redirect response
+        return user                                                 # Retourneert direct de redirect response
 
     # 2. Role check
     role_redirect = require_role(["founder", "PM"], user)
     if role_redirect:
-        return role_redirect # Retourneert direct de redirect response
+        return role_redirect                                        # Retourneert direct de redirect response
         
     return user
 
 # ==============================
 # INDEX
 # ==============================
-@main.route("/", methods=["GET"])
+@main.route("/", methods=["GET"])                                   # Toon de landingspagina of, indien ingelogd, ga direct naar het dashboard.
 def index():
     if "user_id" in session:
         return redirect(url_for("main.dashboard"))
-    return render_template("index.html")
+    return render_template("index.html")                            # Toon de index pagina
 
 
 # ==============================
@@ -49,26 +49,27 @@ def login():
     if request.method == "POST":
         email = (request.form.get("email") or "").lower().strip()
         password = request.form.get("password") 
-        #zoek gebruiker op basis van email
-        user = Profile.query.filter_by(email=email).first()
+        
+        user = Profile.query.filter_by(email=email).first()         #zoek gebruiker op basis van email
+        
         #controleer of gebruiker bestaat
         if user and user.check_password(password):                  #controleer of wachtwoord overeenkomt
-            session["user_id"] = user.id_profile                    
+            session["user_id"] = user.id_profile                    # Sla essentiële info op in de sessie             
             session["name"] = user.name
             session["role"] = user.role
             flash("Successfully logged in!", "success")
             return redirect(url_for("main.dashboard"))
 
-        flash("Invalid email or password.", "danger")
+        flash("Invalid email or password.", "danger")               # Foutmelding bij incorrecte gegevens
 
-    return render_template("login.html")
+    return render_template("login.html")                            # Toon het inlogformulier
 
 @main.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         #haal de gegevens op 
         name = request.form.get("name")
-        email = (request.form.get("email") or "").lower().strip()
+        email = (request.form.get("email") or "").lower().strip()    # email adress lower en strippen, zodat als gebruiker met hoofdletter typt het nog steeds juist is 
         password = request.form.get("password")
         role = request.form.get("role")
         company_name = request.form.get("company_name")
@@ -182,12 +183,12 @@ def projects():
 def add_project():
     user = require_editor_access()
     if not isinstance(user, Profile):
-        return user # Afgevangen door helper: retourneert redirect/error
+        return user                                                             # Afgevangen door helper: retourneert redirect/error
 
     user_company = Company.query.get(user.id_company)
 
     if request.method == "POST":
-        data, errors = parse_project_form(request.form)
+        data, errors = parse_project_form(request.form)                          # Helper-functie valideert en parseert het formulier
         if errors:
             for e in errors:
                 flash(e, "danger")
@@ -212,7 +213,7 @@ def add_project():
 def edit_project(project_id):
     user = require_editor_access()
     if not isinstance(user, Profile):
-        return user # Afgevangen door helper: retourneert redirect/error
+        return user                                                                 # Afgevangen door helper: retourneert redirect/error
 
     project = Project.query.get_or_404(project_id)
 
@@ -384,19 +385,20 @@ def view_features(project_id):
     company = project.company
 
     user_role = session.get("role")
-    can_sort = user_role == "PM"
+    can_sort = user_role == "PM"                                                # Alleen PM's mogen sorteren op berekende scores
 
     if can_sort:
         sort_by = request.args.get("sort_by", "roi")
-        direction = request.args.get("direction", "desc")
+        direction = request.args.get("direction", "desc")                       # Haal de sorteerrichting op uit de URL
     else:
-        sort_by = "name"
-        direction = "asc"
+        sort_by = "name"                                                        # Als GEEN PM: De gebruiker mag de sorteerparameters niet bepalen.
+        direction = "asc"                                                       # De sortering wordt vastgezet op een neutrale, standaardkolom (naam) in oplopende volgorde.
+
 
     features_query = Features_ideas.query.filter_by(id_project=project_id)
 
     if sort_by == "roi":
-        column = Features_ideas.roi_percent
+        column = Features_ideas.roi_percent                                     # Sorteren op de berekende ROI in percentage
     elif sort_by == "ttv":
         column = Features_ideas.ttm_weeks
     elif sort_by == "confidence":
@@ -405,9 +407,10 @@ def view_features(project_id):
         column = Features_ideas.name_feature
 
     if direction == "desc":
-        features = features_query.order_by(column.desc()).all()
+        features = features_query.order_by(column.desc()).all()                 # Order By DESC (Descending): Hoogste waarde eerst
     else:
-        features = features_query.order_by(column.asc()).all()
+        features = features_query.order_by(column.asc()).all()                  # Order By ASC (Ascending): Laagste waarde eerst
+
 
     # Compute VECTR score
     for f in features:
