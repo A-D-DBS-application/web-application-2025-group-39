@@ -4,7 +4,7 @@
 {% block body_class %}features-body{% endblock %}
 
 {% block content %}
-<!-- Right-top button -->
+<!-- Knop rechtsboven om naar de VECTR-grafiek te gaan -->
 <div class="top-right">
   <a href="{{ url_for('main.vectr_chart', project_id=project.id_project) }}" class="btn btn-base btn-nav btn-sm">
     📈 VECTR Chart
@@ -14,17 +14,19 @@
 
 
 <h2 class="text-center mb-4">Add New Feature</h2>
-
+<!-- Hoofdformulier voor het toevoegen van een nieuwe feature -->
 <div class="feature-form card shadow p-4 mx-auto">
   <form method="post" action="{{ url_for('main.add_feature', project_id=project.id_project) }}">
     <!-- BASIC INFO -->
     <div class="mb-4">
+      <!-- BASIC INFO sectie: titel, project en beschrijving -->
       <h4 class="mb-3">Basic Info</h4>
       <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label">Title</label>
           <input type="text" class="form-control" name="name_feature" required>
         </div>
+        <!-- Projectnaam tonen, IDs in hidden fields doorgeven -->
         <div class="col-md-6">
           <label class="form-label">Project</label>
           <input type="text" class="form-control" value="{{ project.project_name }}" disabled>
@@ -38,7 +40,7 @@
       </div>
     </div>
 
-    <!-- ROI -->
+    <!-- ROI sectie: velden voor financiële baten en kosten -->
     <div class="mb-4">
       <h4 class="mb-3">Return on Investment (ROI)</h4>
       <p class="text-muted fst-italic mb-2">
@@ -48,6 +50,7 @@
       <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label">
+            <!-- Horizon (maanden) — bepaalt hoe lang vooruit de ROI berekend wordt -->
             Horizon (months)
             <!--aanmaken van het i icoontje -->
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
@@ -56,6 +59,7 @@
           </label>
           <input type="number" class="form-control" name="horizon" min="0">
         </div>
+        <!-- Extra inkomsten -->
         <div class="col-md-6">
           <label class="form-label">
             Extra Revenue
@@ -65,6 +69,7 @@
           </label>
           <input type="number" class="form-control" name="extra_revenue" min="0">
         </div>
+        <!-- Geld bespaard door minder churn -->
         <div class="col-md-6">
           <label class="form-label">
             Churn Reduction Savings
@@ -74,6 +79,7 @@
           </label>
           <input type="number" class="form-control" name="churn_reduction" min="0">
         </div>
+        <!-- Kostenbesparing door het feature -->
         <div class="col-md-6">
           <label class="form-label">
             Cost Savings
@@ -86,6 +92,7 @@
       </div>
       <h5 class="mt-4">Investment Cost</h5>
       <div class="row g-3">
+        <!-- Development effort (uren) -->
         <div class="col-md-6">
           <label class="form-label">
             Development Effort (hours)
@@ -95,6 +102,7 @@
           </label>
           <input type="number" class="form-control" name="investment_hours" min="0">
         </div>
+        <!-- Uurtarief -->
         <div class="col-md-6">
           <label class="form-label">
             Cost per Hour (€)
@@ -104,6 +112,7 @@
           </label>
           <input type="number" class="form-control" name="hourly_rate" min="0">
         </div>
+        <!-- Operationele kosten -->
         <div class="col-md-6">
           <label class="form-label">
             OPEX (operational costs)
@@ -113,6 +122,7 @@
           </label>
           <input type="number" class="form-control" name="opex_hours" min="0">
         </div>
+        <!-- Andere kosten -->
         <div class="col-md-6">
           <label class="form-label">
             Other Costs (optional)
@@ -123,31 +133,33 @@
           <input type="number" class="form-control" name="other_costs" min="0">
         </div>
       </div>
+      <!-- ROI-resultaten worden dynamisch geladen via partial -->
       <div id="roi-results">
         {% include "features/_roi_partial.html" %}
       </div>
     </div>
 
-    <!-- TTV -->
+    <!-- TTV: Time to Value (Time-to-Market + Time-to-Business-Value) --> 
     <div class="mb-4">
       <h4 class="mb-3">Time to Value (TTV)</h4>
       <div class="row g-3">
-        <!-- Left column: all Time-to-Market -->
+        <!-- Linker kolom: alle Time-to-Market velden -->
         <div class="col-md-6">
+          <!-- Minimale schatting van de tijd om te bouwen -->
           <label class="form-label">Lowest Time-to-Market
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="Provide your best estimate of the minimum number of weeks required to build and release the feature. This will later be used to scale the graph correctly.">
             </i>
           </label>
           <input type="number" class="form-control" name="ttm_low" min="0">
-
+          <!-- Maximale schatting van de tijd om te bouwen -->
           <label class="form-label mt-3">Highest Time-to-Market
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="Provide your best estimate of the maximum number of weeks required to build and release the feature. This will later be used to scale the graph correctly.">
             </i>
           </label>
           <input type="number" class="form-control" name="ttm_high" min="0">
-
+          <!-- Verwachte Time-to-Market waarde (in weken) -->
           <label class="form-label mt-3">Time-to-Market (weeks)
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The number of weeks needed to build and release the first usable version of the feature. This includes everything: design, development, testing and deployment.">
@@ -156,22 +168,23 @@
           <input type="number" class="form-control" name="ttm_weeks" min="0">
         </div>
 
-        <!-- Right column: all Time-to-Business-Value -->
+        <!-- Rechter kolom: alle Time-to-Business-Value velden -->
         <div class="col-md-6">
+          <!-- Minimale tijd tot eerste business value -->
           <label class="form-label">Lowest Time-to-Business-Value
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="Provide your best estimate of the minimum number of weeks after launch before the feature begins delivering measurable business value. This will later be used to scale the graph correctly.">
             </i>
           </label>
           <input type="number" class="form-control" name="ttbv_low" min="0">
-
+          <!-- Maximale tijd tot eerste business value -->
           <label class="form-label mt-3">Highest Time-to-Business-Value
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="Provide your best estimate of the maximum number of weeks after launch before the feature begins delivering measurable business value. This will later be used to scale the graph correctly.">
             </i>
           </label>
           <input type="number" class="form-control" name="ttbv_high" min="0">
-
+          <!-- Verwachte Time-to-Business-Value waarde (in weken) -->
           <label class="form-label mt-3">Time-to-Business-Value (weeks)
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The number of weeks after launch before the feature starts delivering measurable value. Examples include the first paying users, an improvement in key metrics, or visible customer adoption.">
@@ -180,14 +193,14 @@
           <input type="number" class="form-control" name="ttbv_weeks" min="0">
         </div>
 
-        <!-- Full width TTV summary -->
+        <!-- TTV-resultaten (samenvatting via partial template) -->
         <div id="ttv-results">
           {% include "features/_ttv_partial.html" %}
         </div>
       </div>
     </div>
 
-    <!-- CONFIDENCE -->
+    <!-- CONFIDENCE: bewijslast & confidence score voor de VECTR-grafiek -->
     <div class="mb-4 mt-4">
       <h4 class="mb-3">Evidence & Confidence Level</h4>
       <label class="form-label mb-2">
@@ -212,7 +225,7 @@
           <option value="10">Launch Data (10.0) - Real usage data after launch; strongest evidence.</option>
       </select>
   </div>
-
+    <!-- Formulierknoppen: opslaan of annuleren -->
     <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">
       Save
     </button>
