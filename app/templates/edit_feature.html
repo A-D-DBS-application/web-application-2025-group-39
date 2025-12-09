@@ -5,9 +5,7 @@
 
 {% block content %}
 
-{# =========================
-   NAVIGATIE: RECHTSBOVEN
-   ========================= #}
+<!-- NAVIGATIE: RECHTSBOVEN -->
   <!-- Right-top button -->
   <div class="top-right">
     <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" class="btn btn-base btn-nav btn-sm">
@@ -16,16 +14,11 @@
   </div>
   <h2 class="text-center mb-4">Edit Feature: {{ feature.name_feature }}</h2>
 
-  {# =========================
-   FORM CONTAINER
-   ========================= #}
+  <!-- FORM CONTAINER -->
   <div class="feature-form card shadow p-4 mx-auto">
     <form method="post" action="{{ url_for('main.edit_feature', feature_id=feature.id_feature) }}"> {#stuur de ingevulde velden naar de server#}
 
-      {# =========================
-       BASIC INFO SECTION
-       ========================= #}
-      
+      <!--BASIC INFO SECTION-->
       <!-- BASIC INFO -->
       <div class="mb-4"> {# mb-4: ruimte onder dit volledige “Basic Info” blok #}
         <h4 class="mb-3">Basic Info</h4>
@@ -262,9 +255,7 @@
   </form>
 </div>
 
-{# =========================
-   BOOTSTRAP POPOVERS INIT
-   ========================= #}
+<!-- BOOTSTRAP POPOVERS INIT -->
   <script>
     // Initialiseer alle Popovers op de pagina
     document.addEventListener('DOMContentLoaded', function () {

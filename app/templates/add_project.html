@@ -5,19 +5,13 @@
 
 {% block content %}
   
-{# =========================
-   PAGINATITEL
-   ========================= #}
+<!-- PAGETITLE -->
   <h2 class="mb-4 text-center">Add New Project</h2>
 
-{# =========================
-   FORM CONTAINER
-   ========================= #}
+<!-- FORM CONTAINER -->
   <div class="form-card shadow-sm p-4 mx-auto">
     
-    {# =========================
-      FLASH MESSAGES (VALIDATIE/FEEDBACK)
-      ========================= #}
+    <!-- FLASH MESSAGES (VALIDATION/FEEDBACK) -->
     {% with messages = get_flashed_messages(with_categories=true) %} {# Haalt flashed messages op uit Flask (met category + message) #}
       {% if messages %} {# Toon alleen de container als er effectief messages zijn #}
         {% for category, message in messages %} {# Loop door elke (category, message) pair #}
@@ -29,9 +23,7 @@
       {% endif %}
     {% endwith %}
 
-    {# =========================
-      FORM (ADD PROJECT)
-      ========================= #}
+    <!-- FORM (ADD PROJECT) -->
     <form method="POST" action="{{ url_for('main.add_project') }}">
       <h5 class="mb-3 fw-semibold">Project Info</h5>
 

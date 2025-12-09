@@ -6,21 +6,15 @@
 {% block content %}
 <div class="milestone-form">
 
-    {# =========================
-    PAGINATITEL
-    ========================= #}
+    <!-- PAGETITLE -->
     <h2 class="text-center mb-4">Add Milestone</h2>
 
-    {# =========================
-    NAVIGATION BACK TO ROADMAP
-    ========================= #}
+    <!-- NAVIGATION BACK TO ROADMAP -->
     <a href="{{ url_for('main.roadmap_overview', project_id=roadmap.id_project) }}" class="btn btn-nav mb-3">
         {# Link terug naar roadmap-overview van hetzelfde project #}
         ← Back to Roadmap
     </a>
-    {# =========================
-    FORM (ADD MILESTONE)
-    ========================= #}
+    <!-- FORM (ADD MILESTONE) -->
     <form method="POST">
 
         <!-- NAME -->

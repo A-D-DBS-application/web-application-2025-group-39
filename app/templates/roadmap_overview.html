@@ -5,9 +5,7 @@
 
 {% block content %}
 
-{# =========================
-   HEADER + TOP-RIGHT NAV
-   ========================= #}
+<!-- HEADER + TOP-RIGHT NAV -->
 <div class="roadmap-header"> {# Wrapper voor de paginaheader (layout/styling in CSS) #}
   <h2>Roadmap for {{ project.project_name }}</h2>
   <div class="top-right"> {# Container om knop rechtsboven te positioneren (via CSS) #}
@@ -15,9 +13,7 @@
   </div> 
 </div>
 
-{# =========================
-   EMPTY STATE (GEEN ROADMAPS)
-   ========================= #}
+<!-- EMPTY STATE (NO ROADMAPS) -->
 {% if roadmaps|length == 0 %} {# Als er geen roadmaps bestaan voor dit project #}
   <div class="card p-4 mx-auto" style="max-width: 700px;">
     <div class="alert alert-info mb-0">
@@ -34,18 +30,15 @@
   </div>
 {% else %}
 
-  {# =========================
-     ROADMAPS CONTAINER
-     ========================= #}
+  <!-- ROADMAP CONTAINER -->
+
   <div class="roadmap-container"> {# Wrapper voor alle roadmap blokken #}
 
     {% for r in roadmaps %}
       <!-- Single Roadmap Block -->
       <div class="mb-4">
 
-        {# =========================
-           ROADMAP META CARD
-           ========================= #}
+        <!-- ROADMAP META CARD -->
         <div class="card mb-3 p-3">
           <div class="d-flex flex-wrap justify-content-between align-items-center">
             <div>
@@ -92,9 +85,7 @@
           </div>
         </div>
 
-        {# =========================
-           MILESTONES ROW
-           ========================= #}
+        <!-- MILESTONES ROW -->
         <div class="milestones-row">
           <div class="milestone-group"> {# Groepeert alle milestone cards binnen deze roadmap #}
 
@@ -102,9 +93,7 @@
               <p class="text-muted-small">No milestones yet for this roadmap.</p> {# Empty-state tekst als er nog geen milestones zijn #}
             {% endif %}
 
-            {# =========================
-               MILESTONE CARDS
-               ========================= #}
+              <!-- MILESTONE CARDS -->
             {% for m in r.milestones %}
               <div class="milestone-card">
 
@@ -126,18 +115,14 @@
                   <strong>Goal:</strong> {{ m.goal or 'N/A' }}
                 </div>
 
-                {# =========================
-                   STATUS BADGE
-                   ========================= #}
+                <!-- STATUS BADGE -->
                 <div class="milestone-info">
                   <strong>Status:</strong>
                   {% set status_class = (m.status or 'pending') | lower | replace(' ', '-') %}
                   <span class="status-{{ status_class }}">{{ m.status or 'Pending' }}</span>
                 </div>
 
-                {# =========================
-                   FEATURES LIST
-                   ========================= #}
+                <!-- FEATURES LIST -->
                 {% if m.features|length > 0 %} {# Toon dit blok enkel als er gekoppelde features zijn #}
                   <div class="milestone-info">
                     <strong>Features:</strong>
@@ -149,9 +134,7 @@
                   </div>
                 {% endif %}
                 
-                {# =========================
-                   ACTION BUTTONS (ROLE-BASED)
-                   ========================= #}
+                <!-- ACTION BUTTONS (ROLE-BASED) -->
                 {% if session['role'] in ['founder', 'PM'] %} {# Alleen founder en PM mogen milestones aanpassen/verwijderen #}
                   <div class="milestone-actions">
                     <a href="{{ url_for('main.edit_milestone', milestone_id=m.id_milestone) }}"
@@ -169,9 +152,7 @@
               </div>
             {% endfor %}
             
-            {# =========================
-               ADD MILESTONE (PER ROADMAP) - ROLE-BASED
-               ========================= #}
+            <!-- ADD MILESTONE BUTTON (ROLE-BASED) -->
             {% if session['role'] in ['founder', 'PM'] %}
               <a href="{{ url_for('main.add_milestone', roadmap_id=r.id_roadmap) }}"
                  class="btn btn-add-milestone-small">

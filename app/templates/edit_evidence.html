@@ -4,14 +4,10 @@
 
 {% block content %}
 
-{# =========================
-   PAGINATITEL
-   ========================= #}
+<!-- PAGE TITLE -->
 <h2 class="text-center mb-4">Edit Evidence for: {{ feature.name_feature }}</h2>
 
-{# =========================
-   FORM CONTAINER
-   ========================= #}
+<!-- FORM CONTAINER -->
 <div class="card p-4 mx-auto" style="max-width: 700px;">
     <form method="POST">
 
@@ -25,9 +21,7 @@
                    value="{{ evidence.title }}" required>
         </div>
 
-        {# =========================
-            EVIDENCE TYPE
-            ========================= #}
+        <!-- EVIDENCE TYPE  -->
         <div class="mb-3">
             <label class="form-label">Evidence Type</label>
             <select id="evidence_type" name="type_select" class="form-select">
@@ -46,9 +40,7 @@
             </select>
         </div>
 
-        {# =========================
-            CUSTOM EVIDENCE TYPE
-            ========================= #}
+        <!-- CUSTOM EVIDENCE TYPE -->
         <div class="mb-3" id="custom_type_group"
              style="display: {% if evidence.type not in default_types %}block{% else %}none{% endif %};"> 
              {# Dit veld verschijnt als evidence.type NIET in de default_types lijst zit #}
@@ -61,9 +53,7 @@
             {# value vult alleen in wanneer het huidige type een custom type is #}
         </div>
 
-        {# =========================
-            SOURCE
-            ========================= #}
+        <!--SOURCE-->
         <div class="mb-3">
             <label class="form-label">Source</label>
             <input type="text" name="source" class="form-control"
@@ -72,25 +62,19 @@
             {# required: moet ingevuld zijn #}
         </div>
 
-        {# =========================
-            DESCRIPTION
-            ========================= #}
+        <!-- DESCRIPTION -->
         <div class="mb-3">
             <label class="form-label">Description</label>
             <textarea name="description" class="form-control" rows="3" required>{{ evidence.description }}</textarea> {# required: moet ingevuld zijn #}
         </div>
 
-        {# =========================
-            ATTACHMENT
-            ========================= #}
+        <!-- ATTACHMENT -->
         <div class="mb-3">
             <label class="form-label">Attachment URL</label>
             <input type="text" name="attachment_url" class="form-control" value="{{ evidence.attachment_url }}"> {# Optionele link naar bijlage (drive link, doc, screenshot, ...) #}
         </div>
 
-        {# =========================
-            NEW CONFIDENCE
-            ========================= #}
+        <!-- NEW CONFIDENCE -->
         <div class="mb-3">
             <label class="form-label">Confidence Level</label>
             <select name="new_confidence" class="form-select" required> {# required: moet gekozen zijn #}
@@ -105,17 +89,13 @@
             </select>
         </div>
 
-        {# =========================
-            SUBMIT BUTTON
-            ========================= #}
+        <!-- SUBMIT BUTTON -->
         <button class="btn btn-primary w-100">Save Changes</button>
 
     </form>
 </div>
 
-{# =========================
-   UI LOGICA: TOON/VERBERG CUSTOM TYPE
-   ========================= #}
+<!-- UI LOGICA: TOON/VERBERG CUSTOM TYPE -->
 <script>
     const typeSelect = document.getElementById("evidence_type"); // Dropdown element
     const customGroup = document.getElementById("custom_type_group"); // Div met custom input
