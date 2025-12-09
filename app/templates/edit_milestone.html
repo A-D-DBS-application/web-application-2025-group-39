@@ -4,75 +4,126 @@
 {% block body_class %}milestone-body{% endblock %}
 
 {% block content %}
+
+<!-- ==============================================
+     FORM CONTAINER VOOR NETTE UITLIJNING EN KAARTSTIJL
+     ============================================== -->
 <div class="milestone-form">
 
     <h2 class="text-center mb-4">Edit Milestone</h2>
 
+    <!-- Terugknop → link i.p.v. button zodat geen POST gebeurt -->
     <a href="{{ url_for('main.roadmap_overview', project_id=milestone.roadmap.id_project) }}"
        class="btn btn-nav mb-3">
         ← Back to Roadmap
     </a>
 
+    <!-- Formulier verstuurt data terug naar dezelfde route (POST handler) -->
     <form method="POST">
 
-        <!-- NAME -->
+        <!-- ==============================================
+             MILESTONE NAAM – standaard tekstveld
+             ============================================== -->
         <div class="mb-3">
             <label class="form-label fw-bold">Milestone Name</label>
-            <input type="text" name="name" class="form-control"
-                   value="{{ milestone.name }}" required>
+            <input type="text"
+                   name="name"
+                   class="form-control"
+                   value="{{ milestone.name }}"   
+                   required>                     <!-- Browser verplicht dit veld -->
         </div>
 
-        <!-- DATES -->
+        <!-- ==============================================
+             DATUMVELDEN – 2 kolommen naast elkaar
+             ============================================== -->
         <div class="row">
             <div class="col mb-3">
                 <label class="form-label fw-bold">Start Date</label>
-                <input type="date" name="start_date" class="form-control"
-                       value="{{ milestone.start_date }}">
+                <input type="date"
+                       name="start_date"
+                       class="form-control"
+                       value="{{ milestone.start_date }}">  <!-- Date input accepteert YYYY-MM-DD -->
             </div>
 
             <div class="col mb-3">
                 <label class="form-label fw-bold">End Date</label>
-                <input type="date" name="end_date" class="form-control"
+                <input type="date"
+                       name="end_date"
+                       class="form-control"
                        value="{{ milestone.end_date }}">
             </div>
         </div>
 
-        <!-- GOAL -->
+        <!-- ==============================================
+             GOAL – tekstvak met bestaande waarde vooraf ingevuld
+             ============================================== -->
         <div class="mb-3">
             <label class="form-label fw-bold">Goal</label>
-            <textarea name="goal" class="form-control" rows="3">{{ milestone.goal }}</textarea>
+            <textarea name="goal"
+                      class="form-control"
+                      rows="3">{{ milestone.goal }}</textarea>   <!-- textarea sluit tag bevat bestaande tekst -->
         </div>
 
-        <!-- STATUS -->
+        <!-- ==============================================
+             STATUS DROPDOWN – ‘selected’ bepaalt vooraf ingevulde keuze
+             ============================================== -->
         <div class="mb-3">
             <label class="form-label fw-bold">Status</label>
+
             <select name="status" class="form-select" required>
-                <option value="Planned" {% if milestone.status == "Planned" %}selected{% endif %}>Planned</option>
-                <option value="In Progress" {% if milestone.status == "In Progress" %}selected{% endif %}>In Progress</option>
-                <option value="Done" {% if milestone.status == "Done" %}selected{% endif %}>Done</option>
+                <option value="Planned"
+                    {% if milestone.status == "Planned" %}selected{% endif %}> <!-- Jinja vergelijkt huidige DB waarde -->
+                    Planned
+                </option>
+
+                <option value="In Progress"
+                    {% if milestone.status == "In Progress" %}selected{% endif %}>
+                    In Progress
+                </option>
+
+                <option value="Done"
+                    {% if milestone.status == "Done" %}selected{% endif %}>
+                    Done
+                </option>
             </select>
         </div>
 
-        <!-- 🔥 FEATURE MULTI-SELECT -->
+        <!-- ==============================================
+             FEATURE MULTI-SELECT
+             - ‘multiple’ laat meerdere keuzes toe
+             - 'size' bepaalt hoogte van de lijst
+             - features gesorteerd door VECTR-score in route
+             ============================================== -->
         <hr class="my-4">
         <h4 class="mb-3">Assigned Features (sorted by VECTR score)</h4>
 
         <div class="mb-3">
             <label class="form-label">Select features for this milestone</label>
 
-            <select name="features" multiple class="form-select" size="8">
+            <select name="features"
+                    multiple                     
+                    class="form-select"
+                    size="8">                    <!-- Hoogte dropdown -->
+
                 {% for f in features %}
+
+                    <!-- 
+                      'selected_features' is een lijst met feature-id’s
+                      De optie wordt vooraf geselecteerd als het ID voorkomt in die lijst
+                    -->
                     <option value="{{ f.id_feature }}"
-                        {% if f.id_feature in selected_features %}selected{% endif %}
-                    >
-                        {{ f.name_feature }}
-                        — VECTR:
+                        {% if f.id_feature in selected_features %}selected{% endif %}> <!-- Preselectie op basis van database-relatie -->
+
+                        {{ f.name_feature }} — VECTR:
+
+                        <!-- Toon score (2 decimalen), of 'N/A' als geen score -->
                         {% if f.vectr_score %}
-                            {{ "%.2f"|format(f.vectr_score) }}
+                            {{ "%.2f"|format(f.vectr_score) }}   <!-- "%.2f"|format → 2 decimalen formattering -->
                         {% else %}
                             N/A
                         {% endif %}
                     </option>
+
                 {% endfor %}
             </select>
 
@@ -81,14 +132,17 @@
             </small>
         </div>
 
-        <!-- SUBMIT -->
+        <!-- ==============================================
+             SUBMIT KNOP – verstuurt formulier naar server
+             ============================================== -->
         <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary-custom px-4">
+            <button type="submit"
+                    class="btn btn-primary-custom px-4">
                 Save Changes
             </button>
         </div>
 
     </form>
-
 </div>
+
 {% endblock %}
