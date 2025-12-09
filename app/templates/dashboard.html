@@ -4,9 +4,12 @@
 {% block body_class %}dashboard-body{% endblock %}
 
 {% block content %}
+  <!-- Wrapper voor de dashboardpagina -->
   <div class="dashboard-wrapper">
     <h1>Welcome to your Dashboard</h1>
 
+
+  <!-- Hoofdknoppen voor navigatie -->
     <div class="main-buttons">
       <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-primary-custom">Projects Overview</a>
       <a href="{{ url_for('main.add_project') }}" class="btn btn-base btn-primary-custom">Add Project</a>
