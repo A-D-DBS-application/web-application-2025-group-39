@@ -4,19 +4,19 @@
 
 {% block content %}
 
-
+<!-- Titel met naam van de feature waarvoor bewijs wordt toegevoegd -->
 <h2 class="text-center mb-4">Add Evidence for: {{ feature.name_feature }}</h2>
-
+<!-- Formulierkaart -->
 <div class="card p-4 mx-auto" style="max-width: 700px;">
     <form method="POST">
 
-        <!-- Title -->
+        <!-- Evidence titel -->
         <div class="mb-3">
             <label class="form-label">Title</label>
             <input type="text" name="title" class="form-control" required>
         </div>
 
-        <!-- Evidence Type -->
+        <!-- Type van bewijs -->
         <div class="mb-3">
             <label class="form-label">Evidence Type</label>
             <select id="evidence_type" name="type_select" class="form-select">
@@ -28,31 +28,31 @@
             </select>
         </div>
 
-        <!-- Custom Evidence Type -->
+        <!-- Custom Evidence Type: Alleen zichtbaar wanneer 'Other' gekozen wordt -->
         <div class="mb-3" id="custom_type_group" style="display: none;">
             <label class="form-label">Custom Evidence Type</label>
             <input type="text" name="custom_type" id="custom_type" class="form-control">
         </div>
 
-        <!-- Source -->
+        <!-- Bron van het bewijs -->
         <div class="mb-3">
             <label class="form-label">Source</label>
             <input type="text" name="source" class="form-control" required>
         </div>
 
-        <!-- Description -->
+         <!-- Beschrijving -->
         <div class="mb-3">
             <label class="form-label">Description</label>
             <textarea name="description" class="form-control" rows="3" required></textarea>
         </div>
 
-        <!-- Attachment -->
+        <!-- Optionele link naar een document of bestand -->
         <div class="mb-3">
             <label class="form-label">Attachment URL (PDF, link, etc.)</label>
             <input type="text" name="attachment_url" class="form-control">
         </div>
 
-        <!-- NEW CONFIDENCE LEVEL -->
+        <!-- Confidence score van het aangeleverde bewijs -->
         <div class="mb-3">
             <label class="form-label">Confidence Level</label>
             <select name="new_confidence" class="form-select" required>
@@ -70,14 +70,15 @@
                 <option value="10">Launch Data (10.0) - Real usage data after launch; strongest evidence.</option>
             </select>
         </div>
-
+        <!-- Verzenden -->
         <button class="btn btn-primary w-100">Add Evidence</button>
     </form>
 </div>
-
+<!-- Script om custom type veld te tonen/verbergen -->
 <script>
 document.getElementById("evidence_type").addEventListener("change", function () {
     const custom = document.getElementById("custom_type_group");
+    /* Toon custom veld enkel wanneer "Other" geselecteerd is*/
     if (this.value === "Other") {
         custom.style.display = "block";
     } else {
