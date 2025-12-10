@@ -371,20 +371,14 @@ select[multiple] option:checked {
     box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
 }
 
-/* Stijl voor de 'Yes' en 'No' knop (gebruikt uw eigen groene kleur) */
+/* Stijl voor de 'Yes' en 'No' knop */
+
 .btn-decision-yes {
     background-color: transparent;
     color: #28a745;
     border: 1px solid #28a745;
     font-weight: 600;
     transition: all 0.2s ease-in-out;
-}
-
-.btn-decision-yes:hover {
-    background-color: #28a745;
-    color: #ffffff;
-    border-color: #218838;
-    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
 }
 
 .btn-decision-no {
@@ -395,11 +389,18 @@ select[multiple] option:checked {
     transition: all 0.2s ease-in-out;
 }
 
-.btn-decision-no:hover {
+.btn-decision-yes:hover,
+button.table-btn.btn-decision-yes.is-selected {                         /* zorgt ervoor dat de knop groen blijft wanneer deze wordt aangeklikt */
+    background-color: #28a745;
+    color: #ffffff;
+    border-color: #218838;
+}
+
+.btn-decision-no:hover,
+button.table-btn.btn-decision-no.is-selected {
     background-color: #dc3545;
     color: #ffffff;
     border-color: #c82333;
-    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.4);
 }
 
 /* Knop overrides voor de kaart */

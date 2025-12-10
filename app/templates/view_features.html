@@ -10,11 +10,13 @@
 
 <!-- TOP ACTION BUTTONS -->
 <div class="mb-3 d-flex justify-content-center gap-2 flex-wrap">
-    <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom"> {# Link naar “add_feature” route met project_id parameter #}
+    <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom">
+        {# Link naar “add_feature” route met project_id parameter #}
         + Add New Feature
     </a>
 
-    <a href="{{ url_for('main.vectr_chart', project_id=project.id_project) }}" class="btn btn-vectr btn-sm"> {# Link naar VECTR chart pagina voor dit project #}
+    <a href="{{ url_for('main.vectr_chart', project_id=project.id_project) }}" class="btn btn-vectr btn-sm"> {# Link
+        naar VECTR chart pagina voor dit project #}
         📈 VECTR Chart
     </a>
 </div>
@@ -31,7 +33,7 @@
     {% else %}
     <div class="table-responsive"> {# Bootstrap: zorgt dat de tabel horizontaal kan scrollen op kleine schermen #}
         <table class="table table-striped table-bordered align-middle">
-            
+
             <!-- TABLE HEADER -->
             <thead class="table-light">
                 <tr>
@@ -89,11 +91,13 @@
                                 <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='confidence', direction='asc') }}"
                                     class="sort-icon {% if current_sort == 'confidence' and current_direction == 'asc' %}active{% endif %}">
                                     &#9650;
-                                </a> {# Link die Confidence oplopend sorteert; active class als dit de huidige sort is #}
+                                </a> {# Link die Confidence oplopend sorteert; active class als dit de huidige sort is
+                                #}
                                 <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='confidence', direction='desc') }}"
                                     class="sort-icon {% if current_sort == 'confidence' and current_direction == 'desc' %}active{% endif %}">
                                     &#9660;
-                                </a> {# Link die Confidence aflopend sorteert; active class als dit de huidige sort is #}
+                                </a> {# Link die Confidence aflopend sorteert; active class als dit de huidige sort is
+                                #}
                                 {% else %}
                                 <span class="sort-icon-placeholder">&#9650;</span>
                                 <span class="sort-icon-placeholder">&#9660;</span>
@@ -106,138 +110,130 @@
                     <th class="text-center">VECTR Score</th> {# Samengestelde score (vermoedelijk berekend) #}
                     <th class="text-center">Horizon</th> {# Horizon in maanden #}
 
-                    
+
                     <!-- DECISION COLUMN (SORTABLE) -->
                     <th class="text-center">Decision (set)</th> {# Knoppen om decision te zetten #}
                     <th class="text-center">Decision (status)</th> {# Laatste decision status tonen #}
-                    
+
                     <!-- EVIDENCE COLUMN -->
                     <th class="text-center">Evidence</th> {# Knoppen voor evidence toevoegen/bekijken #}
                     <!-- ACTIONS COLUMN -->
-                    <th class="text-center col-actions">Actions</th> {# Acties zoals edit/delete; col-actions is extra CSS-hook voor breedte/styling #}
+                    <th class="text-center col-actions">Actions</th> {# Acties zoals edit/delete; col-actions is extra
+                    CSS-hook voor breedte/styling #}
                 </tr>
             </thead>
 
             <!-- TABLE BODY (FEATURE ROWS) -->
             <tbody class="text-center">
-                {% for feature in features %} {# Loop over alle features die vanuit Flask worden meegegeven #}
+                {% for feature in features %}
                 <tr>
+
+                    {#
+                    *** DEZE REGEL IS DE OPLOSSING! ***
+                    Definieer de variabele BOVEN de cellen (<td>) die deze variabele nodig hebben.
+                        Hierdoor is 'latest_decision' beschikbaar voor de knoppen en de status.
+                        #}
+                        {% set latest_decision =
+                        feature.decisions
+                        | sort(attribute='created_at', reverse=True)
+                        | first
+                        %}
+
 
                     <td>{{ feature.name_feature }}</td>
 
                     <td>
                         {% if feature.roi_percent is not none %}
-                        {{ "%.1f" | format(feature.roi_percent) }}% {# ROI als 1 decimaal + procentteken #}
-                        {% else %} N/A {% endif %} {# Als ROI niet berekend/aanwezig is #}
+                        {{ "%.1f" | format(feature.roi_percent) }}%
+                        {% else %} N/A {% endif %}
                     </td>
 
                     <td>
                         {% if feature.ttv_weeks is not none %}
-                        {{ "%.0f" | format(feature.ttv_weeks) }} {# TTV afgerond naar 0 decimalen (hele weken) #}
-                        {% else %} N/A {% endif %} {# Als TTV niet berekend/aanwezig is #}
+                        {{ "%.0f" | format(feature.ttv_weeks) }}
+                        {% else %} N/A {% endif %}
                     </td>
 
                     <td>
                         {% if feature.quality_score is not none %}
-                        {{ "%.2f" | format(feature.quality_score) }} {# Confidence met 2 decimalen #}
-                        {% else %} N/A {% endif %} {# Als Confidence niet berekend/aanwezig is #}
+                        {{ "%.2f" | format(feature.quality_score) }}
+                        {% else %} N/A {% endif %}
                     </td>
 
                     <td>
                         {% if feature.vectr_score is not none %}
-                        <strong>{{ feature.vectr_score | round(2) }}</strong> {# VECTR score afgerond naar 2 decimalen en vet weergegeven #}
+                        <strong>{{ feature.vectr_score | round(2) }}</strong>
                         {% else %}
-                        - {# Geen score beschikbaar #}
+                        -
                         {% endif %}
                     </td>
 
-                    <td>{{ feature.horizon }} Months</td> {# Horizon wordt als tekst getoond; veronderstelt dat horizon een getal is #}
+                    <td>{{ feature.horizon }} Months</td>
 
-                    <!-- DECISION BUTTONS & STATUS -->
                     <td>
-                        <div class="d-flex flex-column align-items-center gap-2"> {# Flex kolom: buttons onder elkaar; align-items-center centreert; gap-2 ruimte ertussen #}
+                        <div class="d-flex flex-column align-items-center gap-2">
 
-                            <!-- "Yes" BUTTON -->
                             <form method="POST"
                                 action="{{ url_for('main.set_feature_decision', feature_id=feature.id_feature, decision_value='Yes') }}"
                                 style="display:inline;">
-                                <button type="submit" class="btn-base table-btn btn-decision-yes"
+                                <button type="submit" class="btn-base table-btn btn-decision-yes 
+                        {# CHECKT OF latest_decision BESTAAT EN DE TYPE 'Approved' IS #}
+                        {% if latest_decision and latest_decision.decision_type == 'Approved' %}is-selected{% endif %}"
                                     title="Keur de feature goed">
                                     Yes
-                                </button> {# De knop die de beslissing 'Yes' (Approved) via POST verstuurt #}
+                                </button>
                             </form>
-
-                            <!-- "No" BUTTON -->
                             <form method="POST"
                                 action="{{ url_for('main.set_feature_decision', feature_id=feature.id_feature, decision_value='No') }}"
                                 style="display:inline;">
-                                <button type="submit" class="btn-base table-btn btn-decision-no"
+                                <button type="submit" class="btn-base table-btn btn-decision-no 
+                        {# CHECKT OF latest_decision BESTAAT EN DE TYPE 'Rejected' IS #}
+                        {% if latest_decision and latest_decision.decision_type == 'Rejected' %}is-selected{% endif %}"
                                     title="Keur de feature af">
                                     No
-                                </button> {# De knop die de beslissing 'No' (Rejected) via POST verstuurt #}
+                                </button>
                             </form>
 
                         </div>
                     </td>
-                    
-                    <!-- DECISION (STATUS) - LATEST DECISION -->
-                    <td>
-                        {# 1. Haal de meest recente beslissing op uit de Decisions lijst. #}
-                        {% set latest_decision = 
-                            feature.decisions 
-                            | sort(attribute='created_at', reverse=True) 
-                            | first
-                        %} {# Sorteert feature.decisions op created_at aflopend en neemt de eerste (meest recente) #}
 
+                    <td>
                         {% if latest_decision %}
-                            {# 2. Toon de beslissing met een CSS klasse voor de styling (bv. decision-approved) #}
-                            <span class="decision-{{ latest_decision.decision_type | lower }}">
-                                {{latest_decision.decision_type }}
-                            </span>
+                        <span class="decision-{{ latest_decision.decision_type | lower }}">
+                            {{latest_decision.decision_type }}
+                        </span>
                         {% else %}
-                            {# 3. Toon 'Nog geen beslissing' als er geen Decision records zijn. #}
-                            <span class="decision-pending">No decision yet
-                            </span>
+                        <span class="decision-pending">No decision yet
+                        </span>
                         {% endif %}
                     </td>
 
-                    <!-- EVIDENCE BUTTONS -->
                     <td>
                         <div class="d-flex flex-column align-items-center gap-2">
-
-                            <!-- "+ Evidence" BUTTON -->
                             <a href="{{ url_for('main.add_evidence', feature_id=feature.id_feature) }}"
                                 class="btn btn-success table-btn btn-sm">
                                 + Evidence
-                            </a> {# Link om evidence toe te voegen voor deze feature #}
-                            
-                            <!-- "View" BUTTON -->
+                            </a>
                             <a href="{{ url_for('main.view_evidence', feature_id=feature.id_feature) }}"
                                 class="btn btn-view table-btn btn-sm">
                                 View
-                            </a> {# Link om evidence-lijst te bekijken voor deze feature #}
-
+                            </a>
                         </div>
                     </td>
 
-                    <!-- ACTIONS -->
                     <td>
                         <div class="d-flex flex-column align-items-center gap-2">
-
-                            <!-- "Edit" BUTTON -->
                             <a href="{{ url_for('main.edit_feature', feature_id=feature.id_feature) }}"
                                 class="btn btn-edit table-btn btn-sm">
                                 Edit
-                            </a> {# Link naar de edit_feature pagina voor deze feature #}
-
-                            <!-- "Delete" BUTTON -->
+                            </a>
                             <form action="{{ url_for('main.delete_feature', feature_id=feature.id_feature) }}"
-                                method="post"> {# POST form voor delete (veiliger dan delete via GET) #}
+                                method="post">
                                 <button type="submit"
                                     onclick="return confirm('Are you sure you want to delete this feature?');"
                                     class="btn btn-danger-custom table-btn btn-sm">
                                     Delete
-                                </button> {# confirm(): browser popup; return false cancelt submit als gebruiker “Cancel” kiest #}
+                                </button>
                             </form>
 
                         </div>

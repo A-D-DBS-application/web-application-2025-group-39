@@ -12,6 +12,7 @@ import matplotlib.patches as patches
 from app.constants import CONF_MIN, CONF_LOW_THRESHOLD, CONF_MID_HIGH_THRESHOLD, CONF_MAX, TTV_MIN, TTV_SLOW_THRESHOLD, TTV_MID_THRESHOLD, TTV_MAX
 from app.utils.calculations import calc_roi, calc_ttv, to_numeric
 from app.utils.form_helpers import prepare_vectr_chart_data, require_login, require_role, require_company_ownership, parse_project_form, parse_feature_form, parse_roadmap_form, parse_milestone_form, parse_evidence_form, recompute_feature_confidence
+from sqlalchemy.orm import joinedload
 
 # Blueprint
 main = Blueprint("main", __name__)
@@ -407,8 +408,8 @@ def view_features(project_id):
         direction = "asc"                                                       # De sortering wordt vastgezet op een neutrale, standaardkolom (naam) in oplopende volgorde.
 
 
-    features_query = Features_ideas.query.filter_by(id_project=project_id)
-
+    features_query = Features_ideas.query.filter_by(id_project=project_id).options(joinedload(Features_ideas.decisions)) # Laadt de decisions voor elke feature
+        
     if sort_by == "roi":
         column = Features_ideas.roi_percent                                     # Sorteren op de berekende ROI in percentage
     elif sort_by == "ttv":
@@ -1230,6 +1231,10 @@ def set_feature_decision(feature_id, decision_value):
 
     # 5) Nieuwe Decision record opslaan
     try:
+        # Save the value the template expects
+        feature.decision = decision_type  
+        db.session.add(feature)
+
         d = Decision(
             id_feature=feature.id_feature,
             id_company=user.id_company,
@@ -1237,6 +1242,7 @@ def set_feature_decision(feature_id, decision_value):
             reasoning=None,
         )
         db.session.add(d)
+
         db.session.commit()
 
         flash(f"Beslissing opgeslagen: {decision_type}", "success")
@@ -1247,7 +1253,6 @@ def set_feature_decision(feature_id, decision_value):
         print(f"Fout bij het instellen van de beslissing: {e}")
         flash("Er is een fout opgetreden bij het verwerken van de beslissing.", "danger")
         return redirect(url_for("main.view_features", project_id=feature.id_project))
-
 
 
 #route voor deraction balk:
