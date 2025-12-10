@@ -78,6 +78,13 @@
                   Edit
                 </a> {# Link naar edit_roadmap route met roadmap_id #}
               </div>
+
+              <div class="mt-3 mt-md-0">
+                <a href="{{ url_for('main.roadmap_optimize', roadmap_id=r.id_roadmap) }}"
+                   class="btn btn-edit btn-sm">
+                  Optimaliseer Features
+                </a> {# Link naar optimize roadmap route met roadmap_id #}
+              </div>
             {% endif %}
           </div>
         </div>

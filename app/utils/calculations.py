@@ -60,3 +60,18 @@ def calculate_vectr_scores(features_list):                             # Bereken
         setattr(f, "vectr_score", round(vectr_score, 2))
         
     return features_list                                              # Retourneer de bijgewerkte lijst
+
+
+# app/utils/calculations.py (TOEVOEGEN AAN DIT BESTAND)
+
+# ... (bestaande functies calc_roi, calc_ttv, to_numeric, calculate_vectr_scores)
+
+def calculate_feature_cost(feature):
+    """
+    Berekent de totale ontwikkelingskosten van een feature (€).
+    Zorgt voor float conversie van de inputs.
+    """
+    # Gebruik to_numeric uit dit bestand om float conversie te verzekeren
+    invest_hours = to_numeric(feature.investment_hours) 
+    hourly_rate = to_numeric(feature.hourly_rate) 
+    return invest_hours * hourly_rate

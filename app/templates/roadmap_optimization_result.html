@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Optimization Result for {{ roadmap.id_roadmap }}{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4 text-center">Roadmap Optimalisatie Resultaten</h2>
+<h3 class="mb-4 text-center">Project: {{ project.project_name }}</h3>
+
+<div class="card p-4 mb-4">
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Strategische Capaciteit</h4>
+            <ul>
+                <li>Beschikbare Tijd (Uren/Sprint): <strong>{{ max_time }}</strong></li>
+                <li>Beschikbaar Budget: <strong>€ {{ "{:,.0f}".format(max_cost) }}</strong></li>
+                <li>Strategische Weging (Alpha): <strong>{{ alpha | float | round(2) }}</strong> (Alpha=1.0 is Tijd-focus)</li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h4>Optimalisatie-actie</h4>
+            <p>Pas de strategische weging aan om het resultaat te beïnvloeden:</p>
+            <form method="POST" action="{{ url_for('main.roadmap_optimize', roadmap_id=roadmap.id_roadmap) }}">
+                <div class="input-group">
+                    <input type="number" step="0.1" min="0.0" max="1.0" name="alpha" value="{{ alpha | float | round(1) }}" class="form-control" required>
+                    <button type="submit" class="btn btn-primary-custom">Opnieuw Optimaliseren</button>
+                </div>
+                <small class="form-text text-muted">0.0 = Kosten Focus, 1.0 = Tijd Focus</small>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered align-middle">
+        <thead class="table-light text-center">
+            <tr>
+                <th>Status</th>
+                <th>Feature Naam</th>
+                <th>VECTR Score (Waarde)</th>
+                <th>Tijd (Uren)</th>
+                <th>Kosten (€)</th>
+            </tr>
+        </thead>
+        <tbody class="text-center">
+            {% for item in features_data %}
+            <tr class="{% if item.is_selected %}table-success{% else %}table-danger{% endif %}">
+                <td>
+                    {% if item.is_selected %}
+                        <strong>✅ Geselecteerd</strong>
+                    {% else %}
+                        <strong>❌ Niet Geselecteerd</strong>
+                    {% endif %}
+                </td>
+                <td class="text-start">{{ item.feature.name_feature }}</td>
+                <td>{{ item.feature.vectr_score | round(2) if item.feature.vectr_score is not none else 'N/A' }}</td>
+                <td>{{ item.feature.investment_hours if item.feature.investment_hours is not none else 'N/A' }}</td>
+                <td>€ {{ "{:,.0f}".format(item.cost_weight) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}
+
+{% macro calculate_feature_cost(feature) %}
+    {% set invest_hours = feature.investment_hours if feature.investment_hours is not none else 0 %}
+    {% set hourly_rate = feature.hourly_rate if feature.hourly_rate is not none else 0 %}
+    {% set cost = invest_hours * hourly_rate %}
+    {{ "{:,.0f}".format(cost) }}
+{% endmacro %}
