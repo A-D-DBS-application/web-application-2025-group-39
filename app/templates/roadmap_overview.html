@@ -8,9 +8,6 @@
 <!-- HEADER + TOP-RIGHT NAV -->
 <div class="roadmap-header"> {# Wrapper voor de paginaheader (layout/styling in CSS) #}
   <h2>Roadmap for {{ project.project_name }}</h2>
-  <div class="top-right"> {# Container om knop rechtsboven te positioneren (via CSS) #}
-    <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-nav btn-sm">Projects Overview</a> {# Link terug naar projecten-overzicht #}
-  </div> 
 </div>
 
 <!-- EMPTY STATE (NO ROADMAPS) -->
@@ -78,7 +75,7 @@
               <div class="mt-3 mt-md-0">
                 <a href="{{ url_for('main.edit_roadmap', roadmap_id=r.id_roadmap) }}"
                    class="btn btn-edit btn-sm">
-                  Edit Roadmap
+                  Edit
                 </a> {# Link naar edit_roadmap route met roadmap_id #}
               </div>
             {% endif %}

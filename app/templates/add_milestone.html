@@ -4,16 +4,11 @@
 {% block body_class %}milestone-body{% endblock %}
 
 {% block content %}
+<!-- PAGETITLE -->
+<h2 class="text-center mb-4">Add Milestone</h2>
+
 <div class="milestone-form">
 
-    <!-- PAGETITLE -->
-    <h2 class="text-center mb-4">Add Milestone</h2>
-
-    <!-- NAVIGATION BACK TO ROADMAP -->
-    <a href="{{ url_for('main.roadmap_overview', project_id=roadmap.id_project) }}" class="btn btn-nav mb-3">
-        {# Link terug naar roadmap-overview van hetzelfde project #}
-        ← Back to Roadmap
-    </a>
     <!-- FORM (ADD MILESTONE) -->
     <form method="POST">
 
@@ -78,12 +73,17 @@
             </small> {# Helpertekst om multi-select gedrag uit te leggen #}
         </div>
 
-        <!-- SUBMIT -->
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary-custom px-4">
-                Add Milestone
+        <div class="col-12">
+            <button type="submit" class="btn btn-base btn-primary-custom w-100 mb-2">
+            Add Milestone
             </button>
+
+            <a href="{{ url_for('main.roadmap_overview', project_id=roadmap.id_project) }}"
+            class="btn btn-base btn-secondary-custom w-100 mt-2">
+            Cancel
+            </a>
         </div>
+
 
     </form>
 
