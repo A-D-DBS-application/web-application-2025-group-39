@@ -1,5 +1,6 @@
 /* ===========================
-   GLOBAL STYLING
+   1. GLOBAL STYLING
+   Algemene stijlen voor body, lettertypes en basiskleuren.
    =========================== */
 
 body {
@@ -24,10 +25,55 @@ h6 {
     margin-top: 2rem;                                    /* Verhoog de ruimte boven de titel */
 }
 
+/* Formulier Elementen */
+label {
+    font-weight: 500;
+    margin-bottom: 6px;
+    display: block;                                      /* Zorgt dat het element de volledige breedte inneemt */
+    color: #4b5563;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    box-sizing: border-box;                              /* Verandert hoe de breedte en hoogte worden berekend (inclusief padding/border) */
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus,
+select:focus {
+    border-color: #1E46D0;
+    box-shadow: 0 0 0 3px rgba(30, 70, 208, 0.2);
+    outline: none;                                       /* Verwijdert de standaard focus-rand van de browser */
+}
+
+/* Multiselect Specifiek */
+select[multiple] {
+    height: auto;
+    min-height: 150px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+select[multiple] option {
+    padding: 6px;
+    border-radius: 4px;
+}
+
+select[multiple] option:checked {
+    background-color: #1E46D0 !important;
+    color: #ffffff;
+}
+
 /* ======================================
-    NAVIGATIEBALK STYLING (PROFESSIONEEL)
+    2. LAYOUT & NAVIGATIE
+    Stijlen voor de algemene paginastructuur.
    ====================================== */
 
+/* NAVIGATIEBALK STYLING (PROFESSIONEEL) */
 .navbar {
     display: flex;                                       /* Schakelt flexbox lay-out in voor de container */
     align-items: center;                                 /* Lijn flex-items verticaal in het midden uit */
@@ -83,7 +129,14 @@ h6 {
     align-items: center;
     width: auto;
     justify-content: flex-end;                           /* Lijn flex-items uit aan het einde van de hoofd-as */
-    gap: 0;
+    gap: 15px;
+}
+
+
+/* Dropdown container (Projects) */
+.nav-dropdown {
+    position: relative;
+    display: inline-block;                               /* Toon als inline-level container die zich gedraagt als een blok */
 }
 
 /* Dropdown trigger (Projects knop) */
@@ -97,51 +150,6 @@ h6 {
     font-size: 10px;
     margin-left: 6px;
     transition: transform 0.2s;
-}
-
-/* Knoppen rechts (Login/Register/Profiel/Logout) */
-.btn-login,
-.btn-register {
-    padding: 8px 18px;
-    margin-left: 15px;
-    border-radius: 6px;                                  /* Voegt afgeronde hoeken toe aan een element */
-    font-weight: 600;
-    text-align: center;                                  /* Lijn de tekst horizontaal in het midden uit */
-    transition: all 0.2s ease;
-    text-decoration: none;
-    font-size: 14px;
-}
-
-/* Primaire knop (Login/Profiel) */
-.btn-login {
-    color: #ffffff;
-    background-color: #1E46D0;
-    border: 1px solid #1E46D0;                           /* Definieert de rand rondom een element */
-}
-
-.btn-login:hover {
-    background-color: #163BA6;
-    border-color: #163BA6;
-    box-shadow: 0 4px 10px rgba(30, 70, 208, 0.3);
-}
-
-/* Secundaire knop (Register/Logout) */
-.btn-register {
-    color: #1E46D0;
-    background-color: transparent;                       /* Maakt de achtergrond transparant */
-    border: 1px solid #1E46D0;
-}
-
-.btn-register:hover {
-    color: #ffffff;
-    background-color: #1E46D0;
-    box-shadow: 0 2px 5px rgba(30, 70, 208, 0.2);
-}
-
-/* Dropdown container (Projects) */
-.nav-dropdown {
-    position: relative;
-    display: inline-block;                               /* Toon als inline-level container die zich gedraagt als een blok */
 }
 
 /* Dropdown inhoud (lijst met projecten) */
@@ -165,10 +173,7 @@ h6 {
     display: block;                                      /* Toon het element als een blok-level element */
 }
 
-/* ==================================
-   PROJECT COLLAPSE MENU (VERTICAAL)
-   ================================== */
-
+/* Project Collapse Menu Styling */
 /* Stijl voor de projectnaam link (de trigger) */
 .project-collapse-trigger {
     display: flex !important;
@@ -236,8 +241,229 @@ h6 {
 }
 
 /* ===========================
-   FLASH MESSAGE STYLING (Aangepast aan nieuwe stijl)
+   3. KNOPPEN & ACTIES
+   Standaard en contextuele knopstijlen.
    =========================== */
+
+/* Basis voor alle knoppen */
+.btn-base {
+    min-width: 90px;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+/* Primaire knop (Login/Profiel/Add/Save/Make Decision/View) */
+.btn-login,
+.btn-primary-custom,
+.btn-decision-make,
+.btn-view {
+    color: #ffffff;
+    background-color: #1E46D0;
+    border: 1px solid #1E46D0;                           /* Definieert de rand rondom een element */
+    font-weight: 600;
+}
+
+.btn-login:hover,
+.btn-primary-custom:hover,
+.btn-decision-make:hover,
+.btn-view:hover {
+    background-color: #163BA6;
+    border-color: #163BA6;
+    box-shadow: 0 4px 10px rgba(30, 70, 208, 0.3);
+}
+
+/* Secundaire knop (Register/Logout/Terug/All Features) */
+.btn-register {
+    color: #1E46D0;
+    background-color: transparent;                       /* Maakt de achtergrond transparant */
+    border: 1px solid #1E46D0;
+    font-weight: 600;
+}
+
+.btn-register:hover {
+    color: #ffffff;
+    background-color: #1E46D0;
+    box-shadow: 0 2px 5px rgba(30, 70, 208, 0.2);
+}
+
+.btn-secondary-custom {
+    background-color: #6c757d;
+    color: #fff;
+    border-color: #6c757d;
+}
+
+.btn-secondary-custom:hover {
+    background-color: #5a6268;
+    border-color: #5a6268;
+}
+
+/* Navigatieknoppen (secundaire/subtiele look) */
+.btn-nav {
+    background-color: #e5e7eb;
+    color: #4b5563;
+    border-color: #d1d5db;
+}
+
+.btn-nav:hover {
+    background-color: #d1d5db;
+    color: #374151;
+    box-shadow: 0 3px 8px rgba(108, 117, 125, 0.4);
+}
+
+/* Edit knoppen (lichte achtergrond, blauwe tekst) */
+.btn-edit {
+    color: #1E46D0;
+    background-color: #f3f4f6;
+    border-color: #1E46D0;
+}
+
+.btn-edit:hover {
+    background-color: #e5e7eb;
+    border-color: #9ca3af;
+    box-shadow: 0 2px 6px rgba(30, 70, 208, 0.2);
+}
+
+/* Evidence knoppen */
+.btn-success {
+    color: #fff;                                         /* Tekstkleur (wit) */
+    background-color: #00711c;                           /* Achtergrondkleur (middelgroen) */
+    border-color: #005013;                               /* Randkleur */
+}
+
+.btn-success:hover,
+.btn-success:focus {
+    background-color: #005e19;                           /* Iets donkerder groen */
+    border-color: #063510;
+    box-shadow: 0 4px 10px rgba(0, 113, 28, 0.4);
+}
+
+/* Logout & Delete knoppen (Gevaar) */
+.btn-danger-custom {
+    background-color: #dc3545;
+    color: #fff;
+    border-color: #dc3545;
+}
+
+.btn-danger-custom:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
+}
+
+/* Specifieke styling voor de VECTR Chart knop (Groen) */
+.btn-vectr {
+    background-color: #28a745;
+    border-color: #218838;
+    color: #fff;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-vectr:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
+}
+
+/* Stijl voor de 'Yes' en 'No' knop (gebruikt uw eigen groene kleur) */
+.btn-decision-yes {
+    background-color: transparent;
+    color: #28a745;
+    border: 1px solid #28a745;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-decision-yes:hover {
+    background-color: #28a745;
+    color: #ffffff;
+    border-color: #218838;
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
+}
+
+.btn-decision-no {
+    background-color: transparent;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-decision-no:hover {
+    background-color: #dc3545;
+    color: #ffffff;
+    border-color: #c82333;
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.4);
+}
+
+/* Knop overrides voor de kaart */
+.btn-edit-custom {
+    color: #495057;
+    background-color: #f1f1f1;
+    border-color: #e0eeef;
+    transition: background-color 0.2s;
+}
+
+.btn-edit-custom:hover {
+    background-color: #e5e5e5;
+    color: #333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Knop Iconen */
+.icon-sm {
+    font-size: 0.8rem;
+    margin-right: 5px;
+}
+
+/* Knoppen in tabellen */
+.table-btn {
+    min-width: 100px;
+    height: 36px;                                        /* Definieert de hoogte van een element */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    border-radius: 6px;
+    padding: 0;
+}
+
+/* Knoppen binnen de kaartacties */
+.btn-card-action {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+input[type="submit"] {
+    margin-top: 10px;
+    background-color: #1E46D0;
+    color: white;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #163BA6;
+}
+
+/* ===========================
+   4. BERICHTEN & STATUS
+   Flash messages en beslissingsbadges.
+   =========================== */
+
+/* FLASH MESSAGE STYLING */
 .success,
 .error,
 .info {
@@ -266,131 +492,7 @@ h6 {
     border: 1px solid #bee5eb;
 }
 
-/* ===========================
-   BUTTON STYLING (Aangepast aan nieuwe stijl)
-   =========================== */
-
-/* Basis voor alle knoppen */
-.btn-base {
-    min-width: 90px;
-    font-weight: 600;
-    border-radius: 6px;
-    padding: 8px 16px;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
-}
-
-/* Top-right navigatieknoppen (nu secundaire/subtiele look) */
-.btn-nav {
-    background-color: #e5e7eb;
-    color: #4b5563;
-    border-color: #d1d5db;
-}
-
-.btn-nav:hover {
-    background-color: #d1d5db;
-    color: #374151;
-}
-
-/* Logout & Delete knoppen */
-.btn-danger-custom {
-    background-color: #dc3545;
-    color: #fff;
-    border-color: #dc3545;
-}
-
-.btn-danger-custom:hover {
-    background-color: #c82333;
-    border-color: #bd2130;
-    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.4);
-}
-
-/* Edit knoppen (nu lichte achtergrond, blauwe tekst) */
-.btn-edit {
-    color: #1E46D0;
-    background-color: #f3f4f6;
-    border-color: #d1d5db;
-}
-
-.btn-edit:hover {
-    background-color: #e5e7eb;
-    border-color: #9ca3af;
-}
-
-/* Make Decision & View knoppen (nu primaire actie) */
-.btn-decision-make,
-.btn-view {
-    background-color: #1E46D0;
-    color: #fff;
-    border-color: #1E46D0;
-}
-
-/* Hover state */
-.btn-decision-make:hover,
-.btn-view:hover {
-    background-color: #163BA6;
-    border-color: #163BA6;
-    box-shadow: 0 2px 8px rgba(30, 70, 208, 0.4);
-}
-
-/* Specifieke styling voor de VECTR Chart knop (Groen) */
-.btn-vectr {
-    background-color: #28a745;
-    border-color: #218838;
-    color: #fff;
-    font-weight: 600;
-    padding: 8px 18px;
-    border-radius: 6px;
-    transition: all 0.2s ease-in-out;
-}
-
-.btn-vectr:hover {
-    background-color: #218838;
-    border-color: #1e7e34;
-}
-
-/* Primary acties (Add, Save) */
-.btn-primary-custom {
-    background-color: #1E46D0;
-    color: #fff;
-    border-color: #1E46D0;
-}
-
-.btn-primary-custom:hover {
-    background-color: #163BA6;
-    border-color: #163BA6;
-}
-
-
-/* Secondary acties (Terug, All Features) */
-.btn-secondary-custom {
-    background-color: #6c757d;
-    color: #fff;
-    border-color: #6c757d;
-}
-
-.btn-secondary-custom:hover {
-    background-color: #5a6268;
-    border-color: #5a6268;
-}
-
-/* Zorgt dat alle knoppen in tabellen dezelfde grootte hebben */
-.table-btn {
-    min-width: 100px;
-    height: 36px;                                        /* Definieert de hoogte van een element */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 14px;
-    border-radius: 6px;
-    padding: 0;
-}
-
-
-/* ===========================
-   FLASH MESSAGES POSITIONING
-   =========================== */
+/* FLASH MESSAGES POSITIONERING */
 .flash-container {
     position: fixed;                                     /* Stelt de positioneringsmethode in (t.o.v. de viewport) */
     top: 80px;
@@ -404,9 +506,46 @@ h6 {
     margin-bottom: 10px;
 }
 
+/* Decision Status Styling */
+
+/* Groene badge voor Yes / Approved */
+.decision-approved,
+.decision-yes {
+    font-weight: 600;
+    color: #1a7e4b;
+    background-color: #e6f8ef;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Rode badge voor No / Rejected */
+.decision-rejected,
+.decision-no {
+    font-weight: 600;
+    color: #a72834;
+    background-color: #fce7e8;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Gele/Oranje badge voor nog geen beslissing */
+.decision-pending {
+    font-weight: 600;
+    color: #9c6800;
+    background-color: #fff8e6;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
 /* ===========================
-   INDEX PAGE (Aangepast aan nieuwe stijl)
+   5. PAGINA LAYOUTS
+   Stijlen voor specifieke pagina's.
    =========================== */
+
+/* --- INDEX PAGE --- */
 .welcome-container {
     max-width: 700px;
     background: #ffffff;
@@ -459,9 +598,7 @@ h6 {
     font-weight: 700;
 }
 
-/* ===========================
-   LOGIN PAGE (Aangepast aan nieuwe stijl)
-   =========================== */
+/* --- LOGIN PAGE --- */
 .login-container {
     background-color: #ffffff;
     padding: 30px 40px;
@@ -483,52 +620,13 @@ h6 {
     margin-bottom: 18px;
 }
 
-label {
-    font-weight: 500;
-    margin-bottom: 6px;
-    display: block;                                      /* Zorgt dat het element de volledige breedte inneemt */
-    color: #4b5563;
-}
-
-input,
-select {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #d1d5db;
-    box-sizing: border-box;                              /* Verandert hoe de breedte en hoogte worden berekend (inclusief padding/border) */
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-input:focus,
-select:focus {
-    border-color: #1E46D0;
-    box-shadow: 0 0 0 3px rgba(30, 70, 208, 0.2);
-    outline: none;                                       /* Verwijdert de standaard focus-rand van de browser */
-}
-
-input[type="submit"] {
-    margin-top: 10px;
-    background-color: #1E46D0;
-    color: white;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-input[type="submit"]:hover {
-    background-color: #163BA6;
-}
-
 .register-link {
     text-align: center;
     margin-top: 15px;
     font-size: 14px;
 }
 
-/* ===========================
-   REGISTER PAGE (Aangepast aan nieuwe stijl)
-   =========================== */
+/* --- REGISTER PAGE --- */
 .register-container {
     background-color: #ffffff;
     padding: 30px 40px;
@@ -552,9 +650,7 @@ input[type="submit"]:hover {
     font-size: 14px;
 }
 
-/* ===========================
-   DASHBOARD PAGE (Aangepast aan nieuwe stijl)
-   =========================== */
+/* --- DASHBOARD PAGE --- */
 .dashboard-wrapper {
     min-height: 80vh;                                    /* Definieert de minimale hoogte van een element (vh = viewport height) */
     display: flex;
@@ -610,9 +706,7 @@ input[type="submit"]:hover {
     z-index: 998;
 }
 
-/* ===========================
-   PROJECTS PAGE (Aangepast aan nieuwe stijl)
-   =========================== */
+/* --- PROJECTS PAGE --- */
 .projects-wrapper {
     max-width: 1200px;
     margin: 30px auto;
@@ -627,8 +721,7 @@ input[type="submit"]:hover {
     padding: 30px;
 }
 
-
-/* Stijl van de Project Kaart (de glass-card simuleren) */
+/* Stijl van de Project Kaart */
 .project-card {
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
@@ -658,7 +751,7 @@ input[type="submit"]:hover {
     margin: 0;
 }
 
-/* Project Initialen Cirkel (simulatie van de gradient-primary div) */
+/* Project Initialen Cirkel */
 .project-initials-circle {
     width: 40px;
     height: 40px;
@@ -692,45 +785,12 @@ input[type="submit"]:hover {
     color: #333;
 }
 
-/* Knoppen binnen de kaartacties */
-.btn-card-action {
-    padding: 6px 10px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Knoppen Iconen */
-.icon-sm {
-    font-size: 0.8rem;
-    margin-right: 5px;
-}
-
-
 /* Footer Actions (Edit/Delete) */
 .card-footer-actions {
     border-color: #ededed !important;
 }
 
-/* Custom button overrides voor de kaart */
-.btn-edit-custom {
-    color: #495057;
-    background-color: #f1f1f1;
-    border-color: #e0eeef;
-    transition: background-color 0.2s;
-}
-
-.btn-edit-custom:hover {
-    background-color: #e5e5e5;
-    color: #333;
-}
-
-/* ===========================
-   EDIT/ADD PROJECT PAGE (Aangepast aan nieuwe stijl)
-   =========================== */
+/* --- EDIT/ADD PROJECT PAGE --- */
 .form-card {
     max-width: 650px;
     border-radius: 12px;
@@ -740,9 +800,7 @@ input[type="submit"]:hover {
     margin: 40px auto;
 }
 
-/* ===========================
-   ADD FEATURE PAGE (Aangepast aan nieuwe stijl)
-   =========================== */
+/* --- ADD FEATURE PAGE --- */
 .feature-form {
     max-width: 1100px;
     border-radius: 12px;
@@ -752,9 +810,7 @@ input[type="submit"]:hover {
     margin: 40px auto;
 }
 
-/* ===========================
-   ADD ROADMAP PAGE (Aangepast aan nieuwe stijl)
-   =========================== */
+/* --- ADD ROADMAP PAGE --- */
 .roadmap-form {
     max-width: 550px;
     border-radius: 12px;
@@ -764,25 +820,7 @@ input[type="submit"]:hover {
     margin: 40px auto;
 }
 
-/* ===========================
-   ROADMAP OVERVIEW PAGE (Aangepast aan nieuwe stijl)
-   =========================== */
-.card {
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
-    border: none;
-}
-
-.top-right {
-    position: absolute;                                  /* Stelt de positioneringsmethode in (t.o.v. dichtstbijzijnde gepositioneerde voorouder) */
-    top: 15px;
-    right: 20px;
-}
-
-/* ===========================
-   MILESTONE PAGE (Aangepast aan nieuwe stijl)
-   =========================== */
+/* --- MILESTONE PAGE --- */
 .milestone-form {
     max-width: 550px;
     border-radius: 12px;
@@ -792,31 +830,8 @@ input[type="submit"]:hover {
     margin: 40px auto;
 }
 
-/* ===========================
-   Milestone Feature Multiselect
-   =========================== */
-select[multiple] {
-    height: auto;
-    min-height: 150px;
-    background: #f8fafc;
-    border-radius: 8px;
-}
 
-select[multiple] option {
-    padding: 6px;
-    border-radius: 4px;
-}
-
-select[multiple] option:checked {
-    background-color: #1E46D0 !important;
-    color: #ffffff;
-}
-
-
-/* ===========================
-   VECTR Chart Styling (Aangepast aan nieuwe stijl)
-   =========================== */
-
+/* --- VECTR CHART STYLING --- */
 .vectr-card {
     max-width: 800px;
     margin: 0 auto;
@@ -840,9 +855,7 @@ select[multiple] option:checked {
     text-align: center;
 }
 
-/* ===========================
-   FEATURES OVERVIEW CONTAINER (Aangepast aan nieuwe stijl)
-   =========================== */
+/* --- FEATURES OVERVIEW CONTAINER --- */
 .features-container-card {
     width: 100%;
     max-width: none;
@@ -853,196 +866,23 @@ select[multiple] option:checked {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* ===========================
-   Table Styling (Aangepast aan nieuwe stijl)
-   =========================== */
-.table-responsive {
-    border-radius: 10px;
-    overflow-x: auto;                                    /* Toont een horizontale schuifbalk indien nodig */
-    overflow-y: hidden;                                  /* Verbergt een verticale schuifbalk */
-    -webkit-overflow-scrolling: touch;                   /* Bepaalt de scroll-inertie op iOS-apparaten */
-}
-
-
-.table {
-    width: 100%;
-    margin-bottom: 0;
+/* --- ROADMAP OVERVIEW PAGE (Kaarten) --- */
+.card {
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     background-color: #ffffff;
+    border: none;
 }
 
-.table-striped>tbody>tr:nth-of-type(odd)>* {
-    background-color: #f7f9fc;
-}
-
-.table-bordered> :not(caption)>*>* {
-    border-width: 0 0 1px 0;
-    border-color: #e5e7eb;
-}
-
-.table thead th {
-    background-color: #f3f4f6;
-    color: #374151;
-    font-weight: 600;
-    border-bottom: 2px solid #d1d5db;
-    padding: 0.75rem 1rem;
-}
-
-.table tbody td {
-    padding: 12px 15px;
-    vertical-align: middle;                              /* Lijn de inhoud verticaal in het midden uit */
-    color: #4b5563;
-}
-
-.col-actions {
-    width: 260px;
-}
-
-.col-roadmap {
-    width: 220px;
-}
-
-.form-inline {
-    display: inline;
-}
-
-/* Sorteer Iconen */
-.sort-icon,
-.sort-icon-placeholder {
-    color: #9ca3af;
-    font-size: 13px;
-    line-height: 0.5;                                    /* Definieert de hoogte van een regel tekst */
-    display: block;
-    text-decoration: none;
-    transition: color 0.15s ease-in-out;
-    padding: 1px 0;
-}
-
-.sort-icon.active {
-    color: #1E46D0;
-}
-
-.d-flex {
-    align-items: center;
-}
-
-.me-2 {
-    margin-right: 0.6rem;
-}
-
-.table thead th strong {
-    font-weight: 600;
-}
-
-
-
-
-/* ===========================
-   RESPONSIVE STYLING (MOBIELE APPARATEN) - Positie behouden
-   =========================== */
-
-@media (max-width: 768px) {
-
-    /* 1. Containers en Formulier Kaarten */
-    .login-container,
-    .register-container,
-    .profile-card,
-    .form-card,
-    .roadmap-form,
-    .milestone-form,
-    .feature-form,
-    .vectr-card {
-        width: 95%;
-        max-width: none;
-        margin: 20px auto;
-        padding: 20px 15px;
-    }
-
-    /* 2. Index / Welkomstpagina */
-    .welcome-container {
-        margin: 40px 10px;
-        padding: 30px 20px;
-    }
-
-    .welcome-container h1 {
-        font-size: 2.2rem;
-    }
-
-    .subtitle {
-        font-size: 1.1rem;
-    }
-
-    /* 3. Dashboard Knoppen (Verticale stapeling) */
-    .dashboard-wrapper {
-        justify-content: flex-start;
-        padding-top: 50px;
-        min-height: auto;
-    }
-
-    .main-buttons {
-        flex-direction: column;
-        gap: 15px;
-        width: 80%;
-        margin: 20px auto;
-    }
-
-    .main-buttons .btn {
-        width: 100%;
-        height: 50px;
-        font-size: 16px;
-    }
-
-    .bottom-info {
-        position: static;                                    /* Stelt de positioneringsmethode in (normaal in de flow van de pagina) */
-        text-align: center;
-        margin-top: 30px;
-    }
-
-    /* 4. Projecten, Features en Tabellen */
-    .projects-wrapper,
-    .features-container-card {
-        padding: 10px;
-        margin: 10px auto 20px auto;
-        width: 95%;
-        box-sizing: border-box;
-    }
-
-    table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;                                 /* Voorkomt dat de tekst van cellen afbreekt en dwingt horizontale scroll */
-    }
-
-    .table-btn {
-        min-width: 80px;
-        height: 30px;
-        font-size: 12px;
-        padding: 0 5px;
-    }
-
-    .col-actions {
-        width: 180px;
-    }
-
-    .col-roadmap {
-        width: 120px;
-    }
-
-    /* 5. Vaste elementen aanpassen */
-    .top-right-fixed,
-    .top-right {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 1000;
-        display: flex;
-        gap: 5px;
-    }
-
-
+.top-right {
+    position: absolute;                                  /* Stelt de positioneringsmethode in (t.o.v. dichtstbijzijnde gepositioneerde voorouder) */
+    top: 15px;
+    right: 20px;
 }
 
 /* =====================================
-   ROADMAP PAGE 
+   6. ROADMAP COMPONENTEN (Mijlpalen)
+   Styling voor de pijl-kaarten op de roadmap pagina.
    ===================================== */
 
 /* Titel boven de kaart*/
@@ -1212,90 +1052,128 @@ select[multiple] option:checked {
 }
 
 
-/* Mobile: pijlen onder elkaar full width */
-@media (max-width: 768px) {
+/* ===========================
+   7. TABEL STYLING
+   Algemene stijlen voor tabellen.
+   =========================== */
+.table-responsive {
+    border-radius: 10px;
+    overflow-x: auto;                                    /* Toont een horizontale schuifbalk indien nodig */
+    overflow-y: hidden;                                  /* Verbergt een verticale schuifbalk */
+    -webkit-overflow-scrolling: touch;                   /* Bepaalt de scroll-inertie op iOS-apparaten */
+}
 
-    .milestone-card,
-    .btn-add-milestone-small {
-        flex: 0 0 100%;
-        max-width: none;
-    }
+
+.table {
+    width: 100%;
+    margin-bottom: 0;
+    background-color: #ffffff;
+}
+
+.table-striped>tbody>tr:nth-of-type(odd)>* {
+    background-color: #f7f9fc;
+}
+
+.table-bordered> :not(caption)>*>* {
+    border-width: 0 0 1px 0;
+    border-color: #e5e7eb;
+}
+
+.table thead th {
+    background-color: #f3f4f6;
+    color: #374151;
+    font-weight: 600;
+    border-bottom: 2px solid #d1d5db;
+    padding: 0.75rem 1rem;
+}
+
+.table tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;                              /* Lijn de inhoud verticaal in het midden uit */
+    color: #4b5563;
+}
+
+.col-actions {
+    width: 260px;
+}
+
+.col-roadmap {
+    width: 220px;
+}
+
+.form-inline {
+    display: inline;
+}
+
+/* Sorteer Iconen */
+.sort-icon,
+.sort-icon-placeholder {
+    color: #9ca3af;
+    font-size: 13px;
+    line-height: 0.5;                                    /* Definieert de hoogte van een regel tekst */
+    display: block;
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+    padding: 1px 0;
+}
+
+.sort-icon.active {
+    color: #1E46D0;
+}
+
+.d-flex {
+    align-items: center;
+}
+
+.me-2 {
+    margin-right: 0.6rem;
+}
+
+.table thead th strong {
+    font-weight: 600;
+}
+
+/* =====================================
+   8. SCROLL ANIMATION STYLING
+   ===================================== */
+
+.fade-in-scroll {
+    /* Beginstaat: Onzichtbaar en 40px onder de normale positie */
+    opacity: 0;
+    transform: translateY(40px);
+    
+    /* Zorgt voor een vloeiende overgang van de transform en opacity */
+    transition: opacity 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.fade-in-scroll.is-visible {
+    /* Eindstaat: Volledig zichtbaar en op de normale positie */
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- De vertragingen voor het 'staggered' effect --- */
+
+/* Eerste kaart (standaard) heeft geen vertraging (0s) */
+
+/* De vertraging toepassen op de kaart binnen de tweede kolom */
+.col-md-4:nth-child(2) .fade-in-scroll {
+    transition-delay: 0.2s;
+}
+
+/* De vertraging toepassen op de kaart binnen de derde kolom */
+.col-md-4:nth-child(3) .fade-in-scroll {
+    transition-delay: 0.4s;
 }
 
 
 /* ===========================
-   Decision Status Styling
+   9. RESPONSIVE STYLING (MOBIELE APPARATEN)
    =========================== */
 
-/* Groene badge voor Yes / Approved */
-.decision-approved,
-.decision-yes {
-    font-weight: 600;
-    color: #1a7e4b;
-    background-color: #e6f8ef;
-    padding: 4px 8px;
-    border-radius: 4px;
-    display: inline-block;
-}
-
-/* Rode badge voor No / Rejected */
-.decision-rejected,
-.decision-no {
-    font-weight: 600;
-    color: #a72834;
-    background-color: #fce7e8;
-    padding: 4px 8px;
-    border-radius: 4px;
-    display: inline-block;
-}
-
-/* Gele/Oranje badge voor nog geen beslissing */
-.decision-pending {
-    font-weight: 600;
-    color: #9c6800;
-    background-color: #fff8e6;
-    padding: 4px 8px;
-    border-radius: 4px;
-    display: inline-block;
-}
-
-/* Stijl voor de 'Ja' knop (gebruikt uw eigen groene kleur) */
-.btn-decision-yes {
-    background-color: #28a745;
-    color: #fff;
-    border-color: #218838;
-}
-
-.btn-decision-yes:hover {
-    background-color: #218838;
-    border-color: #1e7e34;
-}
-
-
-/* Navbar layout in 2 rijen */
-.navbar {
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 0;
-}
-
-/* De nav-top is niet meer nodig in de HTML, maar als hij er is, moet hij zich gedragen als een rij */
-.nav-top {
-    width: auto;
-    display: contents;                                   /* Zorgt dat de kinderen direct onder de .navbar komen in de flex-context */
-}
-
-
-/* Center row blijft bestaan */
-.navbar-center {
-    width: auto;
-    margin-left: 50px;
-    flex-grow: 1;
-    justify-content: flex-start;
-}
-
-/* Mobile: zet knoppen bovenaan en menu eronder */
 @media (max-width: 768px) {
+    /* Navbar aanpassingen */
     .navbar {
         flex-direction: column;
         gap: 10px;
@@ -1329,5 +1207,108 @@ select[multiple] option:checked {
 
     .navbar-center a {
         margin: 0 12px 0 0;
+    }
+
+    /* Containers en Formulier Kaarten */
+    .login-container,
+    .register-container,
+    .profile-card,
+    .form-card,
+    .roadmap-form,
+    .milestone-form,
+    .feature-form,
+    .vectr-card {
+        width: 95%;
+        max-width: none;
+        margin: 20px auto;
+        padding: 20px 15px;
+    }
+
+    /* Index / Welkomstpagina */
+    .welcome-container {
+        margin: 40px 10px;
+        padding: 30px 20px;
+    }
+
+    .welcome-container h1 {
+        font-size: 2.2rem;
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+    }
+
+    /* Dashboard Knoppen (Verticale stapeling) */
+    .dashboard-wrapper {
+        justify-content: flex-start;
+        padding-top: 50px;
+        min-height: auto;
+    }
+
+    .main-buttons {
+        flex-direction: column;
+        gap: 15px;
+        width: 80%;
+        margin: 20px auto;
+    }
+
+    .main-buttons .btn {
+        width: 100%;
+        height: 50px;
+        font-size: 16px;
+    }
+
+    .bottom-info {
+        position: static;                                    /* Stelt de positioneringsmethode in (normaal in de flow van de pagina) */
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    /* Projecten, Features en Tabellen */
+    .projects-wrapper,
+    .features-container-card {
+        padding: 10px;
+        margin: 10px auto 20px auto;
+        width: 95%;
+        box-sizing: border-box;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;                                 /* Voorkomt dat de tekst van cellen afbreekt en dwingt horizontale scroll */
+    }
+
+    .table-btn {
+        min-width: 80px;
+        height: 30px;
+        font-size: 12px;
+        padding: 0 5px;
+    }
+
+    .col-actions {
+        width: 180px;
+    }
+
+    .col-roadmap {
+        width: 120px;
+    }
+
+    /* Vaste elementen aanpassen */
+    .top-right-fixed,
+    .top-right {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        display: flex;
+        gap: 5px;
+    }
+    
+    /* Roadmap aanpassingen */
+    .milestone-card,
+    .btn-add-milestone-small {
+        flex: 0 0 100%;
+        max-width: none;
     }
 }

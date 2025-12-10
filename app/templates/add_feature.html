@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<h2 class="text-center mb-4">Add New Feature</h2>
+<h2 class="text-center mb-4">Add New Feature Idea</h2>
 <!-- Hoofdformulier voor het toevoegen van een nieuwe feature -->
 <div class="feature-form card shadow p-4 mx-auto">
   <form method="post" action="{{ url_for('main.add_feature', project_id=project.id_project) }}">
@@ -218,7 +218,7 @@
       </select>
   </div>
     <!-- Formulierknoppen: opslaan of annuleren -->
-    <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">
+    <button type="submit" class="btn btn-base btn-primary-custom w-100">
       Add Feature Idea
     </button>
 
