@@ -539,7 +539,7 @@ def view_features(project_id):
         ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
         roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
         confidence_score = f.quality_score if f.quality_score is not None else 0.0
-        vectr_score = ttv_weeks * roi_percent * confidence_score
+        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score
         setattr(f, "vectr_score", round(vectr_score, 2))
 
     return render_template(
@@ -822,7 +822,7 @@ def add_milestone(roadmap_id):
         ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5  # Default TtV waarde
         roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
         confidence_score = f.quality_score if f.quality_score is not None else 0.0
-        vectr_score = ttv_weeks * roi_percent * confidence_score  # Basis VECTR-formule
+        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score  # Basis VECTR-formule
         setattr(f, "vectr_score", round(vectr_score, 2))  # Dynamisch attribuut toevoegen.
 
     # Features sorteren op VECTR score (beste eerst)
@@ -894,7 +894,7 @@ def edit_milestone(milestone_id):
         ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
         roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
         confidence_score = f.quality_score if f.quality_score is not None else 0.0
-        vectr_score = ttv_weeks * roi_percent * confidence_score
+        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score
         setattr(f, "vectr_score", round(vectr_score, 2))
 
     features = sorted(features, key=lambda x: getattr(x, "vectr_score", 0), reverse=True)

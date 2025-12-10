@@ -54,7 +54,7 @@ def calculate_vectr_scores(features_list):                             # Bereken
         confidence_score = f.quality_score if f.quality_score is not None else 0.0
         
         # De VECTR score is het gewogen product van TTV * ROI * Confidence
-        vectr_score = ttv_weeks * roi_percent * confidence_score
+        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score
         
         # Voeg de afgeronde VECTR-score (op 2 decimalen) toe aan het feature-object
         setattr(f, "vectr_score", round(vectr_score, 2))
