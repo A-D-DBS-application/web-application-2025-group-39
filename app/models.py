@@ -188,8 +188,8 @@ class Roadmap(db.Model):
         nullable=False,
     )
 
-    start_quarter = db.Column(db.String, nullable=False)  # bijv. "Q1 2025"
-    end_quarter = db.Column(db.String, nullable=False)
+    start_roadmap = db.Column(db.String, nullable=False)  # bijv. "Q1 2025"
+    end_roadmap = db.Column(db.String, nullable=False)
     team_size = db.Column(db.Integer, nullable=False)
     sprint_capacity = db.Column(db.Integer, nullable=False)
     budget_allocation = db.Column(db.Integer, nullable=False)

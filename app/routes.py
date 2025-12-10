@@ -735,10 +735,10 @@ def roadmap_overview(project_id):
     if company_redirect:
         return company_redirect                     # Geen toegang buiten eigen bedrijf
 
-    # Roadmaps sorted by start_quarter (string sort works for "Qn YYYY")
+    # Roadmaps sorted by start_roadmap (string sort works for "Qn YYYY")
     roadmaps = (
         Roadmap.query.filter_by(id_project=project_id)
-        .order_by(Roadmap.start_quarter.asc())      # Roadmaps chronologisch sorteren
+        .order_by(Roadmap.start_roadmap.asc())      # Roadmaps chronologisch sorteren
         .all()
     )
 
@@ -782,8 +782,8 @@ def edit_roadmap(roadmap_id):
             return render_template("edit_roadmap.html", roadmap=roadmap, project=project)
 
         # Velden aanpassen
-        roadmap.start_quarter = data["start_quarter"]
-        roadmap.end_quarter = data["end_quarter"]
+        roadmap.start_roadmap = data["start_roadmap"]
+        roadmap.end_roadmap = data["end_roadmap"]
         roadmap.team_size = data["team_size"]
         roadmap.sprint_capacity = data["sprint_capacity"]
         roadmap.budget_allocation = data["budget_allocation"]
