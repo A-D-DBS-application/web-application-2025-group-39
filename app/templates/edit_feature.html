@@ -6,148 +6,168 @@
 {% block content %}
 
 <!-- NAVIGATIE: RECHTSBOVEN -->
-  <!-- Right-top button -->
-  <div class="top-right">
-    <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" class="btn btn-base btn-nav btn-sm">
-      Features Overview 
-    </a>
-  </div>
-  <h2 class="text-center mb-4">Edit Feature: {{ feature.name_feature }}</h2>
+<!-- Right-top button -->
+<div class="top-right">
+  <a href="{{ url_for('main.view_features', project_id=project.id_project) }}" class="btn btn-base btn-nav btn-sm">
+    Features Overview
+  </a>
+</div>
+<h2 class="text-center mb-4">Edit Feature: {{ feature.name_feature }}</h2>
 
-  <!-- FORM CONTAINER -->
-  <div class="feature-form card shadow p-4 mx-auto">
-    <form method="post" action="{{ url_for('main.edit_feature', feature_id=feature.id_feature) }}"> {#stuur de ingevulde velden naar de server#}
+<!-- FORM CONTAINER -->
+<div class="feature-form card shadow p-4 mx-auto">
+  <form method="post" action="{{ url_for('main.edit_feature', feature_id=feature.id_feature) }}"> {#stuur de ingevulde
+    velden naar de server#}
 
-      <!--BASIC INFO SECTION-->
-      <!-- BASIC INFO -->
-      <div class="mb-4"> {# mb-4: ruimte onder dit volledige “Basic Info” blok #}
-        <h4 class="mb-3">Basic Info</h4>
-        <div class="row g-3"> {# g-3: ruimte tussen de kolommen #}
-          <div class="col-md-6"> {# kolom: 50% breed vanaf medium schermen #}
-            <label class="form-label">Title</label>
-            <input type="text" class="form-control" name="name_feature" value="{{ feature.name_feature }}" required> {# required: browser blokkeert submit als dit leeg is #}
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Project</label>
-            <input type="text" class="form-control" value="{{ project.project_name }}" disabled> {# disabled: niet aanpasbaar én wordt niet meegestuurd in de POST #}
-            <input type="hidden" name="id_project" value="{{ project.id_project }}"> {# verborgen veld: project-id wordt wel meegestuurd bij submit #}
-            <input type="hidden" name="id_company" value="{{ company.id_company }}"> {# verborgen veld: company-id wordt wel meegestuurd bij submit #}
-          </div>
+    <!--BASIC INFO SECTION-->
+    <!-- BASIC INFO -->
+    <div class="mb-4"> {# mb-4: ruimte onder dit volledige “Basic Info” blok #}
+      <h4 class="mb-3">Basic Info</h4>
+      <div class="row g-3"> {# g-3: ruimte tussen de kolommen #}
+        <div class="col-md-6"> {# kolom: 50% breed vanaf medium schermen #}
+          <label class="form-label">Title</label>
+          <input type="text" class="form-control" name="name_feature" value="{{ feature.name_feature }}" required> {#
+          required: browser blokkeert submit als dit leeg is #}
         </div>
-        <div class="mt-3"> {# mt-3: ruimte boven description veld #}
-          <label class="form-label">Description</label>
-          <textarea class="form-control" name="description" rows="3">{{ feature.description }}</textarea>
-        </div>
-      </div>
- 
-      <!-- ROI -->
-      <div class="mb-4">
-        <h4 class="mb-3">Return on Investment (ROI)</h4>
-        <p class="text-muted fst-italic mb-2"> {# Korte uitleg in grijze (muted) cursieve tekst; mb-2 = kleine marge onder #}
-          <strong>Total Gains =</strong> revenue + churn + cost savings<br>
-          <strong>Total Costs =</strong> development + OPEX + other
-        </p>
-        <div class="row g-3"> {# Bootstrap grid-rij met g-3 spacing #}
-         
-          <!-- HORIZON -->
-          <div class="col-md-6"> {# kolom: 50% breed vanaf medium schermen #}
-            <label class="form-label">
-              Horizon (months)
-              <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-                data-bs-content="The number of months we look ahead to estimate the impact of this feature. During this period, we calculate expected revenue, churn reduction, and cost savings.">
-              </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
-            </label>
-            <input type="number" class="form-control" name="horizon" min="0" value="{{ feature.horizon or '' }}"> {# Numeriek veld; name bepaalt POST-key; min=0 voorkomt negatieve waarden; or '' toont leeg bij None #}
-          </div>
-
-          <!-- EXTRA REVENUE -->
-          <div class="col-md-6">
-            <label class="form-label">
-              Extra Revenue
-              <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-                data-bs-content="The additional money this feature is expected to bring in during the selected time period. Use realistic estimates based on benchmarks or results from previous releases.">
-              </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
-            </label>
-            <input type="number" class="form-control" name="extra_revenue" min="0"value="{{ feature.extra_revenue or '' }}"> {# Verwachte extra omzet binnen horizon; min=0; vult bestaande waarde in #}
-          </div>
-
-          <!-- CHURN REDUCTION SAVINGS -->
-          <div class="col-md-6">
-            <label class="form-label">
-              Churn Reduction Savings
-              <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-                data-bs-content="The amount of money saved because fewer customers leave. If possible, use metrics like customer lifetime value or retention rates to estimate this.">
-              </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
-            </label>
-            <input type="number" class="form-control" name="churn_reduction" min="0" value="{{ feature.churn_reduction or '' }}"> {# Besparing door minder churn; opgeslagen onder churn_reduction #}
-          </div>
-
-          <!-- COST SAVINGS -->
-          <div class="col-md-6">
-            <label class="form-label">
-              Cost Savings
-              <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-                data-bs-content="The direct costs that go down thanks to this feature. Examples include fewer support tickets, automation that replaces manual work, or lower operational overhead.">
-              </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
-            </label>
-            <input type="number" class="form-control" name="cost_savings" min="0" value="{{ feature.cost_savings or '' }}"> {# Directe kostenbesparing; min=0; vult bestaande waarde in #}
-          </div>
-        </div>
-
-        <h5 class="mt-4">Investment Cost</h5> {# Subtitel voor de kosten-kant van ROI; mt-4 = extra ruimte boven #}
-
-        <div class="row g-3">
-
-          <!-- DEVELOPMENT EFFORT -->
-          <div class="col-md-6">
-            <label class="form-label">
-              Development Effort (hours)
-              <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-                data-bs-content="How much time the team needs to build this feature, expressed in hours or person-days. This number is used to calculate the investment cost — keep it honest and consistent.">
-              </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
-            </label>
-            <input type="number" class="form-control" name="investment_hours" min="0" value="{{ feature.investment_hours or '' }}"> {# Aantal ontwikkeluren; input voor investeringskost (uren * tarief) #}
-          </div>
-
-          <!-- COSTS PER HOUR -->
-          <div class="col-md-6">
-            <label class="form-label">
-              Cost per Hour (€)
-              <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-                data-bs-content="The hourly cost of development. This can be internal cost or external billing rate.">
-              </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
-            </label>
-            <input type="number" class="form-control" name="hourly_rate" min="0" value="{{ feature.hourly_rate or '' }}"> {# Uurtarief in euro; combineert typisch met investment_hours voor development cost #}
-          </div>
-
-          <!-- OPEX (operational costs) -->
-          <div class="col-md-6">
-            <label class="form-label">
-              OPEX (operational costs)
-              <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-                data-bs-content="The ongoing costs required after the feature is launched. This could be hosting, subscriptions, monitoring, or maintenance. Only include the extra costs specifically caused by this feature.">
-              </i>
-            </label>
-            <input type="number" class="form-control" name="opex_hours" min="0" value="{{ feature.opex_hours or '' }}"> {# Doorlopende operationele kosten; veldnaam heet opex_hours (maar inhoud is “OPEX kosten”) #}
-          </div>
-
-          <!-- OTHER COSTS -->
-          <div class="col-md-6">
-            <label class="form-label">
-              Other Costs (optional)
-              <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-                data-bs-content="A category for any costs that do not fit elsewhere.This could include licensing fees, integration costs or opportunity costs.">
-              </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
-            </label>
-            <input type="number" class="form-control" name="other_costs" min="0" value="{{ feature.other_costs or '' }}"> {# Overige kosten (licenties, integraties, ...); optioneel veld maar nog steeds min=0 #}
-          </div>
-        </div>
-
-        <div id="roi-results"> {# Container waar de (berekende) ROI-output getoond wordt; handig voor styling of dynamic updates #}
-          {% set roi_percent = feature.roi_percent %} {# Zet lokale variabele roi_percent zodat de partial die meteen kan gebruiken #}
-          {% include "features/_roi_partial.html" %} {# Include partial template die de ROI-resultaten rendert (bv. percentage, labels, berekeningen, ...) #}
+        <div class="col-md-6">
+          <label class="form-label">Project</label>
+          <input type="text" class="form-control" value="{{ project.project_name }}" disabled> {# disabled: niet
+          aanpasbaar én wordt niet meegestuurd in de POST #}
+          <input type="hidden" name="id_project" value="{{ project.id_project }}"> {# verborgen veld: project-id wordt
+          wel meegestuurd bij submit #}
+          <input type="hidden" name="id_company" value="{{ company.id_company }}"> {# verborgen veld: company-id wordt
+          wel meegestuurd bij submit #}
         </div>
       </div>
+      <div class="mt-3"> {# mt-3: ruimte boven description veld #}
+        <label class="form-label">Description</label>
+        <textarea class="form-control" name="description" rows="3">{{ feature.description }}</textarea>
+      </div>
+    </div>
+
+    <!-- ROI -->
+    <div class="mb-4">
+      <h4 class="mb-3">Return on Investment (ROI)</h4>
+      <p class="text-muted fst-italic mb-2"> {# Korte uitleg in grijze (muted) cursieve tekst; mb-2 = kleine marge onder
+        #}
+        <strong>Total Gains =</strong> revenue + churn + cost savings<br>
+        <strong>Total Costs =</strong> development + OPEX + other
+      </p>
+      <div class="row g-3"> {# Bootstrap grid-rij met g-3 spacing #}
+
+        <!-- HORIZON -->
+        <div class="col-md-6"> {# kolom: 50% breed vanaf medium schermen #}
+          <label class="form-label">
+            Horizon (months)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The number of months we look ahead to estimate the impact of this feature. During this period, we calculate expected revenue, churn reduction, and cost savings.">
+            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+          </label>
+          <input type="number" class="form-control" name="horizon" min="0" value="{{ feature.horizon or '' }}"> {#
+          Numeriek veld; name bepaalt POST-key; min=0 voorkomt negatieve waarden; or '' toont leeg bij None #}
+        </div>
+
+        <!-- EXTRA REVENUE -->
+        <div class="col-md-6">
+          <label class="form-label">
+            Extra Revenue
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The additional money this feature is expected to bring in during the selected time period. Use realistic estimates based on benchmarks or results from previous releases.">
+            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+          </label>
+          <input type="number" class="form-control" name="extra_revenue" min="0"
+            value="{{ feature.extra_revenue or '' }}"> {# Verwachte extra omzet binnen horizon; min=0; vult bestaande
+          waarde in #}
+        </div>
+
+        <!-- CHURN REDUCTION SAVINGS -->
+        <div class="col-md-6">
+          <label class="form-label">
+            Churn Reduction Savings
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The amount of money saved because fewer customers leave. If possible, use metrics like customer lifetime value or retention rates to estimate this.">
+            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+          </label>
+          <input type="number" class="form-control" name="churn_reduction" min="0"
+            value="{{ feature.churn_reduction or '' }}"> {# Besparing door minder churn; opgeslagen onder
+          churn_reduction #}
+        </div>
+
+        <!-- COST SAVINGS -->
+        <div class="col-md-6">
+          <label class="form-label">
+            Cost Savings
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The direct costs that go down thanks to this feature. Examples include fewer support tickets, automation that replaces manual work, or lower operational overhead.">
+            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+          </label>
+          <input type="number" class="form-control" name="cost_savings" min="0"
+            value="{{ feature.cost_savings or '' }}"> {# Directe kostenbesparing; min=0; vult bestaande waarde in #}
+        </div>
+      </div>
+
+      <h5 class="mt-4">Investment Cost</h5> {# Subtitel voor de kosten-kant van ROI; mt-4 = extra ruimte boven #}
+
+      <div class="row g-3">
+
+        <!-- DEVELOPMENT EFFORT -->
+        <div class="col-md-6">
+          <label class="form-label">
+            Development Effort (hours)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="How much time the team needs to build this feature, expressed in hours or person-days. This number is used to calculate the investment cost — keep it honest and consistent.">
+            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+          </label>
+          <input type="number" class="form-control" name="investment_hours" min="0"
+            value="{{ feature.investment_hours or '' }}"> {# Aantal ontwikkeluren; input voor investeringskost (uren *
+          tarief) #}
+        </div>
+
+        <!-- COSTS PER HOUR -->
+        <div class="col-md-6">
+          <label class="form-label">
+            Cost per Hour (€)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The hourly cost of development. This can be internal cost or external billing rate.">
+            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+          </label>
+          <input type="number" class="form-control" name="hourly_rate" min="0" value="{{ feature.hourly_rate or '' }}">
+          {# Uurtarief in euro; combineert typisch met investment_hours voor development cost #}
+        </div>
+
+        <!-- OPEX (operational costs) -->
+        <div class="col-md-6">
+          <label class="form-label">
+            OPEX (operational costs)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="The ongoing costs required after the feature is launched. This could be hosting, subscriptions, monitoring, or maintenance. Only include the extra costs specifically caused by this feature.">
+            </i>
+          </label>
+          <input type="number" class="form-control" name="opex_hours" min="0" value="{{ feature.opex_hours or '' }}"> {#
+          Doorlopende operationele kosten; veldnaam heet opex_hours (maar inhoud is “OPEX kosten”) #}
+        </div>
+
+        <!-- OTHER COSTS -->
+        <div class="col-md-6">
+          <label class="form-label">
+            Other Costs (optional)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="A category for any costs that do not fit elsewhere.This could include licensing fees, integration costs or opportunity costs.">
+            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+          </label>
+          <input type="number" class="form-control" name="other_costs" min="0" value="{{ feature.other_costs or '' }}">
+          {# Overige kosten (licenties, integraties, ...); optioneel veld maar nog steeds min=0 #}
+        </div>
+      </div>
+
+      <div id="roi-results"> {# Container waar de (berekende) ROI-output getoond wordt; handig voor styling of dynamic
+        updates #}
+        {% set roi_percent = feature.roi_percent %} {# Zet lokale variabele roi_percent zodat de partial die meteen kan
+        gebruiken #}
+        {% include "features/_roi_partial.html" %} {# Include partial template die de ROI-resultaten rendert (bv.
+        percentage, labels, berekeningen, ...) #}
+      </div>
+    </div>
 
     <!-- TTV -->
     <div class="mb-4">
@@ -163,15 +183,17 @@
               data-bs-content="Provide your best estimate of the minimum number of weeks required to build and release the feature. This will later be used to scale the graph correctly.">
             </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
           </label>
-          <input type="number" class="form-control" name="ttm_low" min="0" value="{{ feature.ttm_low or '' }}"> {# Minimum schatting TTM (weken) #}
-          
+          <input type="number" class="form-control" name="ttm_low" min="0" value="{{ feature.ttm_low or '' }}"> {#
+          Minimum schatting TTM (weken) #}
+
           <!-- HIGHEST TTM -->
           <label class="form-label mt-3">Highest Time-to-Market
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="Provide your best estimate of the maximum number of weeks required to build and release the feature. This will later be used to scale the graph correctly.">
             </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
           </label>
-          <input type="number" class="form-control" name="ttm_high" min="0" value="{{ feature.ttm_high or '' }}"> {# Maximum schatting TTM (weken) #}
+          <input type="number" class="form-control" name="ttm_high" min="0" value="{{ feature.ttm_high or '' }}"> {#
+          Maximum schatting TTM (weken) #}
 
           <!-- TTM WEEKS -->
           <label class="form-label mt-3">Time-to-Market (weeks)
@@ -179,7 +201,8 @@
               data-bs-content="The number of weeks needed to build and release the first usable version of the feature. This includes everything: design, development, testing and deployment.">
             </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
           </label>
-          <input type="number" class="form-control" name="ttm_weeks" min="0" value="{{ feature.ttm_weeks or '' }}"> {# De gekozen/verwachte TTM waarde die je effectief gebruikt #}
+          <input type="number" class="form-control" name="ttm_weeks" min="0" value="{{ feature.ttm_weeks or '' }}"> {#
+          De gekozen/verwachte TTM waarde die je effectief gebruikt #}
         </div>
 
         <!-- TTBV -->
@@ -191,15 +214,17 @@
               data-bs-content="Provide your best estimate of the minimum number of weeks after launch before the feature begins delivering measurable business value. This will later be used to scale the graph correctly.">
             </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
           </label>
-          <input type="number" class="form-control" name="ttbv_low" min="0" value="{{ feature.ttbv_low or '' }}"> {# Minimum schatting TTBV (weken na launch) #}
-          
+          <input type="number" class="form-control" name="ttbv_low" min="0" value="{{ feature.ttbv_low or '' }}"> {#
+          Minimum schatting TTBV (weken na launch) #}
+
           <!-- HIGHEST TTBV -->
           <label class="form-label mt-3">Highest Time-to-Business-Value
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="Provide your best estimate of the maximum number of weeks after launch before the feature begins delivering measurable business value. This will later be used to scale the graph correctly.">
             </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
           </label>
-          <input type="number" class="form-control" name="ttbv_high" min="0" value="{{ feature.ttbv_high or '' }}"> {# Maximum schatting TTBV (weken na launch) #}
+          <input type="number" class="form-control" name="ttbv_high" min="0" value="{{ feature.ttbv_high or '' }}"> {#
+          Maximum schatting TTBV (weken na launch) #}
 
           <!-- TTBV WEEKS -->
           <label class="form-label mt-3">Time-to-Business-Value (weeks)
@@ -207,7 +232,8 @@
               data-bs-content="The number of weeks after launch before the feature starts delivering measurable value. Examples include the first paying users, an improvement in key metrics, or visible customer adoption.">
             </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
           </label>
-          <input type="number" class="form-control" name="ttbv_weeks" min="0" value="{{ feature.ttbv_weeks or '' }}"> {# De gekozen/verwachte TTBV waarde die je effectief gebruikt #}
+          <input type="number" class="form-control" name="ttbv_weeks" min="0" value="{{ feature.ttbv_weeks or '' }}"> {#
+          De gekozen/verwachte TTBV waarde die je effectief gebruikt #}
         </div>
 
         <!-- TTV RESULTS -->
@@ -228,18 +254,30 @@
           data-bs-content="Confidence is based on the strongest available evidence. Score range: 0.01 (very weak) &rarr; 10 (strong launch data). Used for the X-axis position in the VECTR graph.">
         </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
       </label>
-      <select class="form-select" name="quality_score" required> {# Dropdown; name=quality_score => komt zo in request.form terecht; required => moet gekozen zijn #}
-        <option value="0" {% if feature.quality_score==0 %}selected{% endif %}>No Longer Relevant (0.0) - Evidence is outdated or invalid and will no longer be considered.</option>
-        <option value="0.01" {% if feature.quality_score==0.01 %}selected{% endif %}>Self Conviction (0.01) - Your own belief or intuition that the feature is important.</option>
-        <option value="0.03" {% if feature.quality_score==0.03 %}selected{% endif %}>Pitch Deck (0.03) - Information from high-level presentations; not validated.</option>
-        <option value="0.1" {% if feature.quality_score==0.1 %}selected{% endif %}>Thematic Support (0.10) - Fits the overall strategy but has no strong evidence.</option>
-        <option value="0.2" {% if feature.quality_score==0.2 %}selected{% endif %}>Other's Opinion (0.20) - Someone else's judgement; subjective evidence.</option>
-        <option value="0.5" {% if feature.quality_score==0.5 %}selected{% endif %}>Estimates & Plans (0.50) - Forward-looking assumptions or planning data.</option>
-        <option value="1" {% if feature.quality_score==1 %}selected{% endif %}>Anecdotal Evidence (1.0) - Stories, experiences, isolated examples.</option>
-        <option value="2" {% if feature.quality_score==2 %}selected{% endif %}>Market Data (2.0) - Research or trend information; moderately strong.</option>
-        <option value="3" {% if feature.quality_score==3 %}selected{% endif %}>User/Customer Evidence (3.0) - Direct feedback or behavior from users.</option>
-        <option value="7" {% if feature.quality_score==7 %}selected{% endif %}>Test Results (7.0) - Data from experiments or tests; very strong evidence.</option>
-        <option value="10" {% if feature.quality_score==10 %}selected{% endif %}>Launch Data (10.0) - Real usage data after launch; strongest evidence.</option>
+      <select class="form-select" name="quality_score" required> {# Dropdown; name=quality_score => komt zo in
+        request.form terecht; required => moet gekozen zijn #}
+        <option value="0" {% if feature.quality_score==0 %}selected{% endif %}>No Longer Relevant (0.0) - Evidence is
+          outdated or invalid and will no longer be considered.</option>
+        <option value="0.01" {% if feature.quality_score==0.01 %}selected{% endif %}>Self Conviction (0.01) - Your own
+          belief or intuition that the feature is important.</option>
+        <option value="0.03" {% if feature.quality_score==0.03 %}selected{% endif %}>Pitch Deck (0.03) - Information
+          from high-level presentations; not validated.</option>
+        <option value="0.1" {% if feature.quality_score==0.1 %}selected{% endif %}>Thematic Support (0.10) - Fits the
+          overall strategy but has no strong evidence.</option>
+        <option value="0.2" {% if feature.quality_score==0.2 %}selected{% endif %}>Other's Opinion (0.20) - Someone
+          else's judgement; subjective evidence.</option>
+        <option value="0.5" {% if feature.quality_score==0.5 %}selected{% endif %}>Estimates & Plans (0.50) -
+          Forward-looking assumptions or planning data.</option>
+        <option value="1" {% if feature.quality_score==1 %}selected{% endif %}>Anecdotal Evidence (1.0) - Stories,
+          experiences, isolated examples.</option>
+        <option value="2" {% if feature.quality_score==2 %}selected{% endif %}>Market Data (2.0) - Research or trend
+          information; moderately strong.</option>
+        <option value="3" {% if feature.quality_score==3 %}selected{% endif %}>User/Customer Evidence (3.0) - Direct
+          feedback or behavior from users.</option>
+        <option value="7" {% if feature.quality_score==7 %}selected{% endif %}>Test Results (7.0) - Data from
+          experiments or tests; very strong evidence.</option>
+        <option value="10" {% if feature.quality_score==10 %}selected{% endif %}>Launch Data (10.0) - Real usage data
+          after launch; strongest evidence.</option>
       </select>
     </div>
 
@@ -256,15 +294,15 @@
 </div>
 
 <!-- BOOTSTRAP POPOVERS INIT -->
-  <script>
-    // Initialiseer alle Popovers op de pagina
-    document.addEventListener('DOMContentLoaded', function () {
-      var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
-      var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-        // Gebruik de 'html: true' optie als je HTML in de Popover content wilt, maar hier niet nodig
-        return new bootstrap.Popover(popoverTriggerEl)
-      })
-    });
-  </script>
+<script>
+  // Initialiseer alle Popovers op de pagina
+  document.addEventListener('DOMContentLoaded', function () {
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+      // Gebruik de 'html: true' optie als je HTML in de Popover content wilt, maar hier niet nodig
+      return new bootstrap.Popover(popoverTriggerEl)
+    })
+  });
+</script>
 
-  {% endblock %}
+{% endblock %}

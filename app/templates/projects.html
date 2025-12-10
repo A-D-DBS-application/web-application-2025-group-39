@@ -106,7 +106,7 @@
               <!-- Roadmap bestaat wel → Toon Edit-knop voor de eerste roadmap -->
               {% else %}
               <a href="{{ url_for('main.edit_roadmap', roadmap_id=project.roadmaps[0].id_roadmap) }}"
-                class="btn btn-edit btn-card-action flex-grow-1">
+                class="btn btn-base btn-edit btn-card-action flex-grow-1">
                 <i class="bi bi-pencil-fill icon-sm"></i> Edit
               </a>
               {% endif %}
@@ -127,7 +127,7 @@
 
           <!-- Project bewerken -->
           <a href="{{ url_for('main.edit_project', project_id=project.id_project) }}"
-            class="btn btn-edit-custom btn-sm w-50">
+            class="btn btn-edit btn-sm w-50">
             <i class="bi bi-pencil-fill icon-sm"></i> Edit
           </a>
 

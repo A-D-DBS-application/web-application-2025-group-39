@@ -167,7 +167,113 @@ def profile():
         company=company.company_name if company else "N/A",
         role=user.role,
     )
+    
+# ==============================
+# EDIT PROFILE
+# ==============================
 
+@main.route("/profile/edit", methods=["GET", "POST"])
+def edit_profile():
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user  # Redirect naar login
+
+    # Haal de huidige bedrijfsnaam op voor de template
+    current_company = Company.query.get(user.id_company)
+    current_company_name = current_company.company_name if current_company else ""
+
+    # (Aanname: u heeft de lijst met rollen gedefinieerd in app.models of app.constants)
+    # Vervang '...' door de daadwerkelijke variabele, bijv. AVAILABLE_ROLES
+    AVAILABLE_ROLES = ["User", "Founder", "PM"] 
+    
+    if request.method == "POST":
+        try:
+            # 1. Gegevens ophalen
+            name = (request.form.get("name") or "").strip()
+            email = (request.form.get("email") or "").lower().strip()
+            role = request.form.get("role")
+            company_name = (request.form.get("company_name") or "").strip()
+            password = request.form.get("password")
+
+            # 2. Basisvalidatie
+            if not all([name, email, role, company_name]):
+                flash("Alle velden zijn verplicht.", "danger")
+                return render_template("edit_profile.html", user=user, company_name=current_company_name, available_roles=AVAILABLE_ROLES)
+
+            # 3. Controleer op e-mail duplicatie (uitgezonderd de huidige gebruiker)
+            if Profile.query.filter(Profile.email == email, Profile.id_profile != user.id_profile).first():
+                flash("Dit e-mailadres is al in gebruik.", "danger")
+                return render_template("edit_profile.html", user=user, company_name=current_company_name, available_roles=AVAILABLE_ROLES)
+
+            # 4. Bedrijf Logica: Vind of Maak aan (alleen als de naam is gewijzigd)
+            if company_name != current_company_name:
+                company = Company.query.filter_by(company_name=company_name).first()
+                if not company:
+                    # Nieuw bedrijf aanmaken
+                    new_company = Company(company_name=company_name)
+                    db.session.add(new_company)
+                    db.session.flush() # Zorg dat ID beschikbaar is voor user
+                    company = new_company
+                
+                # Update de bedrijfs-ID van de gebruiker
+                user.id_company = company.id_company
+
+            # 5. Profielgegevens bijwerken
+            user.name = name
+            user.email = email
+            user.role = role
+            
+            if password:
+                user.set_password(password)
+
+            # 6. Database opslaan en sessie bijwerken
+            db.session.commit()
+            session["name"] = user.name
+            session["role"] = user.role # Update de rol in de sessie
+            
+            flash("Profiel succesvol bijgewerkt.", "success")
+            return redirect(url_for("main.profile"))
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"Fout bij het bewerken van het profiel: {e}")
+            flash("Er is een onverwachte fout opgetreden bij het opslaan van de wijzigingen.", "danger")
+            return render_template("edit_profile.html", user=user, company_name=current_company_name, available_roles=AVAILABLE_ROLES)
+
+    # GET verzoek: Toon het edit-formulier
+    return render_template(
+        "edit_profile.html", 
+        user=user, 
+        company_name=current_company_name, 
+        available_roles=AVAILABLE_ROLES # Geef de lijst met rollen mee
+    )
+# ==============================
+# DELETE PROFILE
+# ==============================
+
+@main.route("/profile/delete", methods=["POST"])
+def delete_profile():
+    # 1. Authenticatie check
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user  # Redirect naar login
+        
+    try:
+        # 2. Verwijder de gebruiker uit de database
+        db.session.delete(user)
+        db.session.commit()
+        
+        # 3. Ruim de sessie op
+        session.clear()
+
+        flash("Uw profiel is succesvol verwijderd. Tot ziens!", "success")
+        return redirect(url_for("main.index"))  # Stuur terug naar de landingspagina
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Fout bij het verwijderen van het profiel: {e}")
+        flash("Er is een fout opgetreden bij het verwijderen van het profiel.", "danger")
+        return redirect(url_for("main.profile"))
 
 # ==============================
 # PROJECTS OVERVIEW
@@ -288,7 +394,10 @@ def delete_project(project_id):
 @main.route("/projects/<int:project_id>/add-feature", methods=["GET", "POST"])
 def add_feature(project_id):
     user = require_editor_access()
-
+    
+    if not isinstance(user, Profile):
+        return user
+    
     project = Project.query.get_or_404(project_id)
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:

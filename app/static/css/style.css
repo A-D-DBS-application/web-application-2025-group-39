@@ -264,7 +264,6 @@ select[multiple] option:checked {
     color: #ffffff;
     background-color: #1E46D0;
     border: 1px solid #1E46D0;                           /* Definieert de rand rondom een element */
-    font-weight: 600;
 }
 
 .btn-login:hover,
@@ -336,6 +335,7 @@ select[multiple] option:checked {
 
 .btn-success:hover,
 .btn-success:focus {
+    color: #4b5563;
     background-color: #005e19;                           /* Iets donkerder groen */
     border-color: #063510;
     box-shadow: 0 4px 10px rgba(0, 113, 28, 0.4);
@@ -650,6 +650,13 @@ input[type="submit"]:hover {
     margin-top: 15px;
     font-size: 14px;
 }
+
+/* --- PROFILE PAGE --- */
+.profile-card {
+    max-width: 450px;                                    /* Definieer een maximale breedte */
+    margin: 40px auto;                                   /* Centreer de kaart horizontaal */
+}
+
 
 /* --- DASHBOARD PAGE --- */
 .dashboard-wrapper {
@@ -1213,7 +1220,7 @@ input[type="submit"]:hover {
     /* Containers en Formulier Kaarten */
     .login-container,
     .register-container,
-    .profile-card,
+    .profile-card
     .form-card,
     .roadmap-form,
     .milestone-form,
@@ -1224,6 +1231,7 @@ input[type="submit"]:hover {
         margin: 20px auto;
         padding: 20px 15px;
     }
+
 
     /* Index / Welkomstpagina */
     .welcome-container {

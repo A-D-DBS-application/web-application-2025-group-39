@@ -5,21 +5,34 @@
 
 {% block content %}
 
-<!-- Wrapper om de profielkaart mooi te centreren -->
-<div class="profile-wrapper">
-  <div class="profile-wrapper">
-    <!-- Kaart waarin alle profielgegevens worden weergegeven -->
-    <div class="card shadow-lg p-4 profile-card">
-      <!-- Titel van de profielpagina -->
-      <h3 class="text-center mb-4">Your Profile</h3>
+<h2 class="text-center mt-5 mb-4">Your Profile</h2> 
 
-      <!-- Weergave van de naam van de gebruiker, email, bedrijfsnaam, rol -->
+<div class="profile-wrapper">
+    
+    <div class="card shadow-lg p-4 profile-card">
+
       <p><strong>Name:</strong><br>{{ name }}</p>
       <p><strong>E-mail:</strong><br>{{ email }}</p>
-      <p><strong>Company:</strong><br>{{ company }}</p>
       <p><strong>Role:</strong><br>{{ role }}</p>
+      <p><strong>Company:</strong><br>{{ company }}</p>
 
+      <div class="d-flex justify-content-center gap-3 mt-auto">
+          
+          <a href="{{ url_for('main.edit_profile') }}" class="btn btn-edit table-btn btn-sm">
+              Edit
+          </a>
+          
+          <form action="{{ url_for('main.delete_profile') }}" method="post" style="display:inline;">
+              <button type="submit" 
+                  onclick="return confirm('Weet je zeker dat je je profiel wilt verwijderen? Dit kan niet ongedaan gemaakt worden.');"
+                  class="btn btn-danger-custom table-btn btn-sm">
+                  Delete
+              </button>
+          </form>
+
+      </div>
+      
     </div>
-  </div>
+</div>
 
 {% endblock %}

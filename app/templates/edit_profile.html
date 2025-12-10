@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile{% endblock %}
+{% block body_class %}form-body{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <h2 class="text-center">Edit Your Profile</h2>
+    
+    {# Flask zal de errors/success messages hier tonen #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="{{ category }} {{ 'error' if category == 'danger' else '' }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('main.edit_profile') }}">
+        
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="{{ user.name }}" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">E-mail:</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" required>
+        </div>
+        
+        <hr class="my-4">
+
+        <div class="form-group">
+            <label for="role">Role:</label>
+            <select id="role" name="role" required>
+                {# Loop over de mogelijke rollen (die vanuit routes.py moeten komen) #}
+                {% for role in available_roles %} 
+                    <option value="{{ role }}" {% if user.role == role %}selected{% endif %}>
+                        {{ role | capitalize }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="company_name">Company Name:</label>
+            {# We gebruiken company_name, die doorgegeven moet worden vanuit routes.py #}
+            <input type="text" id="company_name" name="company_name" value="{{ company_name }}" required>
+        </div>
+
+        <hr class="my-4">
+        
+        <div class="form-group">
+            <label for="password">New Password (leave blank to keep current):
+            </label>
+            <div class="input-group">
+                <input type="password" id="password" name="password" class="form-control">
+
+                <!-- Icon om het wachtwoord te tonen/verbergen -->
+                <span class="input-group-text">
+                    <i class="bi bi-eye" id="togglePassword" style="cursor: pointer;"></i>
+                </span>
+            </div>
+        </div>
+        
+        <!-- Save and cancel button-->
+        <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">
+        Save Changes
+        </button>
+
+        <a href="{{ url_for('main.projects') }}"
+        class="btn btn-base btn-secondary-custom w-100 mt-2">
+        Cancel
+        </a>
+        
+    </form>
+</div>
+{% endblock %}
