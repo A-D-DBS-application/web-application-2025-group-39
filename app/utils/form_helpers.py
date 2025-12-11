@@ -29,12 +29,26 @@ def require_role(allowed_roles, user: Profile):
         return redirect(url_for("main.dashboard"))
     return None
 
+def require_company_ownership(obj_company_id: int, user):
+    """
+    Ensures object belongs to user’s company. 
+    Accepts: the object's company ID (int) and the user object (Profile or Response).
+    
+    NOTE: Added 'isinstance' check to handle non-Profile objects (redirects).
+    """
+    # CRUCIALE WIJZIGING: Als de user variabele geen Profile object is (maar een Response), 
+    # moeten we de crash voorkomen. Dit zou in routes.py al moeten zijn afgevangen, 
+    # maar dit maakt de helper robuust.
+    if not isinstance(user, Profile):
+        # We geven hier een standaardfoutmelding/redirect terug, 
+        # ook al zou dit niet bereikt moeten worden als routes.py goed is afgevangen.
+        flash("Authorization error: Please log in again.", "danger")
+        return redirect(url_for("main.login"))
 
-def require_company_ownership(obj_company_id: int, user: Profile):
-    """Ensures object belongs to user’s company."""
     if obj_company_id != user.id_company:
         flash("Not allowed.", "danger")
-        return redirect(url_for("main.dashboard"))
+        return redirect(url_for("main.dashboard")) # Stuur naar dashboard, niet projects
+
     return None
 
 # -----------------------------------

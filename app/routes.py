@@ -19,6 +19,7 @@ from sqlalchemy.orm import joinedload
 main = Blueprint("main", __name__)
 
 #helper om te controleren of gebruiker zaken mag doen.
+# routes.py (Rond regel 38)
 def require_editor_access():
     
     # 1. Login check
@@ -26,8 +27,8 @@ def require_editor_access():
     if not isinstance(user, Profile):
         return user                                                 # Retourneert direct de redirect response
 
-    # 2. Role check
-    role_redirect = require_role(["founder", "PM"], user)
+    # 2. Role check: Hoofdletters gebruiken!
+    role_redirect = require_role(["Founder", "PM"], user)  # <-- AANPASSING
     if role_redirect:
         return role_redirect                                        # Retourneert direct de redirect response
         
@@ -370,7 +371,9 @@ def delete_project(project_id):
     project = Project.query.get_or_404(project_id)
 
     # Only founder/PM + same company
-    role_redirect = require_role(["founder", "PM"], user)
+# routes.py (delete_project)
+    # Oude code: role_redirect = require_role(["founder", "PM"], user)
+    role_redirect = require_role(["Founder", "PM"], user) # <-- AANPASSING
     if role_redirect:
         return role_redirect
     company_redirect = require_company_ownership(project.id_company, user)
@@ -638,7 +641,7 @@ def delete_feature(feature_id):
     project = Project.query.get_or_404(feature.id_project)      # Haalt project op waar feature toe behoort
 
     # Only founder/PM + ownership
-    role_redirect = require_role(["founder", "PM"], user)       # Enkel Founder/PM mogen features verwijderen
+    role_redirect = require_role(["Founder", "PM"], user)       # Enkel Founder/PM mogen features verwijderen
     if role_redirect:                                           # require_role() geeft redirect als ongeldig
         return role_redirect
 
@@ -690,8 +693,8 @@ def add_roadmap(project_id):
     if not isinstance(user, Profile):
         return user                            # require_login kan Response teruggeven (redirect)
 
-    # Only founders can create roadmaps
-    role_redirect = require_role(["founder"], user)  # Enkel founders mogen roadmaps maken
+    # Only founders and PM's can create roadmaps
+    role_redirect = require_role(["Founder, PM"], user)  # Enkel founders mogen roadmaps maken
     if role_redirect:
         return role_redirect
 
@@ -763,8 +766,8 @@ def edit_roadmap(roadmap_id):
     if not isinstance(user, Profile):
         return user
 
-    # Only founders may edit
-    role_redirect = require_role(["founder"], user)  # Enkel Founder mag roadmap aanpassen
+    # Only founders and PM's may edit
+    role_redirect = require_role(["Founder, PM"], user)  # Enkel Founder mag roadmap aanpassen
     if role_redirect:
         return role_redirect
 

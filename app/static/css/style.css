@@ -79,7 +79,7 @@ select[multiple] option:checked {
     align-items: center;                                 /* Lijn flex-items verticaal in het midden uit */
     background-color: #ffffff;
     padding: 12px 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);          /* Voegt een schaduw toe aan de box */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);        /* Voegt een schaduw toe aan de box */
     width: 100%;                                         /* Definieert de breedte van een element */
     position: sticky;                                    /* Maakt het element "sticky" bij scrollen */
     top: 0;                                              /* Bepaalt de positie t.o.v. de bovenkant van de viewport (alleen bij position: sticky/fixed/absolute) */
