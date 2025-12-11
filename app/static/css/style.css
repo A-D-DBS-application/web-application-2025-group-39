@@ -1030,6 +1030,7 @@ input[type="submit"]:hover {
     background-color: transparent;
     border: 1px solid #ffffff;
     color: #ffffff;
+    text-decoration: none;
 }
 
 .milestone-card .edit-btn:hover {
