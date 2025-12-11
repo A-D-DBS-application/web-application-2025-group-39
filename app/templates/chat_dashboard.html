@@ -9,14 +9,22 @@
     <!-- LEFT SIDEBAR -->
     <div class="wa-sidebar">
         <div class="wa-sidebar-header">
-            <h4>Projects</h4>
+             <div>
+                <p class="wa-sidebar-label">Workspace</p>
+                <h4 class="wa-sidebar-title">Projects</h4>
+            </div>
         </div>
 
         <div class="wa-project-list">
             {% for p in projects %}
             <a href="{{ url_for('main.chat_dashboard_project', project_id=p.id_project) }}"
                class="wa-project-item {% if p.id_project == selected_project.id_project %}active{% endif %}">
-                {{ p.project_name }}
+                <div class="wa-project-avatar">{{ p.project_name[0]|upper }}</div>
+                <div class="wa-project-details">
+                    <div class="wa-project-name">{{ p.project_name }}</div>
+                    <div class="wa-project-meta">Project chat channel</div>
+                </div>
+                <i class="bi bi-chevron-right"></i>
             </a>
             {% endfor %}
         </div>
@@ -28,7 +36,15 @@
 
         <!-- CHAT HEADER -->
         <div class="wa-chat-header">
-            <h5>{{ selected_project.project_name }}</h5>
+            <div>
+                <div class="wa-chat-title">{{ selected_project.project_name }}</div>
+                <div class="wa-chat-subtitle"><span class="wa-status-dot"></span>Project discussion</div>
+            </div>
+            <div class="wa-header-actions">
+                <button type="button" class="wa-header-btn">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+            </div>
         </div>
 
         <!-- CHAT MESSAGES -->
@@ -38,16 +54,13 @@
             <div class="wa-msg-wrapper {% if msg.id_profile == user.id_profile %}me{% else %}them{% endif %}">
 
                 <div class="wa-msg-bubble">
-                    <div class="wa-msg-sender">
-                        {{ msg.sender.name }}
+                    <div class="wa-msg-meta">
+                        <span class="wa-msg-sender">{{ msg.sender.name }}</span>
+                        <span class="wa-msg-time">{{ msg.timestamp.strftime("%H:%M") }}</span>
                     </div>
 
                     <div class="wa-msg-text">
                         {{ msg.content }}
-                    </div>
-
-                    <div class="wa-msg-time">
-                        {{ msg.timestamp.strftime("%H:%M") }}
                     </div>
                 </div>
 
@@ -66,7 +79,7 @@
                    autocomplete="off"
                    class="wa-input">
 
-            <button class="wa-send-btn">
+            <button class="wa-send-btn" aria-label="Send message">
                 <i class="bi bi-send-fill"></i>
             </button>
         </form>
