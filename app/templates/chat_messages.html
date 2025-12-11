@@ -1,0 +1,13 @@
+{% for msg in messages %}
+<div class="wa-msg-wrapper {% if msg.id_profile == user.id_profile %}me{% else %}them{% endif %}">
+    <div class="wa-msg-bubble">
+        <div class="wa-msg-meta">
+            <span class="wa-msg-sender">{{ msg.sender.name }}</span>
+            <span class="wa-msg-time">{{ msg.timestamp.strftime("%H:%M") }}</span>
+        </div>
+        <div class="wa-msg-text">
+            {{ msg.content }}
+        </div>
+    </div>
+</div>
+{% endfor %}

@@ -317,3 +317,30 @@ class Decision(db.Model):
     )
 
     feature = db.relationship("Features_ideas", back_populates="decisions")
+
+# =====================================================
+# PROJECT CHAT MESSAGE
+# =====================================================
+class ProjectChatMessage(db.Model):
+    __tablename__ = "project_chat_message"
+    __table_args__ = {"schema": "public"}
+
+    id_message = db.Column(db.Integer, primary_key=True)
+
+    id_project = db.Column(
+        db.Integer,
+        db.ForeignKey("public.project.id_project", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    id_profile = db.Column(
+        db.Integer,
+        db.ForeignKey("public.profile.id_profile", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    sender = db.relationship("Profile")
+    project = db.relationship("Project")

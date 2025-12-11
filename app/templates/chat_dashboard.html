@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Project Chat{% endblock %}
+
+{% block content %}
+
+<div class="wa-chat-container">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="wa-sidebar">
+        <div class="wa-sidebar-header">
+             <div>
+                <p class="wa-sidebar-label">Workspace</p>
+                <h4 class="wa-sidebar-title">Projects</h4>
+            </div>
+        </div>
+
+        <div class="wa-project-list">
+            {% for p in projects %}
+            <a href="{{ url_for('main.chat_dashboard_project', project_id=p.id_project) }}"
+               class="wa-project-item {% if p.id_project == selected_project.id_project %}active{% endif %}">
+                <div class="wa-project-avatar">{{ p.project_name[0]|upper }}</div>
+                <div class="wa-project-details">
+                    <div class="wa-project-name">{{ p.project_name }}</div>
+                    <div class="wa-project-meta">Project chat channel</div>
+                </div>
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <!-- RIGHT CHAT PANEL -->
+    <div class="wa-chat-panel">
+
+        <!-- CHAT HEADER -->
+        <div class="wa-chat-header">
+            <div>
+                <div class="wa-chat-title">{{ selected_project.project_name }}</div>
+                <div class="wa-chat-subtitle"><span class="wa-status-dot"></span>Project discussion</div>
+            </div>
+            <div class="wa-header-actions">
+                <button type="button" class="wa-header-btn">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- CHAT MESSAGES -->
+        <div class="wa-messages" id="chatMessages">
+            {% include "chat_messages.html" %}   {# Hergebruik de partial voor de initiële render, zodat de fetch-refresh dezelfde markup gebruikt #}
+        </div>
+
+        <!-- INPUT BAR -->
+        <form class="wa-input-bar"
+              action="{{ url_for('main.chat_dashboard_send', project_id=selected_project.id_project) }}"
+              method="POST">
+
+            <input type="text"
+                   name="content"
+                   placeholder="Type a message..."
+                   autocomplete="off"
+                   class="wa-input">
+
+            <button class="wa-send-btn" aria-label="Send message">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Houd de berichtenlijst up-to-date zonder de hele pagina te verversen.
+    const chatMessages = document.getElementById("chatMessages");
+    const chatForm = document.querySelector(".wa-input-bar");
+    const chatInput = chatForm.querySelector("input[name='content']");
+
+    function laadBerichten() {
+        fetch("{{ url_for('main.chat_project_messages', project_id=selected_project.id_project) }}")
+            .then(response => response.text())
+            .then(html => {
+                // De partial levert dezelfde HTML als de initiële render
+                chatMessages.innerHTML = html;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+    }
+
+    chatForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(chatForm);
+        fetch(chatForm.action, { method: "POST", body: formData })
+            .then(() => {
+                chatInput.value = "";
+                laadBerichten();
+            });
+    });
+
+    laadBerichten();
+    setInterval(laadBerichten, 3000);
+</script>
+{% endblock %}
