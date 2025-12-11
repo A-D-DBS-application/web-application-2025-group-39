@@ -23,8 +23,15 @@ def require_login():
 
 
 def require_role(allowed_roles, user: Profile):
-    """Ensures user has one of the allowed roles."""
-    if user.role not in allowed_roles:
+    """
+    Ensures user has one of the allowed roles, using case-insensitive comparison.
+    """
+    # CRUCIALE WIJZIGING: Normaliseer de rol van de gebruiker naar hoofdletters 
+    # en normaliseer de lijst van toegestane rollen.
+    user_role_upper = user.role.upper()
+    allowed_roles_upper = [role.upper() for role in allowed_roles]
+
+    if user_role_upper not in allowed_roles_upper:
         flash("You are not allowed to perform this action.", "danger")
         return redirect(url_for("main.dashboard"))
     return None
@@ -37,11 +44,8 @@ def require_company_ownership(obj_company_id: int, user):
     NOTE: Added 'isinstance' check to handle non-Profile objects (redirects).
     """
     # CRUCIALE WIJZIGING: Als de user variabele geen Profile object is (maar een Response), 
-    # moeten we de crash voorkomen. Dit zou in routes.py al moeten zijn afgevangen, 
-    # maar dit maakt de helper robuust.
+    # moeten we de crash voorkomen.
     if not isinstance(user, Profile):
-        # We geven hier een standaardfoutmelding/redirect terug, 
-        # ook al zou dit niet bereikt moeten worden als routes.py goed is afgevangen.
         flash("Authorization error: Please log in again.", "danger")
         return redirect(url_for("main.login"))
 

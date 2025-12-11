@@ -19,21 +19,18 @@ from sqlalchemy.orm import joinedload
 main = Blueprint("main", __name__)
 
 #helper om te controleren of gebruiker zaken mag doen.
-# routes.py (Rond regel 38)
-def require_editor_access():
-    
+def require_editor_access(): 
     # 1. Login check
     user = require_login()
     if not isinstance(user, Profile):
         return user                                                 # Retourneert direct de redirect response
 
-    # 2. Role check: Hoofdletters gebruiken!
-    role_redirect = require_role(["Founder", "PM"], user)  # <-- AANPASSING
+    # 2. Role check (Founder EN PM)
+    role_redirect = require_role(["Founder", "PM"], user)
     if role_redirect:
         return role_redirect                                        # Retourneert direct de redirect response
         
     return user
-
 # ==============================
 # INDEX
 # ==============================
@@ -368,14 +365,13 @@ def delete_project(project_id):
     if not isinstance(user, Profile):
         return user
 
-    project = Project.query.get_or_404(project_id)
-
-    # Only founder/PM + same company
-# routes.py (delete_project)
-    # Oude code: role_redirect = require_role(["founder", "PM"], user)
-    role_redirect = require_role(["Founder", "PM"], user) # <-- AANPASSING
+    # Alleen Founders mogen verwijderen
+    role_redirect = require_role(["Founder"], user)
     if role_redirect:
         return role_redirect
+    
+    project = Project.query.get_or_404(project_id)
+    
     company_redirect = require_company_ownership(project.id_company, user)
     if company_redirect:
         return company_redirect
@@ -640,14 +636,14 @@ def delete_feature(feature_id):
     feature = Features_ideas.query.get_or_404(str(feature_id))  # Haalt feature op; 404 als niet gevonden
     project = Project.query.get_or_404(feature.id_project)      # Haalt project op waar feature toe behoort
 
-    # Only founder/PM + ownership
-    role_redirect = require_role(["Founder", "PM"], user)       # Enkel Founder/PM mogen features verwijderen
-    if role_redirect:                                           # require_role() geeft redirect als ongeldig
-        return role_redirect
-
     company_redirect = require_company_ownership(project.id_company, user)  # Check dat user van juiste company is
     if company_redirect:
         return company_redirect
+    
+    # Only founder/PM + ownership
+    role_redirect = require_role(["Founder"], user)
+    if role_redirect:
+        return role_redirect                                    # Geeft redirect als ongeldig
 
     project_id = feature.id_project               # Project ID opslaan zodat we na delete kunnen redirecten
     db.session.delete(feature)                    # Feature verwijderen uit database
@@ -685,7 +681,7 @@ def vectr_chart(project_id):
 
 
 # ==============================
-# ROADMAP ROUTES
+# ADD ROADMAP
 # ==============================
 @main.route("/roadmap/add/<int:project_id>", methods=["GET", "POST"])
 def add_roadmap(project_id):
@@ -693,8 +689,8 @@ def add_roadmap(project_id):
     if not isinstance(user, Profile):
         return user                            # require_login kan Response teruggeven (redirect)
 
-    # Only founders and PM's can create roadmaps
-    role_redirect = require_role(["Founder, PM"], user)  # Enkel founders mogen roadmaps maken
+    # Founders and PM's roadmaps maken
+    role_redirect = require_role(["Founder", "PM"], user)  # Enkel founders mogen roadmaps maken
     if role_redirect:
         return role_redirect
 
@@ -726,7 +722,9 @@ def add_roadmap(project_id):
     # GET → pagina tonen
     return render_template("add_roadmap.html", project=project)
 
-
+# ==============================
+# ROADMAP OVERVIEW
+# ==============================
 
 @main.route("/roadmap/<int:project_id>")
 def roadmap_overview(project_id):
@@ -758,7 +756,9 @@ def roadmap_overview(project_id):
         roadmaps=roadmaps,
     )
 
-
+# ==============================
+# EDIT ROADMAP
+# ==============================
 
 @main.route("/roadmap/edit/<int:roadmap_id>", methods=["GET", "POST"])
 def edit_roadmap(roadmap_id):
@@ -766,8 +766,8 @@ def edit_roadmap(roadmap_id):
     if not isinstance(user, Profile):
         return user
 
-    # Only founders and PM's may edit
-    role_redirect = require_role(["Founder, PM"], user)  # Enkel Founder mag roadmap aanpassen
+    # Founders and PM's mogen editen
+    role_redirect = require_role(["Founder", "PM"], user)  # Enkel Founder mag roadmap aanpassen
     if role_redirect:
         return role_redirect
 
@@ -879,7 +879,7 @@ def roadmap_optimize(roadmap_id):
 
 
 # ==============================
-# MILESTONES ROUTES
+# ADD MILESTONES
 # ==============================
 
 @main.route("/milestone/add/<int:roadmap_id>", methods=["GET", "POST"])
@@ -951,7 +951,9 @@ def add_milestone(roadmap_id):
         selected_features=[],
     )
 
-
+# ==============================
+# EDIT MILESTONES
+# ==============================
 
 
 @main.route("/milestone/edit/<int:milestone_id>", methods=["GET", "POST"])
@@ -1021,15 +1023,20 @@ def edit_milestone(milestone_id):
         selected_features=existing_selected,
     )
 
-
-
-
+# ==============================
+# DELETE MILESTONE
+# ==============================
 
 @main.route("/milestone/delete/<int:milestone_id>", methods=["POST"])
 def delete_milestone(milestone_id):
     user = require_login()  # Login check
     if not isinstance(user, Profile):
         return user
+
+    # Alleen Founders mogen verwijderen
+    role_redirect = require_role(["Founder"], user)
+    if role_redirect:
+        return role_redirect
 
     milestone = Milestone.query.get_or_404(milestone_id)  # Opzoeken of 404
     roadmap = Roadmap.query.get_or_404(milestone.id_roadmap)
@@ -1128,8 +1135,6 @@ def view_evidence(feature_id):
     )
 
 
-
-
 # ==============================
 # EVIDENCE: DELETE
 # ==============================
@@ -1138,6 +1143,11 @@ def delete_evidence(evidence_id):
     user = require_login()
     if not isinstance(user, Profile):
         return user
+    
+    # Alleen Founders mogen verwijderen
+    role_redirect = require_role(["Founder"], user)
+    if role_redirect:
+        return role_redirect
 
     ev = Evidence.query.get_or_404(evidence_id)  # Evidence ophalen
     feature = Features_ideas.query.get_or_404(ev.id_feature)
