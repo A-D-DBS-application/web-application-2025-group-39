@@ -4,15 +4,6 @@
 
 {% block content %}
 
-<!-- ==============================================
-     RECHTSBOVEN NAVIGATIEKNOP
-     ============================================== -->
-<div class="top-right">
-    <a href="{{ url_for('main.projects', project_id=project.id_project) }}"
-       class="btn btn-base btn-nav btn-sm">
-        Projects Overview
-    </a>
-</div>
 
 <h2 class="text-center mb-4">Edit Roadmap – {{ project.project_name }}</h2>
 
@@ -24,41 +15,20 @@
 <form method="POST"> <!--  Methode: POST → verstuurt data naar de server.  De ingevulde velden worden opgeslagen in de roadmap. -->
 
     <!-- ==============================================
-         START QUARTER SELECTIE
+         START ROADMAP SELECTIE
          ============================================== -->
     <div class="mb-3">
-        <label class="form-label">Start Quarter</label>
-
-        <!-- Select dropdown: toont lijst van opties -->
-        <select name="start_quarter" class="form-select" required> <!-- required = browser haalt fout op bij leeg -->
-            <option value="">Select quarter</option>
-
-            <!-- Dynamische selectie: optie wordt "selected" als roadmap.start_quarter gelijk is aan deze waarde -->
-            <option value="Q4 2025" {% if roadmap.start_quarter == "Q4 2025" %}selected{% endif %}>Q4 2025</option> <!-- 'selected' markeert standaardkeuze -->
-            <option value="Q1 2026" {% if roadmap.start_quarter == "Q1 2026" %}selected{% endif %}>Q1 2026</option>
-            <option value="Q2 2026" {% if roadmap.start_quarter == "Q2 2026" %}selected{% endif %}>Q2 2026</option>
-            <option value="Q3 2026" {% if roadmap.start_quarter == "Q3 2026" %}selected{% endif %}>Q3 2026</option>
-            <option value="Q4 2026" {% if roadmap.start_quarter == "Q4 2026" %}selected{% endif %}>Q4 2026</option>
-        </select>
+        <label class="form-label fw-bold">Start Date Project</label>
+        <input type="date" name="start_roadmap" class="form-control">
     </div>
 
 
     <!-- ==============================================
-         END QUARTER SELECTIE
+         END ROADMAP SELECTIE
          ============================================== -->
     <div class="mb-3">
-        <label class="form-label">End Quarter</label>
-
-        <select name="end_quarter" class="form-select" required>
-            <option value="">Select quarter</option>
-
-            <!-- 'selected' zorgt dat de juiste waarde wordt voorgeselecteerd -->
-            <option value="Q4 2025" {% if roadmap.end_quarter == "Q4 2025" %}selected{% endif %}>Q4 2025</option>
-            <option value="Q1 2026" {% if roadmap.end_quarter == "Q1 2026" %}selected{% endif %}>Q1 2026</option>
-            <option value="Q2 2026" {% if roadmap.end_quarter == "Q2 2026" %}selected{% endif %}>Q2 2026</option>
-            <option value="Q3 2026" {% if roadmap.end_quarter == "Q3 2026" %}selected{% endif %}>Q3 2026</option>
-            <option value="Q4 2026" {% if roadmap.end_quarter == "Q4 2026" %}selected{% endif %}>Q4 2026</option>
-        </select>
+        <label class="form-label fw-bold">End Date Project</label>
+        <input type="date" name="end_roadmap" class="form-control">
     </div>
 
 

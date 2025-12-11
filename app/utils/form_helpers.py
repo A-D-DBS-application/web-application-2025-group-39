@@ -176,8 +176,8 @@ def parse_feature_form(form):
 def parse_roadmap_form(form):
     errors = []
     return {
-        "start_quarter": required_str(form, "start_quarter", errors),
-        "end_quarter": required_str(form, "end_quarter", errors),
+        "start_roadmap": required_str(form, "start_roadmap", errors),
+        "end_roadmap": required_str(form, "end_roadmap", errors),
         "team_size": required_int(form, "team_size", errors),
         "sprint_capacity": required_int(form, "sprint_capacity", errors),
         "budget_allocation": required_int(form, "budget_allocation", errors),

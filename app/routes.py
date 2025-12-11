@@ -10,8 +10,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.patches as patches
 from app.constants import CONF_MIN, CONF_LOW_THRESHOLD, CONF_MID_HIGH_THRESHOLD, CONF_MAX, TTV_MIN, TTV_SLOW_THRESHOLD, TTV_MID_THRESHOLD, TTV_MAX
-from app.utils.calculations import calc_roi, calc_ttv, to_numeric
+from app.utils.calculations import calc_roi, calc_ttv, to_numeric, calculate_feature_cost # <-- calculate_feature_cost toegevoegd
 from app.utils.form_helpers import prepare_vectr_chart_data, require_login, require_role, require_company_ownership, parse_project_form, parse_feature_form, parse_roadmap_form, parse_milestone_form, parse_evidence_form, recompute_feature_confidence
+from app.utils.knapsack_optimizer import optimize_roadmap
 from sqlalchemy.orm import joinedload
 
 # Blueprint
@@ -539,7 +540,7 @@ def view_features(project_id):
         ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
         roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
         confidence_score = f.quality_score if f.quality_score is not None else 0.0
-        vectr_score = ttv_weeks * roi_percent * confidence_score
+        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score
         setattr(f, "vectr_score", round(vectr_score, 2))
 
     return render_template(
@@ -735,10 +736,10 @@ def roadmap_overview(project_id):
     if company_redirect:
         return company_redirect                     # Geen toegang buiten eigen bedrijf
 
-    # Roadmaps sorted by start_quarter (string sort works for "Qn YYYY")
+    # Roadmaps sorted by start_roadmap (string sort works for "Qn YYYY")
     roadmaps = (
         Roadmap.query.filter_by(id_project=project_id)
-        .order_by(Roadmap.start_quarter.asc())      # Roadmaps chronologisch sorteren
+        .order_by(Roadmap.start_roadmap.asc())      # Roadmaps chronologisch sorteren
         .all()
     )
 
@@ -782,8 +783,8 @@ def edit_roadmap(roadmap_id):
             return render_template("edit_roadmap.html", roadmap=roadmap, project=project)
 
         # Velden aanpassen
-        roadmap.start_quarter = data["start_quarter"]
-        roadmap.end_quarter = data["end_quarter"]
+        roadmap.start_roadmap = data["start_roadmap"]
+        roadmap.end_roadmap = data["end_roadmap"]
         roadmap.team_size = data["team_size"]
         roadmap.sprint_capacity = data["sprint_capacity"]
         roadmap.budget_allocation = data["budget_allocation"]
@@ -795,6 +796,82 @@ def edit_roadmap(roadmap_id):
 
     # GET → formulier tonen
     return render_template("edit_roadmap.html", roadmap=roadmap, project=project)
+
+#==============================
+# KNAPSACK ALGORITME
+#==============================
+
+@main.route("/roadmap/optimize/<int:roadmap_id>", methods=["GET", "POST"])
+def roadmap_optimize(roadmap_id):
+    user = require_editor_access()
+    if not isinstance(user, Profile):
+        return user
+    
+    roadmap = Roadmap.query.get_or_404(roadmap_id)
+    project = Project.query.get_or_404(roadmap.id_project)
+    
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
+
+    # 1. Haal alle features op en bereken de VECTR-scores 
+    features = Features_ideas.query.filter_by(id_project=project.id_project).all()
+    # Zorg dat de VECTR score op de features is gezet vóórdat je optimize_roadmap aanroept!
+    # Dit is cruciaal. Je kunt hiervoor de calculate_vectr_scores uit calculations.py gebruiken.
+    # (Let op: de calculate_vectr_scores functie in calculations.py gebruikt ttv_weeks * (roi_percent/100) * confidence_score, wat een simpele formule is, maar werkt.)
+
+    from app.utils.calculations import calculate_vectr_scores
+    features = calculate_vectr_scores(features)
+    
+    # Standaard Alpha
+    alpha = 1.0 
+    
+    if request.method == "POST":
+        # Gebruiker kan de strategische weging (Alpha) instellen via een formulier
+        alpha = to_numeric(request.form.get("alpha", 1.0))
+        if not 0.0 <= alpha <= 1.0:
+            flash("Alpha moet tussen 0.0 en 1.0 liggen.", "danger")
+            alpha = 1.0 # fallback
+
+    # 2. Voer het Knapzak-algoritme uit
+    optimized_selection = optimize_roadmap(roadmap, features, alpha=alpha)
+
+    # 3. Zorg dat de originele features (voor de niet-geselecteerde) ook de dichtheid hebben
+    # zodat de tabel kan worden weergegeven
+    all_features_data = []
+    
+    # We hergebruiken de logic om de density per feature te krijgen, 
+    # zodat we de features kunnen sorteren in de template
+    for f in features:
+        # Bereken de cost_weight met de geimporteerde helper
+        cost_weight = calculate_feature_cost(f)
+        
+        time_weight = f.investment_hours if f.investment_hours is not None else 0
+        value = f.vectr_score if f.vectr_score is not None else 0
+        
+        # ... (de rest van de logica in de lus blijft hetzelfde)
+        
+        all_features_data.append({
+            'feature': f,
+            'is_selected': f in optimized_selection,
+            # Voeg gewicht en kosten toe voor weergave in de template
+            'time_weight': time_weight, 
+            'cost_weight': cost_weight
+        })
+        
+    # Sorteer de data (geselecteerde features bovenaan, daarna op VECTR-score)
+    all_features_data.sort(key=lambda x: (x['is_selected'], x['feature'].vectr_score if x['feature'].vectr_score is not None else 0), reverse=True)
+
+
+    return render_template(
+        "roadmap_optimization_result.html",
+        roadmap=roadmap,
+        project=project,
+        features_data=all_features_data,
+        alpha=alpha,
+        max_time=roadmap.sprint_capacity * roadmap.team_size, # Gebruik de berekende max
+        max_cost=roadmap.budget_allocation
+    )
 
 
 
@@ -822,7 +899,7 @@ def add_milestone(roadmap_id):
         ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5  # Default TtV waarde
         roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
         confidence_score = f.quality_score if f.quality_score is not None else 0.0
-        vectr_score = ttv_weeks * roi_percent * confidence_score  # Basis VECTR-formule
+        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score  # Basis VECTR-formule
         setattr(f, "vectr_score", round(vectr_score, 2))  # Dynamisch attribuut toevoegen.
 
     # Features sorteren op VECTR score (beste eerst)
@@ -894,7 +971,7 @@ def edit_milestone(milestone_id):
         ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
         roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
         confidence_score = f.quality_score if f.quality_score is not None else 0.0
-        vectr_score = ttv_weeks * roi_percent * confidence_score
+        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score
         setattr(f, "vectr_score", round(vectr_score, 2))
 
     features = sorted(features, key=lambda x: getattr(x, "vectr_score", 0), reverse=True)

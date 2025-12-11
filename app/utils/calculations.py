@@ -54,9 +54,24 @@ def calculate_vectr_scores(features_list):                             # Bereken
         confidence_score = f.quality_score if f.quality_score is not None else 0.0
         
         # De VECTR score is het gewogen product van TTV * ROI * Confidence
-        vectr_score = ttv_weeks * roi_percent * confidence_score
+        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score
         
         # Voeg de afgeronde VECTR-score (op 2 decimalen) toe aan het feature-object
         setattr(f, "vectr_score", round(vectr_score, 2))
         
     return features_list                                              # Retourneer de bijgewerkte lijst
+
+
+# app/utils/calculations.py (TOEVOEGEN AAN DIT BESTAND)
+
+# ... (bestaande functies calc_roi, calc_ttv, to_numeric, calculate_vectr_scores)
+
+def calculate_feature_cost(feature):
+    """
+    Berekent de totale ontwikkelingskosten van een feature (€).
+    Zorgt voor float conversie van de inputs.
+    """
+    # Gebruik to_numeric uit dit bestand om float conversie te verzekeren
+    invest_hours = to_numeric(feature.investment_hours) 
+    hourly_rate = to_numeric(feature.hourly_rate) 
+    return invest_hours * hourly_rate
