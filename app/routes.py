@@ -2,7 +2,7 @@ import uuid
 import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, send_file, Response
 from app import db
-from app.models import Profile, Company, Project, Features_ideas, Roadmap, Milestone, Evidence, Decision, CONFIDENCE_LEVELS
+from app.models import Profile, Company, Project, Features_ideas, Roadmap, Milestone, Evidence, Decision, ProjectChatMessage, CONFIDENCE_LEVELS
 from io import BytesIO
 import matplotlib
 matplotlib.use("Agg")
@@ -1477,3 +1477,118 @@ def inject_user_projects():
             
     # Zorgt dat {{ user_projects }} overal beschikbaar is
     return dict(user_projects=user_projects)
+
+
+
+
+
+# ==============================
+# CHAT DASHBOARD (PROJECT-CHATS)
+# ==============================
+
+@main.route("/chat")
+def chat_dashboard():
+    """Toont chatdashboard: links projecten, rechts chat van eerste project."""
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
+
+    # Alle projecten van de company van de gebruiker
+    projects = (
+        Project.query
+        .filter_by(id_company=user.id_company)
+        .order_by(Project.project_name.asc())
+        .all()
+    )
+
+    # Geen projecten? Terug naar dashboard
+    if not projects:
+        flash("No projects available for chat.", "danger")
+        return redirect(url_for("main.dashboard"))
+
+    # Standaard: eerste project in de lijst
+    first_project = projects[0]
+
+    messages = (
+        ProjectChatMessage.query
+        .filter_by(id_project=first_project.id_project)
+        .order_by(ProjectChatMessage.timestamp.asc())
+        .all()
+    )
+
+    return render_template(
+        "chat_dashboard.html",
+        projects=projects,
+        selected_project=first_project,
+        messages=messages,
+        user=user,
+    )
+
+
+@main.route("/chat/project/<int:project_id>")
+def chat_dashboard_project(project_id):
+    """Zelfde layout, maar met een andere geselecteerde project-chat."""
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
+
+    project = Project.query.get_or_404(project_id)
+
+    # Company-check: user moet bij hetzelfde bedrijf horen als het project
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
+
+    # Alle projecten opnieuw ophalen voor de linker lijst
+    projects = (
+        Project.query
+        .filter_by(id_company=user.id_company)
+        .order_by(Project.project_name.asc())
+        .all()
+    )
+
+    messages = (
+        ProjectChatMessage.query
+        .filter_by(id_project=project_id)
+        .order_by(ProjectChatMessage.timestamp.asc())
+        .all()
+    )
+
+    return render_template(
+        "chat_dashboard.html",
+        projects=projects,
+        selected_project=project,
+        messages=messages,
+        user=user,
+    )
+
+
+@main.route("/chat/project/<int:project_id>/send", methods=["POST"])
+def chat_dashboard_send(project_id):
+    """Stuurt een nieuw bericht in de chat van een bepaald project."""
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
+
+    project = Project.query.get_or_404(project_id)
+
+    # Company-check
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
+
+    text = request.form.get("content", "").strip()
+    if not text:
+        # Leeg bericht? Gewoon terug naar dezelfde chat (geen flash nodig)
+        return redirect(url_for("main.chat_dashboard_project", project_id=project_id))
+
+    # Nieuw chatbericht opslaan
+    msg = ProjectChatMessage(
+        id_project=project_id,
+        id_profile=user.id_profile,
+        content=text,
+    )
+    db.session.add(msg)
+    db.session.commit()
+
+    return redirect(url_for("main.chat_dashboard_project", project_id=project_id))

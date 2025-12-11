@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Project Chat{% endblock %}
+
+{% block content %}
+
+<div class="wa-chat-container">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="wa-sidebar">
+        <div class="wa-sidebar-header">
+            <h4>Projects</h4>
+        </div>
+
+        <div class="wa-project-list">
+            {% for p in projects %}
+            <a href="{{ url_for('main.chat_dashboard_project', project_id=p.id_project) }}"
+               class="wa-project-item {% if p.id_project == selected_project.id_project %}active{% endif %}">
+                {{ p.project_name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <!-- RIGHT CHAT PANEL -->
+    <div class="wa-chat-panel">
+
+        <!-- CHAT HEADER -->
+        <div class="wa-chat-header">
+            <h5>{{ selected_project.project_name }}</h5>
+        </div>
+
+        <!-- CHAT MESSAGES -->
+        <div class="wa-messages" id="chatMessages">
+
+            {% for msg in messages %}
+            <div class="wa-msg-wrapper {% if msg.id_profile == user.id_profile %}me{% else %}them{% endif %}">
+
+                <div class="wa-msg-bubble">
+                    <div class="wa-msg-sender">
+                        {{ msg.sender.name }}
+                    </div>
+
+                    <div class="wa-msg-text">
+                        {{ msg.content }}
+                    </div>
+
+                    <div class="wa-msg-time">
+                        {{ msg.timestamp.strftime("%H:%M") }}
+                    </div>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- INPUT BAR -->
+        <form class="wa-input-bar"
+              action="{{ url_for('main.chat_dashboard_send', project_id=selected_project.id_project) }}"
+              method="POST">
+
+            <input type="text"
+                   name="content"
+                   placeholder="Type a message..."
+                   autocomplete="off"
+                   class="wa-input">
+
+            <button class="wa-send-btn">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
