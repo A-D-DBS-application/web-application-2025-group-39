@@ -1,19 +1,17 @@
-import uuid
-import datetime
+import uuid, datetime
+from io import BytesIO
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, send_file, Response
+from sqlalchemy.orm import joinedload
+import matplotlib, numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 from app import db
 from app.models import Profile, Company, Project, Features_ideas, Roadmap, Milestone, Evidence, Decision, ProjectChatMessage, CONFIDENCE_LEVELS
-from io import BytesIO
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import numpy as np
-import matplotlib.patches as patches
 from app.constants import CONF_MIN, CONF_LOW_THRESHOLD, CONF_MID_HIGH_THRESHOLD, CONF_MAX, TTV_MIN, TTV_SLOW_THRESHOLD, TTV_MID_THRESHOLD, TTV_MAX
-from app.utils.calculations import calc_roi, calc_ttv, to_numeric, calculate_feature_cost # <-- calculate_feature_cost toegevoegd
+from app.utils.calculations import calc_roi, calc_ttv, to_numeric, calculate_feature_cost
 from app.utils.form_helpers import prepare_vectr_chart_data, require_login, require_role, require_company_ownership, parse_project_form, parse_feature_form, parse_roadmap_form, parse_milestone_form, parse_evidence_form, recompute_feature_confidence
 from app.utils.knapsack_optimizer import optimize_roadmap
-from sqlalchemy.orm import joinedload
+
 
 # Blueprint
 main = Blueprint("main", __name__)
