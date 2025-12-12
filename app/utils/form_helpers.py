@@ -151,6 +151,29 @@ def required_int(form, field, errors, label=None, required=True):
         errors.append(f"{label or field.replace('_', ' ').title()} must be an integer.")
         return None
 
+def optional_int_zero(form, field, errors, label=None):
+    #Geeft 0 terug als het veld leeg is, valideert integer wanneer er wel invoer is.#
+    raw = form.get(field, "").strip()
+    if not raw:
+        return 0  # Geen waarde ingevuld? Maak er automatisch 0 van zodat de gebruiker niets hoeft te typen.
+    try:
+        return int(raw)  # Wel een waarde: probeer deze te converteren naar een integer.
+    except ValueError:
+        errors.append(f"{label or field.replace('_', ' ').title()} must be an integer.")
+        return None
+
+
+def optional_float_zero(form, field, errors, label=None):
+    #Geeft 0.0 terug als het veld leeg is, valideert float wanneer er wel invoer is.#
+    raw = form.get(field, "").strip()
+    if not raw:
+        return 0.0  # Leeg laten wordt automatisch 0.0 zodat optionele velden de flow niet blokkeren.
+    try:
+        return float(raw)  # Invoer aanwezig: converteer naar float.
+    except ValueError:
+        errors.append(f"{label or field.replace('_', ' ').title()} must be a number.")
+        return None
+
 
 # -----------------------------------
 # OBJECT-LEVEL PARSERS
@@ -172,12 +195,12 @@ def parse_feature_form(form):
         "name_feature": name_feature,
         "description": description,
         "extra_revenue": required_int(form, "extra_revenue", errors),
-        "churn_reduction": required_int(form, "churn_reduction", errors),
-        "cost_savings": required_int(form, "cost_savings", errors),
+        "churn_reduction": optional_int_zero(form, "churn_reduction", errors),
+        "cost_savings": optional_int_zero(form, "cost_savings", errors),
         "investment_hours": required_int(form, "investment_hours", errors),
         "hourly_rate": required_int(form, "hourly_rate", errors),
-        "opex_hours": required_int(form, "opex_hours", errors),
-        "other_costs": required_int(form, "other_costs", errors),
+        "opex_hours": optional_int_zero(form, "opex_hours", errors),
+        "other_costs": optional_int_zero(form, "other_costs", errors),
         "horizon": required_int(form, "horizon", errors),
         "ttm_weeks": required_int(form, "ttm_weeks", errors),
         "ttbv_weeks": required_int(form, "ttbv_weeks", errors),
