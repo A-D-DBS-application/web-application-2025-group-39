@@ -6,7 +6,7 @@
 {% block content %}
 
 <!-- PAGETITLE -->
-<h2 class="mb-4 text-center">Features Overview: {{ project.project_name }}</h2>
+<h2 class="mb-4 text-center">Feature Ideas: {{ project.project_name }}</h2>
 
 <!-- TOP ACTION BUTTONS -->
 <div class="mb-3 d-flex justify-content-center gap-2 flex-wrap">
@@ -27,7 +27,7 @@
     {% if features|length == 0 %} {# Als er geen features zijn, toon een lege-state #}
 
     <div class="text-center py-4 text-muted">
-        No features yet — add one soon!
+        No feature ideas yet — add one soon!
     </div>
 
     {% else %}

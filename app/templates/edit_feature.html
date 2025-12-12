@@ -152,7 +152,7 @@
           <label class="form-label">
             Other Costs (optional)
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-              data-bs-content="A category for any costs that do not fit elsewhere.This could include licensing fees, integration costs or opportunity costs.">
+              data-bs-content="A category for any costs that do not fit elsewhere. This could include licensing fees, integration costs or opportunity costs.">
             </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
           </label>
           <input type="number" class="form-control" name="other_costs" min="0" value="{{ feature.other_costs or '' }}">
@@ -175,27 +175,8 @@
       <div class="row g-3">
 
         <!-- TtV -->
+         <!-- TTM WEEKS -->
         <div class="col-md-6">
-
-          <!-- LOWEST TTM -->
-          <label class="form-label">Lowest Time-to-Market
-            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-              data-bs-content="Provide your best estimate of the minimum number of weeks required to build and release the feature. This will later be used to scale the graph correctly.">
-            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
-          </label>
-          <input type="number" class="form-control" name="ttm_low" min="0" value="{{ feature.ttm_low or '' }}"> {#
-          Minimum schatting TTM (weken) #}
-
-          <!-- HIGHEST TTM -->
-          <label class="form-label mt-3">Highest Time-to-Market
-            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-              data-bs-content="Provide your best estimate of the maximum number of weeks required to build and release the feature. This will later be used to scale the graph correctly.">
-            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
-          </label>
-          <input type="number" class="form-control" name="ttm_high" min="0" value="{{ feature.ttm_high or '' }}"> {#
-          Maximum schatting TTM (weken) #}
-
-          <!-- TTM WEEKS -->
           <label class="form-label mt-3">Time-to-Market (weeks)
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The number of weeks needed to build and release the first usable version of the feature. This includes everything: design, development, testing and deployment.">
@@ -207,25 +188,6 @@
 
         <!-- TTBV -->
         <div class="col-md-6">
-
-          <!-- LOWEST TTBV -->
-          <label class="form-label">Lowest Time-to-Business-Value
-            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-              data-bs-content="Provide your best estimate of the minimum number of weeks after launch before the feature begins delivering measurable business value. This will later be used to scale the graph correctly.">
-            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
-          </label>
-          <input type="number" class="form-control" name="ttbv_low" min="0" value="{{ feature.ttbv_low or '' }}"> {#
-          Minimum schatting TTBV (weken na launch) #}
-
-          <!-- HIGHEST TTBV -->
-          <label class="form-label mt-3">Highest Time-to-Business-Value
-            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
-              data-bs-content="Provide your best estimate of the maximum number of weeks after launch before the feature begins delivering measurable business value. This will later be used to scale the graph correctly.">
-            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
-          </label>
-          <input type="number" class="form-control" name="ttbv_high" min="0" value="{{ feature.ttbv_high or '' }}"> {#
-          Maximum schatting TTBV (weken na launch) #}
-
           <!-- TTBV WEEKS -->
           <label class="form-label mt-3">Time-to-Business-Value (weeks)
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"

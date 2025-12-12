@@ -1,25 +1,37 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Project{% endblock %}
+{% block title %}Edit Project: {{ project.project_name }}{% endblock %}
 {% block body_class %}projects-body{% endblock %}
 
 {% block content %}
-  <!-- Terugknop naar projectenoverzicht -->
+  
   <div class="top-right">
     <a href="{{ url_for('main.projects') }}" 
       class="btn btn-base btn-nav btn-sm">
       Projects Overview
-
     </a>
   </div>
 
-  <h2 class="mb-4 text-center">Edit Project</h2>
+  <h2 class="mb-4 text-center">Edit Project: {{ project.project_name }}</h2>
 
-    <!-- Formulier voor projectbewerking -->
-  <div class="form-card shadow-sm p-4 mx-auto">
-    <form method="post">
+    <div class="form-card shadow-sm p-4 mx-auto">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'danger' if category in ['danger','error'] else category }} alert-dismissible fade show"
+      role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <form method="post" action="{{ url_for('main.edit_project', project_id=project.id_project) }}">
       
-      <!-- Projectnaam aanpassen -->
+      <h5 class="mb-3 fw-semibold">Project Info</h5>
+      
       <div class="mb-3">
         <label class="form-label">Project Name</label>
         <input type="text" 
@@ -28,12 +40,85 @@
                value="{{ project.project_name }}"
                required>
       </div>
-    <!-- Opslaan en annuleren knoppen -->
 
+      {% set company = project.company %} 
+      {% if company %}
+      <div class="mb-3">
+        <label class="form-label">Company</label>
+        <input type="text" class="form-control" value="{{ company.company_name }}" readonly>
+      </div>
+      {% endif %}
+
+      <hr class="my-4">
+
+      <h5 class="mb-3 fw-semibold">TtV Scaling Limits (Project Scope)</h5>
+      <p class="text-muted fst-italic mb-3">
+        These values define the 0-10 scale for Time-to-Value in the VECTR chart for all features in this project.
+      </p>
+      
+      <div class="row g-3 mb-4">
+        
+        <div class="col-md-6">
+          <h6 class="fw-bold">Time-to-Market (TtM)</h6>
+          
+          <div class="mb-3">
+            <label class="form-label">Lowest TtM (weeks)
+              <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+                data-bs-content="Provide your best estimate of the minimum number of weeks required to build and release the feature.">
+              </i>
+            </label>
+            <input type="number" class="form-control" name="ttm_low_limit" min="0" required
+                   value="{{ project.ttm_low_limit or '' }}">
+          </div>
+
+          <div>
+            <label class="form-label">Highest TtM (weeks)
+              <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+                data-bs-content="Provide your best estimate of the maximum number of weeks required to build and release the feature.">
+              </i>
+            </label>
+            <input type="number" class="form-control" name="ttm_high_limit" min="0" required
+                   value="{{ project.ttm_high_limit or '' }}">
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <h6 class="fw-bold">Time-to-Business-Value (TtBV)</h6>
+          
+          <div class="mb-3">
+            <label class="form-label">Lowest TtBV (weeks)
+              <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+                data-bs-content="Provide your best estimate of the minimum number of weeks after launch before the feature begins delivering measurable business value.">
+              </i>
+            </label>
+            <input type="number" class="form-control" name="ttbv_low_limit" min="0" required
+                   value="{{ project.ttbv_low_limit or '' }}">
+          </div>
+
+          <div>
+            <label class="form-label">Highest TtBV (weeks)
+              <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+                data-bs-content="Provide your best estimate of the maximum number of weeks after launch before the feature begins delivering measurable business value.">
+              </i>
+            </label>
+            <input type="number" class="form-control" name="ttbv_high_limit" min="0" required
+                   value="{{ project.ttbv_high_limit or '' }}">
+          </div>
+        </div>
+      </div>
       <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">Save Changes</button>
       <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-secondary-custom w-100 mt-2">
         Cancel
       </a>
     </form>
   </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+      var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl)
+      })
+    });
+  </script>
 {% endblock %}

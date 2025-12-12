@@ -1,7 +1,7 @@
 # app/utils/form_helpers.py
 
 from flask import session, flash, redirect, url_for
-from app.models import Profile, CONFIDENCE_LEVELS, Features_ideas
+from app.models import Profile, Project, CONFIDENCE_LEVELS, Features_ideas
 
 # -----------------------------------
 # LOGIN / ROLE / OWNERSHIP HELPERS
@@ -58,30 +58,20 @@ def require_company_ownership(obj_company_id: int, user):
 # -----------------------------------
 # vectr chart HELPERS
 # -----------------------------------
-def prepare_vectr_chart_data(features_list):
+def prepare_vectr_chart_data(project: Project, features_list: list):
     """
     Verwerkt een lijst van features in de genormaliseerde structuur die Chart.js nodig heeft,
-    inclusief TtV-normalisatie (schaling).
+    gebruikmakend van de TtV-limits van het Project-object.
     """
-    valid_ttv = []
-    for f in features_list:
-        if (
-            f.ttm_low is not None
-            and f.ttbv_low is not None
-            and f.ttm_high is not None
-            and f.ttbv_high is not None
-        ):
-            min_ttv = float(f.ttm_low) + float(f.ttbv_low)
-            max_ttv = float(f.ttm_high) + float(f.ttbv_high)
-            valid_ttv.append((min_ttv, max_ttv))
-
-    if valid_ttv:
-        local_TTV_MIN = min(m for m, _ in valid_ttv)
-        local_TTV_MAX = max(M for _, M in valid_ttv)
-    else:
-        local_TTV_MIN, local_TTV_MAX = 0.0, 10.0
+    
+    # 1. Bepaal de TtV grenzen op basis van het Project-object
+    # De maximale TTV is de som van de hoogste TTM en de hoogste TTBV van het project
+    local_TTV_MIN = (project.ttm_low_limit or 0.0) + (project.ttbv_low_limit or 0.0)
+    local_TTV_MAX = (project.ttm_high_limit or 10.0) + (project.ttbv_high_limit or 0.0) # Gebruik 10.0 als fallback voor de max
 
     chart_data = []
+    
+    # 2. Itereren en schalen
     for f in features_list:
         if (
             f.roi_percent is not None
@@ -92,13 +82,14 @@ def prepare_vectr_chart_data(features_list):
             conf = float(f.quality_score)
             effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
 
+            # Schaling: Gebruik de lokale projectgrenzen
             if local_TTV_MAX > local_TTV_MIN:
                 ttv_norm = (effective_ttv - local_TTV_MIN) / (
                     local_TTV_MAX - local_TTV_MIN
-                ) * 10
-                ttv_scaled = 10.0 - ttv_norm
+                ) * 10 # Schaal naar bereik 0-10
+                ttv_scaled = 10.0 - min(max(ttv_norm, 0), 10) # 10.0 - TTV zorgt voor omgekeerde Y-as (Fast bovenaan)
             else:
-                ttv_scaled = 0
+                ttv_scaled = 0 # Val terug op 0 als grenzen gelijk zijn
 
             chart_data.append(
                 {
@@ -182,8 +173,20 @@ def optional_float_zero(form, field, errors, label=None):
 def parse_project_form(form):
     errors = []
     name = required_str(form, "project_name", errors, label="Project name")
-    return {"project_name": name}, errors
-
+    
+    # NIEUW: TTV LIMITS OPHALEN
+    ttm_low = required_float(form, "ttm_low_limit", errors, label="Lowest TTM")
+    ttm_high = required_float(form, "ttm_high_limit", errors, label="Highest TTM")
+    ttbv_low = required_float(form, "ttbv_low_limit", errors, label="Lowest TTBV")
+    ttbv_high = required_float(form, "ttbv_high_limit", errors, label="Highest TTBV")
+    
+    return {
+        "project_name": name,
+        "ttm_low_limit": ttm_low,
+        "ttm_high_limit": ttm_high,
+        "ttbv_low_limit": ttbv_low,
+        "ttbv_high_limit": ttbv_high,
+    }, errors
 
 def parse_feature_form(form):
     errors = []
@@ -204,10 +207,6 @@ def parse_feature_form(form):
         "horizon": required_int(form, "horizon", errors),
         "ttm_weeks": required_int(form, "ttm_weeks", errors),
         "ttbv_weeks": required_int(form, "ttbv_weeks", errors),
-        "ttm_low": required_float(form, "ttm_low", errors),
-        "ttm_high": required_float(form, "ttm_high", errors),
-        "ttbv_low": required_float(form, "ttbv_low", errors),
-        "ttbv_high": required_float(form, "ttbv_high", errors),
         "quality_score": required_float(form, "quality_score", errors, required=False),
     }
 

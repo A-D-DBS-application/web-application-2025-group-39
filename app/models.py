@@ -89,6 +89,12 @@ class Project(db.Model):
 
     project_name = db.Column(db.String, nullable=False)
     createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    
+    # TtV Schalings limiet
+    ttm_low_limit = db.Column(db.Float)
+    ttm_high_limit = db.Column(db.Float)
+    ttbv_low_limit = db.Column(db.Float)
+    ttbv_high_limit = db.Column(db.Float)
 
     company = db.relationship("Company", back_populates="projects")
 
@@ -137,10 +143,6 @@ class Features_ideas(db.Model):
     other_costs = db.Column(db.Integer)
 
     # TTV fields
-    ttm_low = db.Column(db.Float)
-    ttm_high = db.Column(db.Float)
-    ttbv_low = db.Column(db.Float)
-    ttbv_high = db.Column(db.Float)
     ttm_weeks = db.Column(db.Integer)
     ttbv_weeks = db.Column(db.Integer)
 

@@ -1,8 +1,10 @@
+import matplotlib
+matplotlib.use("Agg") 
 import uuid, datetime
 from io import BytesIO
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session, send_file, Response
 from sqlalchemy.orm import joinedload
-import matplotlib, numpy as np
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from app import db
@@ -11,7 +13,6 @@ from app.constants import CONF_MIN, CONF_LOW_THRESHOLD, CONF_MID_HIGH_THRESHOLD,
 from app.utils.calculations import calc_roi, calc_ttv, to_numeric, calculate_feature_cost
 from app.utils.form_helpers import prepare_vectr_chart_data, require_login, require_role, require_company_ownership, parse_project_form, parse_feature_form, parse_roadmap_form, parse_milestone_form, parse_evidence_form, recompute_feature_confidence
 from app.utils.knapsack_optimizer import optimize_roadmap
-
 
 # Blueprint
 main = Blueprint("main", __name__)
@@ -313,6 +314,10 @@ def add_project():
         new_project = Project(
             project_name=data["project_name"],
             id_company=user_company.id_company,
+            ttm_low_limit=data["ttm_low_limit"],
+            ttm_high_limit=data["ttm_high_limit"],
+            ttbv_low_limit=data["ttbv_low_limit"],
+            ttbv_high_limit=data["ttbv_high_limit"],
         )
         db.session.add(new_project)
         db.session.commit()
@@ -346,6 +351,11 @@ def edit_project(project_id):
             return render_template("edit_project.html", project=project)
 
         project.project_name = data["project_name"]
+        project.ttm_low_limit = data["ttm_low_limit"]
+        project.ttm_high_limit = data["ttm_high_limit"]
+        project.ttbv_low_limit = data["ttbv_low_limit"]
+        project.ttbv_high_limit = data["ttbv_high_limit"]
+        
         db.session.commit()
 
         flash("Project updated successfully.", "success")
@@ -437,10 +447,6 @@ def add_feature(project_id):
             horizon=data["horizon"],
             ttm_weeks=data["ttm_weeks"],
             ttbv_weeks=data["ttbv_weeks"],
-            ttm_low=data["ttm_low"],
-            ttm_high=data["ttm_high"],
-            ttbv_low=data["ttbv_low"],
-            ttbv_high=data["ttbv_high"],
             roi_percent=roi_percent,
             ttv_weeks=ttv_weeks,
             quality_score=data["quality_score"],
@@ -565,7 +571,7 @@ def edit_feature(feature_id):
     company = Company.query.get(project.id_company)
 
     # Only founder/PM + ownership
-    role_redirect = require_role(["founder", "PM"], user)
+    role_redirect = require_role(["Founder", "PM"], user)
     if role_redirect:
         return role_redirect
     company_redirect = require_company_ownership(project.id_company, user)
@@ -596,10 +602,6 @@ def edit_feature(feature_id):
         feature.horizon = data["horizon"]
         feature.ttm_weeks = data["ttm_weeks"]
         feature.ttbv_weeks = data["ttbv_weeks"]
-        feature.ttm_low = data["ttm_low"]
-        feature.ttm_high = data["ttm_high"]
-        feature.ttbv_low = data["ttbv_low"]
-        feature.ttbv_high = data["ttbv_high"]
         feature.quality_score = data["quality_score"]
 
         feature.roi_percent = calc_roi(
@@ -668,7 +670,7 @@ def vectr_chart(project_id):
     features = Features_ideas.query.filter_by(id_project=project_id).all()   # Alle features voor dit project ophalen
 
     # De volledige berekening wordt uitgevoerd in een aparte helperfunctie voor overzichtelijkheid
-    chart_data = prepare_vectr_chart_data(features)
+    chart_data = prepare_vectr_chart_data(project, features)
 
     return render_template(
         "vectr_chart.html",                   # Template dat de grafiek tekent
@@ -1245,34 +1247,21 @@ def vectr_chart_pdf(project_id):
     # 3) Haal alle features van dit project op
     features = Features_ideas.query.filter_by(id_project=project_id).all()
 
-    # 4) Bereken min/max TTV (time-to-value) uit de features
-    valid_ttv = []
-    for f in features:
-        # Controleer of alle 4 waarden aanwezig zijn (low/high voor TTM en TTBV)
-        if (
-            f.ttm_low is not None
-            and f.ttbv_low is not None
-            and f.ttm_high is not None
-            and f.ttbv_high is not None
-        ):
-            # Bereken de minimum en maximum TTV
-            min_ttv = float(f.ttm_low) + float(f.ttbv_low)
-            max_ttv = float(f.ttm_high) + float(f.ttbv_high)
-            # Voeg dit paar toe aan de lijst
-            valid_ttv.append((min_ttv, max_ttv))
+    # 4) Gebruik de centrale helper om de geschaalde chart data te verkrijgen
+    # Deze helper (prepare_vectr_chart_data) haalt de grenzen uit het Project object.
+    chart_data = prepare_vectr_chart_data(project, features) 
 
-    if valid_ttv:
-        local_TTV_MIN = min(m for m, _ in valid_ttv)        # Neem het kleinste min_ttv uit alle features -> globale minimum TTV
-        local_TTV_MAX = max(M for _, M in valid_ttv)        # Analoog
-    else:
-        local_TTV_MIN, local_TTV_MAX = 0.0, 10.0  # fallback range
+    # 5) Bepaal de TtV grenzen van het Project voor de schaal-berekening in de plot
+    # De grens is nu de som van de project-limieten (TTM Low/High + TTBV Low/High)
+    local_TTV_MIN = (project.ttm_low_limit or 0.0) + (project.ttbv_low_limit or 0.0)
+    local_TTV_MAX = (project.ttm_high_limit or 10.0) + (project.ttbv_high_limit or 0.0)
 
-    # 5) Setup matplotlib figuur
+    # 6) Setup matplotlib figuur
     fig, ax = plt.subplots(figsize=(10, 10))                # Maak een figuur en een as-object van 10x10 inch
     ax.set_xlim(0.0, 10.0)
     ax.set_ylim(0.0, 10.0)
 
-    # 6) Definieer zones (kleurvlakken op de chart)
+    # 7) Definieer zones (kleurvlakken op de chart)
     zones = [
         {"color": (1, 0, 0, 0.25), "x": 0.0, "y": 0.0, "w": 7.0, "h": 5.0},   # rood zone
         {"color": (1, 140/255, 0, 0.25), "x": 1.0, "y": 5.0, "w": 6.0, "h": 5.0}, # oranje zone
@@ -1282,7 +1271,7 @@ def vectr_chart_pdf(project_id):
         {"color": (1, 165/255, 0, 0.25), "x": 7.0, "y": 0.0, "w": 3.0, "h": 5.0}, # oranje zone
     ]
 
-    # 7) Voeg zones toe als rechthoeken
+    # 8) Voeg zones toe als rechthoeken
     for z in zones:
         rect = patches.Rectangle(
             (z["x"], z["y"]),           # startpositie (linkeronderhoek)
@@ -1294,7 +1283,7 @@ def vectr_chart_pdf(project_id):
         )
         ax.add_patch(rect)              # voeg de rechthoek toe aan de grafiek
 
-    # 8) Helperfunctie: bepaal kleur van een feature op basis van confidence + TTV
+    # 9) Helperfunctie: bepaal kleur van een feature op basis van confidence + TTV
     def get_zone_color_mpl(confidence, ttv_scaled):
         x_low = CONF_LOW_THRESHOLD        # drempel voor lage confidence
         x_high = CONF_MID_HIGH_THRESHOLD  # drempel voor hoge confidence
@@ -1315,43 +1304,32 @@ def vectr_chart_pdf(project_id):
             else:
                 return (1, 140/255, 0, 1)  # oranje
 
-    # 9) Verzamel scatter data (punten op de chart)
+    # 10) Verzamel scatter data (punten op de chart)
     scatter_x = []       # x-waarden: confidence waarden
     scatter_y = []       # y-waarden: TTV waarden
     scatter_s = []       # grootte van de cirkel (ROI)
     scatter_c = []       # kleur van de cirkel
     scatter_labels = []  # naam van de feature
 
-    for f in features:
-        # Alleen features met alle nodige waarden worden getoond
-        if (
-            f.roi_percent is not None
-            and f.quality_score is not None
-            and f.ttm_weeks is not None
-            and f.ttbv_weeks is not None
-        ):
-            conf = float(f.quality_score)                               # confidence score
-            effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)    # totale TTV
+    for item in chart_data: # Loop over de reeds geschaalde data uit de helper
+        
+        conf = item["confidence"]                       # confidence score
+        ttv_scaled = item["ttv"]                        # geschaalde TTV (0-10)
+        roi_val = item["roi"]                           # ROI waarde
+        
+        # De effectieve TTV (ttm_weeks + ttbv_weeks) zit in item["ttv_weeks"] indien nodig
+        
+        size_mpl_area = max(50, min(2000, max(0, roi_val) * 15))  # bubble size
+        color = get_zone_color_mpl(conf, ttv_scaled)              # kleur bepalen via helperfunctie
+        
+        # Voegt data toe aan de lijsten
+        scatter_x.append(conf)
+        scatter_y.append(ttv_scaled)
+        scatter_s.append(size_mpl_area)
+        scatter_c.append(color)
+        scatter_labels.append(item["name"])
 
-            # Normaliseer TTV naar schaal 0-10
-            if local_TTV_MAX > local_TTV_MIN:
-                ttv_norm = (effective_ttv - local_TTV_MIN) / (local_TTV_MAX - local_TTV_MIN) * 10
-                ttv_scaled = 10.0 - ttv_norm  # omgekeerde schaal
-            else:
-                ttv_scaled = 0
-
-            roi_val = float(f.roi_percent)                            # ROI waarde
-            size_mpl_area = max(50, min(2000, max(0, roi_val) * 15))  # bubble size
-            color = get_zone_color_mpl(conf, ttv_scaled)              # kleur bepalen via helperfunctie
-            
-            # Voegt data toe aan de lijsten
-            scatter_x.append(conf)
-            scatter_y.append(ttv_scaled)
-            scatter_s.append(size_mpl_area)
-            scatter_c.append(color)
-            scatter_labels.append(f.name_feature)
-
-    # 10) Plot scatter chart
+    # 11) Plot scatter chart
     ax.scatter(
         scatter_x,
         scatter_y,
@@ -1362,7 +1340,7 @@ def vectr_chart_pdf(project_id):
         alpha=0.8,          # transparantie
     )
 
-    # 11) Labels en ticks (custom tekst op assen)
+    # 12) Labels en ticks (custom tekst op assen)
     ax.set_xticks([0, 1, 3, 5, 7, 8, 10])
     ax.set_xticklabels(["0", "Low", "3", "5", "7", "High", "10"])
     ax.set_yticks([0, 1, 2, 3, 5, 7, 8, 10])
@@ -1372,7 +1350,7 @@ def vectr_chart_pdf(project_id):
     ax.set_ylabel("Time-to-Value (TtV)")                                    # y-as label
     ax.set_title(f"VECTR Prioritization Chart for {project.project_name}")  # titel met projectnaam
 
-    # 12) Annotaties (labels bij de punten)
+    # 13) Annotaties (labels bij de punten)
     for i, label in enumerate(scatter_labels):
         ax.annotate(
             label,                        # tekst (feature naam)
@@ -1383,21 +1361,20 @@ def vectr_chart_pdf(project_id):
             fontsize=7,                   # lettergrootte
         )
 
-    # 13) Opslaan als PDF in geheugenbuffer
+    # 14) Opslaan als PDF in geheugenbuffer
     plt.tight_layout()              # layout netjes maken
     buf = BytesIO()                 # buffer in geheugen (om data tijdelijk op te slaan zonder dat er iets op de schijft terecht komt) )
     plt.savefig(buf, format="pdf")  # figuur opslaan als PDF in buffer
     plt.close(fig)                  # figuur sluiten om geheugen vrij te maken
     buf.seek(0)                     # cursor terug naar begin van buffer
 
-    # 14) Stuur PDF terug als download
+    # 15) Stuur PDF terug als download
     return send_file(
         buf,
         as_attachment=True,                                             # forceer download
         download_name=f"vectr_chart_{project.project_name}.pdf",        # bestandsnaam
         mimetype="application/pdf",                                     # soort bestand waarin het wordt gedownload
     )
-
 
 # ==============================
 # FEATURE DECISION ROUTE 

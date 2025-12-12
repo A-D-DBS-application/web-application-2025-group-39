@@ -4,52 +4,107 @@
 {% block body_class %}projects-body{% endblock %}
 
 {% block content %}
-  
-<!-- PAGETITLE -->
-  <h2 class="mb-4 text-center">Add New Project</h2>
 
-<!-- FORM CONTAINER -->
-  <div class="form-card shadow-sm p-4 mx-auto">
-    
-    <!-- FLASH MESSAGES (VALIDATION/FEEDBACK) -->
-    {% with messages = get_flashed_messages(with_categories=true) %} {# Haalt flashed messages op uit Flask (met category + message) #}
-      {% if messages %} {# Toon alleen de container als er effectief messages zijn #}
-        {% for category, message in messages %} {# Loop door elke (category, message) pair #}
-          <div class="alert alert-{{ 'danger' if category in ['danger','error'] else category }} alert-dismissible fade show" role="alert">
-            {{ message }} {# Toon de message tekst #}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+<h2 class="mb-4 text-center">Add New Project</h2>
 
-    <!-- FORM (ADD PROJECT) -->
-    <form method="POST" action="{{ url_for('main.add_project') }}">
-      <h5 class="mb-3 fw-semibold">Project Info</h5>
+<div class="form-card shadow-sm p-4 mx-auto">
 
-      <!-- Project Name -->
-      <div class="mb-3">
-        <label class="form-label">Project Name</label>
-        <input type="text" name="project_name" class="form-control" required>
-      </div>
-
-      <!-- Company -->
-      <div class="mb-3">
-        <label class="form-label">Company</label>
-        <input type="text" class="form-control" value="{{ company.company_name }}" readonly> {# Toon de bedrijfsnaam ter info; readonly = niet aanpasbaar maar blijft “leesbaar” #}
-        <input type="hidden" name="company_id" value="{{ company.id_company }}"> {# Belangrijk: ID wordt meegestuurd in POST om project correct aan company te koppelen #}
-      </div>
-      
-      <!--add project en cancel prodject button-->
-      <button type="submit" class="btn btn-base btn-primary-custom w-100">
-      Add Project
-      </button>
-
-      <a href="{{ url_for('main.projects') }}"
-      class="btn btn-base btn-secondary-custom w-100 mt-2">
-      Cancel
-      </a>
-    
-    </form>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  {% for category, message in messages %}
+  <div class="alert alert-{{ 'danger' if category in ['danger','error'] else category }} alert-dismissible fade show"
+    role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
   </div>
+  {% endfor %}
+  {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="{{ url_for('main.add_project') }}">
+    <h5 class="mb-3 fw-semibold">Project Info</h5>
+
+    <div class="mb-3">
+      <label class="form-label">Project Name</label>
+      <input type="text" name="project_name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Company</label>
+      <input type="text" class="form-control" value="{{ company.company_name }}" readonly> {# Toon de bedrijfsnaam ter
+      info; readonly = niet aanpasbaar maar blijft “leesbaar” #}
+      <input type="hidden" name="company_id" value="{{ company.id_company }}"> {# Belangrijk: ID wordt meegestuurd in
+      POST om project correct aan company te koppelen #}
+    </div>
+
+    <h5 class="mb-3 fw-semibold mt-4">TtV Scaling Limits (Project Scope)</h5>
+    <p class="text-muted fst-italic mb-3">
+      These values define the 0-10 scale for Time-to-Value in the VECTR chart for all features in this project.
+    </p>
+    
+    <div class="row g-3 mb-4">
+      
+      <div class="col-md-6">
+        <h6 class="fw-bold">Time-to-Market (TtM)</h6>
+        
+        <div class="mb-3">
+          <label class="form-label">Lowest TtM (weeks)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="Provide your best estimate of the minimum number of weeks required to build and release the feature.">
+            </i>
+          </label>
+          <input type="number" class="form-control" name="ttm_low_limit" min="0" required>
+        </div>
+
+        <div>
+          <label class="form-label">Highest TtM (weeks)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="Provide your best estimate of the maximum number of weeks required to build and release the feature.">
+            </i>
+          </label>
+          <input type="number" class="form-control" name="ttm_high_limit" min="0" required>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <h6 class="fw-bold">Time-to-Business-Value (TtBV)</h6>
+        
+        <div class="mb-3">
+          <label class="form-label">Lowest TtBV (weeks)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="Provide your best estimate of the minimum number of weeks after launch before the feature begins delivering measurable business value.">
+            </i>
+          </label>
+          <input type="number" class="form-control" name="ttbv_low_limit" min="0" required>
+        </div>
+
+        <div>
+          <label class="form-label">Highest TtBV (weeks)
+            <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
+              data-bs-content="Provide your best estimate of the maximum number of weeks after launch before the feature begins delivering measurable business value.">
+            </i>
+          </label>
+          <input type="number" class="form-control" name="ttbv_high_limit" min="0" required>
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-base btn-primary-custom w-100">
+      Add Project
+    </button>
+
+    <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-secondary-custom w-100 mt-2">
+      Cancel
+    </a>
+
+  </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+      var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl)
+      })
+    });
+  </script>
 {% endblock %}
