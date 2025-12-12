@@ -1592,3 +1592,29 @@ def chat_dashboard_send(project_id):
     db.session.commit()
 
     return redirect(url_for("main.chat_dashboard_project", project_id=project_id))
+
+@main.route("/chat/project/<int:project_id>/messages")
+def chat_project_messages(project_id):
+    """Geeft alleen de chatberichten terug voor dynamische refresh."""
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
+
+    project = Project.query.get_or_404(project_id)
+
+    company_redirect = require_company_ownership(project.id_company, user)
+    if company_redirect:
+        return company_redirect
+
+    messages = (
+        ProjectChatMessage.query
+        .filter_by(id_project=project_id)
+        .order_by(ProjectChatMessage.timestamp.asc())
+        .all()
+    )
+
+    return render_template(
+        "chat_messages.html",
+        messages=messages,
+        user=user,
+    )

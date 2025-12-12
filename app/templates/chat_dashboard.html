@@ -49,23 +49,7 @@
 
         <!-- CHAT MESSAGES -->
         <div class="wa-messages" id="chatMessages">
-
-            {% for msg in messages %}
-            <div class="wa-msg-wrapper {% if msg.id_profile == user.id_profile %}me{% else %}them{% endif %}">
-
-                <div class="wa-msg-bubble">
-                    <div class="wa-msg-meta">
-                        <span class="wa-msg-sender">{{ msg.sender.name }}</span>
-                        <span class="wa-msg-time">{{ msg.timestamp.strftime("%H:%M") }}</span>
-                    </div>
-
-                    <div class="wa-msg-text">
-                        {{ msg.content }}
-                    </div>
-                </div>
-
-            </div>
-            {% endfor %}
+            {% include "chat_messages.html" %}   {# Hergebruik de partial voor de initiële render, zodat de fetch-refresh dezelfde markup gebruikt #}
         </div>
 
         <!-- INPUT BAR -->
@@ -88,4 +72,37 @@
 
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Houd de berichtenlijst up-to-date zonder de hele pagina te verversen.
+    const chatMessages = document.getElementById("chatMessages");
+    const chatForm = document.querySelector(".wa-input-bar");
+    const chatInput = chatForm.querySelector("input[name='content']");
+
+    function laadBerichten() {
+        fetch("{{ url_for('main.chat_project_messages', project_id=selected_project.id_project) }}")
+            .then(response => response.text())
+            .then(html => {
+                // De partial levert dezelfde HTML als de initiële render
+                chatMessages.innerHTML = html;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+    }
+
+    chatForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(chatForm);
+        fetch(chatForm.action, { method: "POST", body: formData })
+            .then(() => {
+                chatInput.value = "";
+                laadBerichten();
+            });
+    });
+
+    laadBerichten();
+    setInterval(laadBerichten, 3000);
+</script>
 {% endblock %}
