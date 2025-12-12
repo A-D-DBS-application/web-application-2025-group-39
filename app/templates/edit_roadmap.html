@@ -19,7 +19,11 @@
          ============================================== -->
     <div class="mb-3">
         <label class="form-label fw-bold">Start Date Project</label>
-        <input type="date" name="start_roadmap" class="form-control">
+        <!-- Vooraf ingevuld zodat je ziet welke datum eerder was opgeslagen -->
+        <input type="date"
+               name="start_roadmap"
+               class="form-control"
+               value="{{ roadmap.start_roadmap or '' }}">
     </div>
 
 
@@ -28,7 +32,11 @@
          ============================================== -->
     <div class="mb-3">
         <label class="form-label fw-bold">End Date Project</label>
-        <input type="date" name="end_roadmap" class="form-control">
+        <!-- Zelfde logica: toon bestaande waarde zodat de gebruiker niet opnieuw hoeft te gokken -->
+        <input type="date"
+               name="end_roadmap"
+               class="form-control"
+               value="{{ roadmap.end_roadmap or '' }}">
     </div>
 
 
@@ -42,6 +50,7 @@
         <input type="number"
                name="team_size"
                class="form-control"
+               step="0.01"
                value="{{ roadmap.team_size }}"> <!-- toont huidige waarde -->
     </div>
 
@@ -55,6 +64,7 @@
         <input type="number"
                name="sprint_capacity"
                class="form-control"
+               step="0.01"
                value="{{ roadmap.sprint_capacity }}">
     </div>
 
@@ -68,6 +78,7 @@
         <input type="number"
                name="budget_allocation"
                class="form-control"
+               step="0.01"
                value="{{ roadmap.budget_allocation }}">
     </div>
 

@@ -25,22 +25,34 @@
         <input type="date" name="end_roadmap" class="form-control">
       </div>
 
-      <!-- TEAM SIZE -->
+      <!-- TEAM SIZE, step voor decimalen toe te laten -->
       <div class="mb-3">
         <label class="form-label">Team Size</label>
-        <input type="number" name="team_size" class="form-control" required>
+        <input type="number"
+               name="team_size"
+               class="form-control"
+               step="0.01"                         
+               required>
       </div>
 
       <!-- SPRINT CAPACITY -->
       <div class="mb-3">
         <label class="form-label">Sprint Capacity</label>
-        <input type="number" name="sprint_capacity" class="form-control" required>
+        <input type="number"
+               name="sprint_capacity"
+               class="form-control"
+               step="0.01"          
+               required>
       </div>
 
       <!-- BUDGET ALLOCATION -->
       <div class="mb-3">
         <label class="form-label">Budget Allocation</label>
-        <input type="number" name="budget_allocation" class="form-control" required>
+        <input type="number"
+               name="budget_allocation"
+               class="form-control"
+               step="0.01"          
+               required>
       </div>
 
       <!-- SUBMIT BUTTON -->

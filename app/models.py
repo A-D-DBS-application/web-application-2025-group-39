@@ -188,11 +188,14 @@ class Roadmap(db.Model):
         nullable=False,
     )
 
-    start_roadmap = db.Column(db.String, nullable=False)  # bijv. "Q1 2025"
+    # Roadmap periodes blijven strings zodat de originele invoer bewaard blijft
+    start_roadmap = db.Column(db.String, nullable=False)  
     end_roadmap = db.Column(db.String, nullable=False)
-    team_size = db.Column(db.Integer, nullable=False)
-    sprint_capacity = db.Column(db.Integer, nullable=False)
-    budget_allocation = db.Column(db.Integer, nullable=False)
+    # Capaciteit en budget mogen nu decimalen bevatten (bijv. 2.5 FTE)
+    # Float i.p.v. Integer voorkomt dat valid decimals worden afgerond of geweigerd
+    team_size = db.Column(db.Float, nullable=False)
+    sprint_capacity = db.Column(db.Float, nullable=False)
+    budget_allocation = db.Column(db.Float, nullable=False)
     createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
     project = db.relationship("Project", back_populates="roadmaps")

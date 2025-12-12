@@ -193,12 +193,13 @@ def parse_feature_form(form):
 
 def parse_roadmap_form(form):
     errors = []
+        # Met floats kunnen we decimalen opslaan (bijv. 2.5 personen of 3.75 punten)
     return {
         "start_roadmap": required_str(form, "start_roadmap", errors),
         "end_roadmap": required_str(form, "end_roadmap", errors),
-        "team_size": required_int(form, "team_size", errors),
-        "sprint_capacity": required_int(form, "sprint_capacity", errors),
-        "budget_allocation": required_int(form, "budget_allocation", errors),
+        "team_size": required_float(form, "team_size", errors),
+        "sprint_capacity": required_float(form, "sprint_capacity", errors),
+        "budget_allocation": required_float(form, "budget_allocation", errors),
     }, errors
 
 
