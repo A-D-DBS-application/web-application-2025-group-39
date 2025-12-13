@@ -5,17 +5,16 @@
 
 {% block content %}
 
-<!-- Loginpagina container -->
+<!--LOGINPAGINA -->
 <div class="login-container">
 
   <h1 class="login-title">Login</h1>
 
   <!-- Loginformulier dat naar de login-route post -->
-  <form method="post" action="{{ url_for('main.login') }}">
-
+  <form method="post" action="{{ url_for('main.login') }}">                   <!-- method="post": gevoelige data veilig verzenden -->     
     <!-- E-mailadres -->
-    <div class="form-group">
-      <label for="email">E-mail:</label>
+    <div class="form-group">                                                  <!-- form-group: groepeert label + input en zorgt voor verticale spacing --> 
+      <label for="email">E-mail:</label>  
       <input type="email" id="email" name="email" required>
     </div>
 
@@ -23,10 +22,10 @@
     <div class="form-group">
       <label for="password">Password:</label>
 
-      <div class="input-group">
+      <div class="input-group">                                              <!-- input-group: combineert inputveld en icoon in één visuele eenheid -->
         <input type="password" id="password" name="password" class="form-control" required>
 
-        <!-- Oog-icoon om het wachtwoord zichtbaar/onzichtbaar te maken -->
+        <!-- Oog-icoon (javascript) om het wachtwoord zichtbaar/onzichtbaar te maken -->
         <span class="input-group-text">
           <i class="bi bi-eye" id="togglePassword" style="cursor: pointer;"></i>
         </span>
@@ -37,7 +36,7 @@
     <input type="submit" value="Login">
   </form>
 
-  <!-- Link naar registratiepagina -->
+  <!-- Link naar REGISTERPAGINA -->
   <div class="register-link">
     Don't have an account? <a href="{{ url_for('main.register') }}">Register here</a>
   </div>
