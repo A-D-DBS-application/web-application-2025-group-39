@@ -195,8 +195,7 @@ class Roadmap(db.Model):
     end_roadmap = db.Column(db.String, nullable=False)
     # Capaciteit en budget mogen nu decimalen bevatten (bijv. 2.5 FTE)
     # Float i.p.v. Integer voorkomt dat valid decimals worden afgerond of geweigerd
-    team_size = db.Column(db.Float, nullable=False)
-    sprint_capacity = db.Column(db.Float, nullable=False)
+    time_capacity = db.Column(db.Float, nullable=False)
     budget_allocation = db.Column(db.Float, nullable=False)
     createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 

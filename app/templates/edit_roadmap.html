@@ -41,32 +41,19 @@
 
 
     <!-- ==============================================
-         TEAM SIZE INPUT
+         TOTAL TIME CAPACITY
          ============================================== -->
     <div class="mb-3">
-        <label class="form-label">Team Size</label>
+        <label class="form-label">Total Time Capacity (in hours)</label>
 
         <!-- value="{{ roadmap.team_size }}" → vult huidige databasewaarde automatisch in -->
         <input type="number"
-               name="team_size"
+               name="time_capacity"
                class="form-control"
                step="0.01"
                value="{{ roadmap.team_size }}"> <!-- toont huidige waarde -->
     </div>
 
-
-    <!-- ==============================================
-         SPRINT CAPACITY INPUT
-         ============================================== -->
-    <div class="mb-3">
-        <label class="form-label">Sprint Capacity</label>
-
-        <input type="number"
-               name="sprint_capacity"
-               class="form-control"
-               step="0.01"
-               value="{{ roadmap.sprint_capacity }}">
-    </div>
 
 
     <!-- ==============================================

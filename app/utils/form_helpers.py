@@ -219,8 +219,7 @@ def parse_roadmap_form(form):
     return {
         "start_roadmap": required_str(form, "start_roadmap", errors),
         "end_roadmap": required_str(form, "end_roadmap", errors),
-        "team_size": required_float(form, "team_size", errors),
-        "sprint_capacity": required_float(form, "sprint_capacity", errors),
+        "time_capacity": required_float(form, "time_capacity", errors),
         "budget_allocation": required_float(form, "budget_allocation", errors),
     }, errors
 

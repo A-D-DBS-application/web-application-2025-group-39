@@ -788,8 +788,7 @@ def edit_roadmap(roadmap_id):
         # Velden aanpassen
         roadmap.start_roadmap = data["start_roadmap"]
         roadmap.end_roadmap = data["end_roadmap"]
-        roadmap.team_size = data["team_size"]
-        roadmap.sprint_capacity = data["sprint_capacity"]
+        roadmap.time_capacity = data["time_capacity"]
         roadmap.budget_allocation = data["budget_allocation"]
 
         db.session.commit()                           # Opgeslagen wijzigingen
@@ -872,7 +871,7 @@ def roadmap_optimize(roadmap_id):
         project=project,
         features_data=all_features_data,
         alpha=alpha,
-        max_time=roadmap.sprint_capacity * roadmap.team_size, # Gebruik de berekende max
+        max_time=roadmap.time_capacity, 
         max_cost=roadmap.budget_allocation
     )
 
