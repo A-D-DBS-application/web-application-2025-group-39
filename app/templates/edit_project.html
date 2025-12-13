@@ -4,71 +4,82 @@
 {% block body_class %}projects-body{% endblock %}
 
 {% block content %}
-  
-  <div class="top-right">
+   <!-- -->
+  <!-- Top-right navigatieknop terug naar overzicht -->
+  <div class="top-right">                                                             <!-- positioneert de knop rechtsboven -->
     <a href="{{ url_for('main.projects') }}" 
-      class="btn btn-base btn-nav btn-sm">
+      class="btn btn-base btn-nav btn-sm">                                            <!--basis-knopstijl + navigatievariant + compact formaat-->
       Projects Overview
     </a>
   </div>
 
-  <h2 class="mb-4 text-center">Edit Project: {{ project.project_name }}</h2>
+  <!--container edit project-->
+  <h2 class="mb-4 text-center">Edit Project: {{ project.project_name }}</h2>          <!--Bootstrap spacing + centrering van tekst-->
 
     <div class="form-card shadow-sm p-4 mx-auto">
-    
+   
+    <!--flash message: Toont feedback vanuit de backend (success/error) na submit/validatie-->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
     {% for category, message in messages %}
     <div class="alert alert-{{ 'danger' if category in ['danger','error'] else category }} alert-dismissible fade show"
-      role="alert">
+      role="alert">                                                                   <!--Bootstrap alert: bepaalt de kleur (success/danger/info/...) -->  
       {{ message }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>       <!--Bootstrap dismiss knop om alert te sluiten -->
     </div>
     {% endfor %}
     {% endif %}
     {% endwith %}
 
+    <!-- Edit formulier-->
     <form method="post" action="{{ url_for('main.edit_project', project_id=project.id_project) }}">
-      
+      <!--Project info-->
       <h5 class="mb-3 fw-semibold">Project Info</h5>
       
-      <div class="mb-3">
+      <div class="mb-3">                                                             <!-- form-label + form-control: Bootstrap form styling voor label en input -->
         <label class="form-label">Project Name</label>
         <input type="text" 
                name="project_name" 
                class="form-control"
-               value="{{ project.project_name }}"
-               required>
+               value="{{ project.project_name }}"             
+               required>                                                             <!-- value: toont de huidige projectnaam zodat gebruiker kan aanpassen -->
       </div>
 
       {% set company = project.company %} 
       {% if company %}
       <div class="mb-3">
         <label class="form-label">Company</label>
-        <input type="text" class="form-control" value="{{ company.company_name }}" readonly>
+        <input type="text" class="form-control" value="{{ company.company_name }}" readonly>    <!-- readonly: gebruiker kan dit niet wijzigen (informatief veld) -->
       </div>
       {% endif %}
 
+      <!-- Scheidingslijn tussen basisinfo en schaalinstellingen -->
       <hr class="my-4">
 
+      <!-- TtV SCALING LIMITS -->
       <h5 class="mb-3 fw-semibold">TtV Scaling Limits (Project Scope)</h5>
+      
+      <!-- Extra uitleg voor de gebruiker -->
       <p class="text-muted fst-italic mb-3">
         These values define the 0-10 scale for Time-to-Value in the VECTR chart for all features in this project.
       </p>
       
-      <div class="row g-3 mb-4">
-        
+      <!-- INPUTS IN GRID-->
+      <div class="row g-3 mb-4">                                                    <!-- row + col-md-6:Bootstrap grid layout, g-3 voegt spacing tussen kolommen/rijen toe -->
+      
+        <!-- TIME-TO-MARKET (TtM) -->
         <div class="col-md-6">
           <h6 class="fw-bold">Time-to-Market (TtM)</h6>
           
           <div class="mb-3">
-            <label class="form-label">Lowest TtM (weeks)
+            <label class="form-label">Lowest TtM (weeks)          
+                <!-- Info-icoon met popover: toont extra uitleg bij lowest ttm -->
               <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
                 data-bs-content="Provide your best estimate of the minimum number of weeks required to build and release the feature.">
               </i>
             </label>
             <input type="number" class="form-control" name="ttm_low_limit" min="0"
-                   value="{{ project.ttm_low_limit or '' }}">
+                   value="{{ project.ttm_low_limit or '' }}">                       <!-- min="0": voorkomt negatieve waarden in de UI -->
           </div>
 
           <div>
@@ -81,7 +92,8 @@
                    value="{{ project.ttm_high_limit or '' }}">
           </div>
         </div>
-
+        
+        <!-- ---------- TIME-TO-BUSINESS-VALUE (TtBV) ---------- -->
         <div class="col-md-6">
           <h6 class="fw-bold">Time-to-Business-Value (TtBV)</h6>
           
@@ -106,6 +118,8 @@
           </div>
         </div>
       </div>
+
+      <!--Actief: Submit en Cancel-->
       <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">Save Changes</button>
       <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-secondary-custom w-100 mt-2">
         Cancel
@@ -113,9 +127,12 @@
     </form>
   </div>
   
+  <!--POPOVER INITIALISATIE: Activeert alle Bootstrap popovers op de pagina.-->
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      // Selecteer alle elementen met data-bs-toggle="popover"
       var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+      // Maak voor elk element een Bootstrap Popover instance
       var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
         return new bootstrap.Popover(popoverTriggerEl)
       })
