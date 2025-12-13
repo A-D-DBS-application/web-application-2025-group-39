@@ -4,15 +4,17 @@
 
 {% block content %}
 
+<!--ADD EVIDENCE PAGINA-->
+
 <!-- Titel met naam van de feature waarvoor bewijs wordt toegevoegd -->
-<h2 class="text-center mb-4">Add Evidence for: {{ feature.name_feature }}</h2>
+<h2 class="text-center mb-4">Add Evidence for: {{ feature.name_feature }}</h2>                          <!-- text-center + mb-4: Bootstrap helpers voor centrering en spacing -->
 <!-- Formulierkaart -->
-<div class="card p-4 mx-auto" style="max-width: 700px;">
+<div class="card p-4 mx-auto" style="max-width: 700px;">                                                 <!-- card: Bootstrap card styling, p-4: interne padding, mx-auto: centreren, max-width: beperkt de breedte voor betere UX -->
     <form method="POST">
 
         <!-- Evidence titel -->
-        <div class="mb-3">
-            <label class="form-label">Title</label>
+        <div class="mb-3">                                                                               <!-- mb-3: consistente verticale spacing tussen velden -->
+            <label class="form-label">Title</label>                                                      <!-- form-label: Bootstrap label styling -->
             <input type="text" name="title" class="form-control" required>
         </div>
 
@@ -20,7 +22,7 @@
         <div class="mb-3">
             <label class="form-label">Evidence Type</label>
             <select id="evidence_type" name="type_select" class="form-select">
-                <option value="Customer Feedback">Customer Feedback</option>
+                <option value="Customer Feedback">Customer Feedback</option>                             <!-- vaste opties: waarden worden in backend gebruikt voor categorisatie -->
                 <option value="Pilot Result">Pilot Result</option>
                 <option value="Paying Customer">Paying Customer</option>
                 <option value="Market Data">Market Data</option>
@@ -28,8 +30,8 @@
             </select>
         </div>
 
-        <!-- Custom Evidence Type: Alleen zichtbaar wanneer 'Other' gekozen wordt -->
-        <div class="mb-3" id="custom_type_group" style="display: none;">
+        <!-- Custom Evidence Type (optioneel) -->
+        <div class="mb-3" id="custom_type_group" style="display: none;">                              <!-- custom_type_group: standaard verborgen wordt zichtbaar via JS wanneer type = "Other" -->
             <label class="form-label">Custom Evidence Type</label>
             <input type="text" name="custom_type" id="custom_type" class="form-control">
         </div>
@@ -43,7 +45,7 @@
          <!-- Beschrijving -->
         <div class="mb-3">
             <label class="form-label">Description</label>
-            <textarea name="description" class="form-control" rows="3" required></textarea>
+            <textarea name="description" class="form-control" rows="3" required></textarea>           <!-- textarea: geschikt voor langere toelichting;  rows bepaalt de zichtbare hoogte -->
         </div>
 
         <!-- Optionele link naar een document of bestand -->
@@ -52,10 +54,10 @@
             <input type="text" name="attachment_url" class="form-control">
         </div>
 
-        <!-- Confidence score van het aangeleverde bewijs -->
+        <!-- Confidence score dropdown van het aangeleverde bewijs -->
         <div class="mb-3">
             <label class="form-label">Confidence Level</label>
-            <select name="new_confidence" class="form-select" required>
+            <select name="new_confidence" class="form-select" required>                              <!-- vaste schaal: option value is de numerieke score die backend opslaat -->
                 <option value="">Select score</option>
                 <option value="0">No Longer Relevant (0.0) - Evidence is outdated or invalid and will no longer be considered.</option>
                 <option value="0.01">Self Conviction (0.01) - Your own belief or intuition that the feature is important.</option>
@@ -70,26 +72,28 @@
                 <option value="10">Launch Data (10.0) - Real usage data after launch; strongest evidence.</option>
             </select>
         </div>
-        <!-- Verzenden -->
-        <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">
+        <!-- Acties -->
+         <!--Sbmit-->
+        <button type="submit" class="btn btn-base btn-primary-custom w-100 mt-3">                 <!-- w-100: knop neemt volledige breedte -->
         Add Evidence
         </button>
-
+        <!--Cancel-->
         <a href="{{ url_for('main.projects') }}"
         class="btn btn-base btn-secondary-custom w-100 mt-2">
         Cancel
         </a>
     </form>
 </div>
-<!-- Script om custom type veld te tonen/verbergen -->
+<!-- Script om custom type veld te tonen/verbergen wanneer Evidence Type = "Other" -->
 <script>
 document.getElementById("evidence_type").addEventListener("change", function () {
     const custom = document.getElementById("custom_type_group");
-    /* Toon custom veld enkel wanneer "Other" geselecteerd is*/
+    // Toon custom veld enkel wanneer "Other" geselecteerd is
     if (this.value === "Other") {
         custom.style.display = "block";
     } else {
         custom.style.display = "none";
+        // Reset het custom veld zodat er geen “oude” input blijft hangen
         document.getElementById("custom_type").value = "";
     }
 });
