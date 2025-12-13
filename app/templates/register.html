@@ -8,48 +8,48 @@
 <!-- Container voor de volledige registratiepagina -->
 <div class="register-container">
 
-
-    <h1 class="register-title">Register</h1>                  <!-- Titel van het registratieformulier -->
+    <!-- Titel van het registratieformulier -->
+    <h1 class="register-title">Register</h1>                  
 
     <form method="post" action="{{ url_for('main.register') }}"> 
-
-        <div class="form-group">                              <!-- Invoerveld volledige naam van de gebruiker -->
+        <!-- Invoerveld volledige naam van de gebruiker -->
+        <div class="form-group">                              
             <label for="name">Full Name:</label>
             <input type="text" id="name" name="name" required>
         </div>
-
-        <div class="form-group">                               <!-- Invoerveld e-mailadres -->
+        <!-- Invoerveld e-mailadres -->
+        <div class="form-group">                               
             <label for="email">E-mail:</label>
             <input type="email" id="email" name="email" required>
         </div>
-
-        <div class="form-group">                               <!-- Wachtwoordveld  -->
+        <!-- Wachtwoordveld  -->
+        <div class="form-group">                               
             <label for="password">Password:</label>
             <div class="input-group">
                 <input type="password" id="password" name="password" class="form-control" required>
-
-                <span class="input-group-text">                <!-- Oogje om het wachtwoord te tonen/verbergen -->
+                <!-- Oogje om het wachtwoord te tonen/verbergen -->
+                <span class="input-group-text">                
                     <i class="bi bi-eye" id="togglePassword" style="cursor: pointer;"></i>
                 </span>
             </div>
         </div>
-
-        <div class="form-group">                               <!-- Rolkeuze: gebruiker moet aangeven welke rol hij/zij heeft -->
+        <!-- Rolkeuze -->
+        <div class="form-group">                               
             <label for="role">Role:</label>
             <select id="role" name="role" required>
-                <option value="" disabled selected>Choose a role</option>
+                <option value="" disabled selected>Choose a role</option>      <!-- gebruiker moet rol kiezen -->
                 <option value="User">User</option>
                 <option value="Founder">Founder</option>
                 <option value="PM">PM</option>
             </select>
         </div>
-
-        <div class="form-group">                                <!-- Invoerveld bedrijfsnaam -->
+        <!-- Invoerveld bedrijfsnaam -->    
+        <div class="form-group">                               
             <label for="company_name">Company name:</label>
             <input type="text" id="company_name" name="company_name" required>
         </div>
-
-        <input type="submit" value="Register">                  <!-- Verzenden van het formulier -->
+        <!-- Verzenden van het formulier -->
+        <input type="submit" value="Register">                 
     </form>
 
 
