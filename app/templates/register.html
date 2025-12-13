@@ -5,15 +5,15 @@
 
 {% block content %}
 
-<!-- Container voor de volledige registratiepagina -->
+<!-- REGISTERPAGINA -->
 <div class="register-container">
 
     <!-- Titel van het registratieformulier -->
     <h1 class="register-title">Register</h1>                  
 
-    <form method="post" action="{{ url_for('main.register') }}"> 
+    <form method="post" action="{{ url_for('main.register') }}">                   <!-- method="post": gevoelige data veilig verzenden -->
         <!-- Invoerveld volledige naam van de gebruiker -->
-        <div class="form-group">                              
+        <div class="form-group">                                                   <!-- form-group: groepeert label + input en zorgt voor verticale spacing -->         
             <label for="name">Full Name:</label>
             <input type="text" id="name" name="name" required>
         </div>
@@ -25,7 +25,7 @@
         <!-- Wachtwoordveld  -->
         <div class="form-group">                               
             <label for="password">Password:</label>
-            <div class="input-group">
+            <div class="input-group">                                               <!-- Bootstrap-structuur om input en icoon te combineren -->
                 <input type="password" id="password" name="password" class="form-control" required>
                 <!-- Oogje om het wachtwoord te tonen/verbergen -->
                 <span class="input-group-text">                
@@ -37,7 +37,7 @@
         <div class="form-group">                               
             <label for="role">Role:</label>
             <select id="role" name="role" required>
-                <option value="" disabled selected>Choose a role</option>      <!-- gebruiker moet rol kiezen -->
+                <option value="" disabled selected>Choose a role</option>           <!-- verplicht rol kiezen -->
                 <option value="User">User</option>
                 <option value="Founder">Founder</option>
                 <option value="PM">PM</option>
