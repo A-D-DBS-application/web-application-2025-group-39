@@ -175,9 +175,9 @@ def parse_project_form(form):
     name = required_str(form, "project_name", errors, label="Project name")
     
     # NIEUW: TTV LIMITS OPHALEN
-    ttm_low = required_float(form, "ttm_low_limit", errors, label="Lowest TTM")
+    ttm_low = optional_float_zero(form, "ttm_low_limit", errors, label="Lowest TTM")
     ttm_high = required_float(form, "ttm_high_limit", errors, label="Highest TTM")
-    ttbv_low = required_float(form, "ttbv_low_limit", errors, label="Lowest TTBV")
+    ttbv_low = optional_float_zero(form, "ttbv_low_limit", errors, label="Lowest TTBV")
     ttbv_high = required_float(form, "ttbv_high_limit", errors, label="Highest TTBV")
     
     return {
