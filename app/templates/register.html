@@ -8,39 +8,33 @@
 <!-- Container voor de volledige registratiepagina -->
 <div class="register-container">
 
-    <!-- Titel van het registratieformulier -->
-    <h1 class="register-title">Register</h1>
 
-    <!-- Registratieformulier: verstuurt data naar de register route -->
-    <form method="post" action="{{ url_for('main.register') }}">
+    <h1 class="register-title">Register</h1>                  <!-- Titel van het registratieformulier -->
 
-        <!-- Invoerveld voor volledige naam van de gebruiker -->
-        <div class="form-group">
+    <form method="post" action="{{ url_for('main.register') }}"> 
+
+        <div class="form-group">                              <!-- Invoerveld volledige naam van de gebruiker -->
             <label for="name">Full Name:</label>
             <input type="text" id="name" name="name" required>
         </div>
 
-        <!-- Invoerveld voor e-mailadres -->
-        <div class="form-group">
+        <div class="form-group">                               <!-- Invoerveld e-mailadres -->
             <label for="email">E-mail:</label>
             <input type="email" id="email" name="email" required>
         </div>
 
-        <!-- Wachtwoordveld + toggle icon om wachtwoord zichtbaar/onzichtbaar te maken -->
-        <div class="form-group">
+        <div class="form-group">                               <!-- Wachtwoordveld  -->
             <label for="password">Password:</label>
             <div class="input-group">
                 <input type="password" id="password" name="password" class="form-control" required>
 
-                <!-- Icon om het wachtwoord te tonen/verbergen -->
-                <span class="input-group-text">
+                <span class="input-group-text">                <!-- Oogje om het wachtwoord te tonen/verbergen -->
                     <i class="bi bi-eye" id="togglePassword" style="cursor: pointer;"></i>
                 </span>
             </div>
         </div>
 
-        <!-- Rolkeuze: gebruiker moet aangeven welke rol hij/zij heeft -->
-        <div class="form-group">
+        <div class="form-group">                               <!-- Rolkeuze: gebruiker moet aangeven welke rol hij/zij heeft -->
             <label for="role">Role:</label>
             <select id="role" name="role" required>
                 <option value="" disabled selected>Choose a role</option>
@@ -50,15 +44,14 @@
             </select>
         </div>
 
-        <!-- Invoerveld voor bedrijfsnaam -->
-        <div class="form-group">
+        <div class="form-group">                                <!-- Invoerveld bedrijfsnaam -->
             <label for="company_name">Company name:</label>
             <input type="text" id="company_name" name="company_name" required>
         </div>
 
-        <!-- Verzenden van het formulier -->
-        <input type="submit" value="Register">
+        <input type="submit" value="Register">                  <!-- Verzenden van het formulier -->
     </form>
+
 
     <!-- Link naar loginpagina voor gebruikers die al een account hebben -->
     <div class="login-link">
