@@ -5,27 +5,32 @@
 
 {% block content %}
 
-<h2 class="text-center mt-5 mb-4">Your Profile</h2> 
+<!-- PROFILE PAGINA-->
 
-<div class="profile-wrapper">
+<!-- Pagina titel -->
+<h2 class="text-center mt-5 mb-4">Your Profile</h2>                                 <!-- mt-5 / mb-4:Bootstrap margin helpers voor consistente verticale ruimte -->
+
+<div class="profile-wrapper">                                                       <!-- profile-wrapper: zorgt typisch voor centrering (max-width) en uitlijning van de card via CSS -->
     
-    <div class="card shadow-lg p-4 profile-card">
-
+    <!--Profielkaart-->
+    <div class="card shadow-lg p-4 profile-card">                                   <!-- card + shadow-lg:Bootstrap card-styling + sterke schaduw, p-4 voegt interne padding toe -->
+      <!--profielgegevens uit backend-->
       <p><strong>Name:</strong><br>{{ name }}</p>
       <p><strong>E-mail:</strong><br>{{ email }}</p>
       <p><strong>Role:</strong><br>{{ role }}</p>
       <p><strong>Company:</strong><br>{{ company }}</p>
 
-      <div class="d-flex justify-content-center gap-3 mt-auto">
-          
+      <!--Actieknoppen-->
+      <div class="d-flex justify-content-center gap-3 mt-auto">                       <!-- d-flex + justify-content-center: knoppen in flexibele box en gecentreerd, gap-3: ruimte tussen knoppen, mt-auto: duwt knoppen naar onder als card flex-layout gebruikt -->
+          <!-- Edit profiel: navigeren naar edit_profile  --> 
           <a href="{{ url_for('main.edit_profile') }}" class="btn btn-edit table-btn btn-sm">
               Edit
           </a>
-          
+           <!-- Delete profiel: POST gedaan (geen link), met confirm om accidental clicks te voorkomen  -->          
           <form action="{{ url_for('main.delete_profile') }}" method="post" style="display:inline;">
               <button type="submit" 
                   onclick="return confirm('Weet je zeker dat je je profiel wilt verwijderen? Dit kan niet ongedaan gemaakt worden.');"
-                  class="btn btn-danger-custom table-btn btn-sm">
+                  class="btn btn-danger-custom table-btn btn-sm">                    <!-- btn-danger-custom: visuele waarschuwing voor destructieve actie -->
                   Delete
               </button>
           </form>
