@@ -5,15 +5,20 @@
 
 {% block content %}
 
+
+<!--ADD FEATURE PAGINA-->
+
+<!--Titel (centreren + spacing via bootstrap helpers)-->
 <h2 class="text-center mb-4">Add New Feature Idea</h2>
+
 <!-- Hoofdformulier voor het toevoegen van een nieuwe feature -->
-<div class="feature-form card shadow p-4 mx-auto">
+<div class="feature-form card shadow p-4 mx-auto">                                                      <!-- feature-form: custom class voor breedte/spacing/styling, card + shadow: Bootstrap card styling met schaduw, p-4: interne padding, mx-auto: centreren -->
   <form method="post" action="{{ url_for('main.add_feature', project_id=project.id_project) }}">
     <!-- BASIC INFO -->
     <div class="mb-4">
       <!-- BASIC INFO sectie: titel, project en beschrijving -->
       <h4 class="mb-3">Basic Info</h4>
-      <div class="row g-3">
+      <div class="row g-3">                                                                            <!-- row + col-md-6: Bootstrap grid: op desktop 2 kolommen, op mobiel onder elkaar -->
         <div class="col-md-6">
           <label class="form-label">Title</label>
           <input type="text" class="form-control" name="name_feature" required>
@@ -21,35 +26,39 @@
         <!-- Projectnaam tonen, IDs in hidden fields doorgeven -->
         <div class="col-md-6">
           <label class="form-label">Project</label>
-          <input type="text" class="form-control" value="{{ project.project_name }}" disabled>
-          <input type="hidden" name="id_project" value="{{ project.id_project }}">
+          <input type="text" class="form-control" value="{{ project.project_name }}" disabled>          <!-- disabled input: toont projectnaam maar kan niet gewijzigd worden -->
+          <input type="hidden" name="id_project" value="{{ project.id_project }}">                      <!-- hidden inputs: IDs worden wel meegestuurd naar backend (koppelingen in DB) -->
           <input type="hidden" name="id_company" value="{{ company.id_company }}">
         </div>
       </div>
+
+      <!-- Beschrijving (optioneel/extra context) -->
       <div class="mt-3">
         <label class="form-label">Description</label>
-        <textarea class="form-control" name="description" rows="3"></textarea>
+        <textarea class="form-control" name="description" rows="3"></textarea>                           <!-- textarea: geschikt voor langere tekst, rows bepaalt de zichtbare hoogte -->
       </div>
     </div>
 
     <!-- ROI sectie: velden voor financiële baten en kosten -->
     <div class="mb-4">
       <h4 class="mb-3">Return on Investment (ROI)</h4>
+      <!-- Kleine toelichting (UX) hoe totalen opgebouwd worden -->
       <p class="text-muted fst-italic mb-2">
         <strong>Total Gains =</strong> revenue + churn + cost savings<br>
         <strong>Total Costs =</strong> development + OPEX + other
       </p>
       <div class="row g-3">
+        <!-- Grid layout voor ROI inputs -->
         <div class="col-md-6">
           <label class="form-label">
             <!-- Horizon (maanden) — bepaalt hoe lang vooruit de ROI berekend wordt -->
             Horizon (months)
-            <!--aanmaken van het i icoontje -->
+            <!-- Popover icoon: extra uitleg zonder UI te overladen -->
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The number of months we look ahead to estimate the impact of this feature. During this period, we calculate expected revenue, churn reduction, and cost savings.">
             </i>
           </label>
-          <input type="number" class="form-control" name="horizon" min="0">
+          <input type="number" class="form-control" name="horizon" min="0">                             <!-- min="0": voorkomt negatieve invoer in de UI -->
         </div>
         <!-- Extra inkomsten -->
         <div class="col-md-6">
@@ -61,7 +70,7 @@
           </label>
           <input type="number" class="form-control" name="extra_revenue" min="0">
         </div>
-        <!-- Geld bespaard door minder churn -->
+        <!-- Churn Recuction Savings -->
         <div class="col-md-6">
           <label class="form-label">
             Churn Reduction Savings
@@ -71,7 +80,7 @@
           </label>
           <input type="number" class="form-control" name="churn_reduction" min="0">
         </div>
-        <!-- Kostenbesparing door het feature -->
+        <!-- Cost Savings -->
         <div class="col-md-6">
           <label class="form-label">
             Cost Savings
@@ -82,6 +91,9 @@
           <input type="number" class="form-control" name="cost_savings" min="0">
         </div>
       </div>
+      
+      
+      <!-- Investment cost: -->
       <h5 class="mt-4">Investment Cost</h5>
       <div class="row g-3">
         <!-- Development effort (uren) -->
@@ -125,8 +137,9 @@
           <input type="number" class="form-control" name="other_costs" min="0">
         </div>
       </div>
+
       <!-- ROI-resultaten worden dynamisch geladen via partial -->
-      <div id="roi-results">
+      <div id="roi-results">                                                                            <!-- id="roi-results": target container voor eventuele JS/AJAX updates (indien gebruikt) -->                                              <!-- id="roi-results": target container voor JS/AJAX updates (indien gebruikt) -->
         {% include "features/_roi_partial.html" %}
       </div>
     </div>
@@ -175,7 +188,7 @@
         </i>
       </label>
       <select class="form-select" name="quality_score" required>
-        <option value="">Select score</option>
+        <option value="">Select score</option>                                                         <!-- option value = numerieke score die backend opslaat -->
           <option value="0">No Longer Relevant (0.0) - Evidence is outdated or invalid and will no longer be considered.</option>
           <option value="0.01">Self Conviction (0.01) - Your own belief or intuition that the feature is important.</option>
           <option value="0.03">Pitch Deck (0.03) - Information from high-level presentations; not validated.</option>
@@ -189,7 +202,7 @@
           <option value="10">Launch Data (10.0) - Real usage data after launch; strongest evidence.</option>
       </select>
   </div>
-    <!-- Formulierknoppen: opslaan of annuleren -->
+    <!-- Acties: Submit of Cancel -->
     <button type="submit" class="btn btn-base btn-primary-custom w-100">
       Add Feature Idea
     </button>
@@ -202,11 +215,12 @@
 </div>
 
 <script>
-  // Initialiseer alle Popovers op de pagina
+  // Selecteer alle Popovers op de pagina
   document.addEventListener('DOMContentLoaded', function () {
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    // Maak voor elk element een Bootstrap Popover instance
     var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-      // Gebruik de 'html: true' optie als je HTML in de Popover content wilt, maar hier niet nodig
+
       return new bootstrap.Popover(popoverTriggerEl)
     })
   });
