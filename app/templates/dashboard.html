@@ -6,11 +6,11 @@
 {% block content %}
   <!-- Wrapper voor de dashboardpagina -->
   <div class="dashboard-wrapper">
-    <h1>Welcome to your Dashboard</h1>
+    <h1>Welcome to your Dashboard</h1>                   <!-- h1:primaire titel-->
 
 
   <!-- Hoofdknoppen voor navigatie -->
-    <div class="main-buttons">
+    <div class="main-buttons">                           <!-- main-buttons:groepeert knoppen en regelt onderlinge spacing/alignment -->
       <a href="{{ url_for('main.projects') }}" class="btn btn-base btn-primary-custom">Projects Overview</a>
       <a href="{{ url_for('main.add_project') }}" class="btn btn-base btn-primary-custom">Add Project</a>
       <a href="{{ url_for('main.profile') }}" class="btn btn-base btn-primary-custom">Profile</a>
