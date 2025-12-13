@@ -11,9 +11,7 @@
 <div class="card p-4 mx-auto" style="max-width: 700px;">
     <form method="POST">
 
-        {# =========================
-            TITLE
-            ========================= #}
+        <!-- TITLE -->
        
         <div class="mb-3">
             <label class="form-label">Title</label>
@@ -29,7 +27,7 @@
                 {% set default_types = [
                     'Customer Feedback', 'Pilot Result', 'Paying Customer',
                     'Market Data', 'Other'
-                ] %}  {# Lijst met standaard types die in de dropdown verschijnen #}
+                ] %}                                                                                                             <!-- Lijst met standaard types die in de dropdown verschijnen -->
 
                 {% for t in default_types %}
                     <option value="{{ t }}"
@@ -43,14 +41,14 @@
         <!-- CUSTOM EVIDENCE TYPE -->
         <div class="mb-3" id="custom_type_group"
              style="display: {% if evidence.type not in default_types %}block{% else %}none{% endif %};"> 
-             {# Dit veld verschijnt als evidence.type NIET in de default_types lijst zit #}
-             {# display block/none wordt meteen correct gezet bij het laden van de pagina #}
+                                                                                                                                <!-- Dit veld verschijnt als evidence.type NIET in de default_types lijst zit -->                               
+                                                                                                                                <!-- display block/none wordt meteen correct gezet bij het laden van de pagina -->
             <label class="form-label">Custom Evidence Type</label>
             <input type="text" name="custom_type" id="custom_type"
                    class="form-control"
                    value="{% if evidence.type not in default_types %}{{ evidence.type }}{% endif %}">
-            {# custom_type: wordt gebruikt als gebruiker een eigen type invult #}
-            {# value vult alleen in wanneer het huidige type een custom type is #}
+                                                                                                                                {# custom_type: wordt gebruikt als gebruiker een eigen type invult #}
+                                                                                                                                {# value vult alleen in wanneer het huidige type een custom type is #}
         </div>
 
         <!--SOURCE-->
@@ -58,26 +56,26 @@
             <label class="form-label">Source</label>
             <input type="text" name="source" class="form-control"
                    value="{{ evidence.source }}" required>
-            {# Bron van het bewijs (bv. klant, rapport, link, meeting) #}
-            {# required: moet ingevuld zijn #}
+                                                                                                                                {# Bron van het bewijs (bv. klant, rapport, link, meeting) #}
+                                                                                                                                {# required: moet ingevuld zijn #}
         </div>
 
         <!-- DESCRIPTION -->
         <div class="mb-3">
             <label class="form-label">Description</label>
-            <textarea name="description" class="form-control" rows="3" required>{{ evidence.description }}</textarea> {# required: moet ingevuld zijn #}
+            <textarea name="description" class="form-control" rows="3" required>{{ evidence.description }}</textarea>           {# required: moet ingevuld zijn #}
         </div>
 
         <!-- ATTACHMENT -->
         <div class="mb-3">
             <label class="form-label">Attachment URL</label>
-            <input type="text" name="attachment_url" class="form-control" value="{{ evidence.attachment_url }}"> {# Optionele link naar bijlage (drive link, doc, screenshot, ...) #}
+            <input type="text" name="attachment_url" class="form-control" value="{{ evidence.attachment_url }}">                {# Optionele link naar bijlage (drive link, doc, screenshot, ...) #}
         </div>
 
         <!-- NEW CONFIDENCE -->
         <div class="mb-3">
             <label class="form-label">New Confidence Level</label>
-            <select name="new_confidence" class="form-select" required> {# required: moet gekozen zijn #}
+            <select name="new_confidence" class="form-select" required>                                                         {# required: moet gekozen zijn #}
 
                 {% for value, label in CONFIDENCE_LEVELS %}
                     <option value="{{ value }}"
@@ -104,16 +102,16 @@
 
 <!-- UI LOGICA: TOON/VERBERG CUSTOM TYPE -->
 <script>
-    const typeSelect = document.getElementById("evidence_type"); // Dropdown element
-    const customGroup = document.getElementById("custom_type_group"); // Div met custom input
-    const customInput = document.getElementById("custom_type"); // Het inputveld zelf
+    const typeSelect = document.getElementById("evidence_type");                                    // Dropdown element
+    const customGroup = document.getElementById("custom_type_group");                               // Div met custom input
+    const customInput = document.getElementById("custom_type");                                     // Het inputveld zelf
 
-    typeSelect.addEventListener("change", () => { // Luister naar veranderingen in de dropdown
-        if (typeSelect.value === "Other") { // Als "Other" gekozen is
-            customGroup.style.display = "block"; // Toon het custom input veld
+    typeSelect.addEventListener("change", () => {                                                   // Luister naar veranderingen in de dropdown
+        if (typeSelect.value === "Other") {                                                         // Als "Other" gekozen is
+            customGroup.style.display = "block";                                                    // Toon het custom input veld
         } else {
-            customGroup.style.display = "none"; // Verberg het custom input veld
-            customInput.value = ""; // Maak de waarde van het custom input veld leeg
+            customGroup.style.display = "none";                                                     // Verberg het custom input veld
+            customInput.value = "";                                                                 // Maak de waarde van het custom input veld leeg
         }
     });
 </script>

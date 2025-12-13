@@ -48,7 +48,7 @@
         </div>
 
         <!-- FEATURE MULTI-SELECT -->
-        <hr class="my-4"> {# Horizontale lijn als visuele scheiding; my-4 = marge boven én onder #}
+        <hr class="my-4">                                                                                                   <!-- Horizontale lijn als visuele scheiding; my-4 = marge boven én onder -->    
         <h4 class="mb-3">Assign Features (recommended by VECTR score)</h4>
 
         <div class="mb-3">
@@ -60,9 +60,9 @@
                     {{ f.name_feature }}
                     — VECTR:
                     {% if f.vectr_score %}
-                    {{ "%.2f"|format(f.vectr_score) }} {# Toon vectr_score met 2 decimalen #}
+                    {{ "%.2f"|format(f.vectr_score) }}                                                                      <!-- Toon vectr_score met 2 decimalen -->
                     {% else %}
-                    N/A {# Als score ontbreekt #}
+                    N/A                                                                                                     <!-- Als score ontbreekt -->
                     {% endif %}
                 </option>
                 {% endfor %}
@@ -70,7 +70,7 @@
 
             <small class="text-muted">
                 Hold CTRL (Windows) or CMD (Mac) to select multiple features.
-            </small> {# Helpertekst om multi-select gedrag uit te leggen #}
+            </small>                                                                                                       <!-- Helpertekst om multi-select gedrag uit te leggen -->
         </div>
 
         <div class="col-12">

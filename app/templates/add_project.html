@@ -31,10 +31,8 @@
 
     <div class="mb-3">
       <label class="form-label">Company</label>
-      <input type="text" class="form-control" value="{{ company.company_name }}" readonly> {# Toon de bedrijfsnaam ter
-      info; readonly = niet aanpasbaar maar blijft “leesbaar” #}
-      <input type="hidden" name="company_id" value="{{ company.id_company }}"> {# Belangrijk: ID wordt meegestuurd in
-      POST om project correct aan company te koppelen #}
+      <input type="text" class="form-control" value="{{ company.company_name }}" readonly>                                      <!-- Toon de bedrijfsnaam ter info; readonly = niet aanpasbaar maar blijft “leesbaar” -->
+      <input type="hidden" name="company_id" value="{{ company.id_company }}">                                                  <!-- Belangrijk: ID wordt meegestuurd in POST om project correct aan company te koppelen -->
     </div>
 
     <h5 class="mb-3 fw-semibold mt-4">TtV Scaling Limits (Project Scope)</h5>

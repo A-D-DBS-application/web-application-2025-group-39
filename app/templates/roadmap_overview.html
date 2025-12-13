@@ -5,28 +5,28 @@
 
 {% block content %}
 
-<div class="roadmap-header"> {# Wrapper voor de paginaheader (layout/styling in CSS) #}
+<div class="roadmap-header">                                                                                            <!-- Wrapper voor de paginaheader (layout/styling in CSS) -->
   <h2>Roadmap for {{ project.project_name }}</h2>
 </div>
 
-{% if roadmaps|length == 0 %} {# Als er geen roadmaps bestaan voor dit project #}
+{% if roadmaps|length == 0 %}                                                                                           <!-- Als er geen roadmaps bestaan voor dit project -->
   <div class="card p-4 mx-auto" style="max-width: 700px;">
     <div class="alert alert-info mb-0">
       No roadmap has been created for this project yet.
     </div>
-    {# De eerste roadmap mag alleen door Founder/PM gemaakt worden (PM edit check in routes.py) #}
+                                                                                                                        <!-- De eerste roadmap mag alleen door Founder/PM gemaakt worden (PM edit check in routes.py) -->
     {% if session['role'] in ['Founder', 'PM'] %} 
       <div class="mt-3 text-center">
         <a href="{{ url_for('main.add_roadmap', project_id=project.id_project) }}"
            class="btn btn-primary-custom">
           + Add First Roadmap
-        </a> {# Link naar add_roadmap route met project_id parameter #}
+        </a>                                                                                                            <!-- Link naar add_roadmap route met project_id parameter -->
       </div>
     {% endif %}
   </div>
 {% else %}
 
-  <div class="roadmap-container"> {# Wrapper voor alle roadmap blokken #}
+  <div class="roadmap-container">                                                                                       <!-- Wrapper voor alle roadmap blokken -->
 
     {% for r in roadmaps %}
       <div class="mb-4">
@@ -47,7 +47,7 @@
 
               <div>
                 <span class="text-muted">Total Time Capacity</span><br>
-                <strong>{{ r.time_capacity }}</strong> {# Toont time capacity #}
+                <strong>{{ r.time_capacity }}</strong>                                                                  <!-- Toont time capacity -->
               </div>
 
               <div>
@@ -56,17 +56,17 @@
               </div>
             </div>
 
-            {# KNOPPEN VOOR ROADMAP ZELF (Edit/Optimize) #}
+            <!-- KNOPPEN VOOR ROADMAP ZELF (Edit/Optimize) -->
             {% if session['role'] in ['Founder', 'PM'] %}
               <div class="mt-3 mt-md-0 d-flex gap-2">
                 
-                {# EDIT KNOP (Founder/PM) #}
+                <!-- EDIT KNOP (Founder/PM) -->
                 <a href="{{ url_for('main.edit_roadmap', roadmap_id=r.id_roadmap) }}"
                    class="btn btn-edit btn-sm">
                   Edit
                 </a> 
 
-                {# OPTIMALISEER KNOP (Founder/PM - Kan PM ook doen) #}
+                <!-- OPTIMALISEER KNOP (Founder/PM - Kan PM ook doen) -->
                 <a href="{{ url_for('main.roadmap_optimize', roadmap_id=r.id_roadmap) }}"
                    class="btn btn-edit btn-sm">
                   Optimaliseer Features
@@ -78,10 +78,10 @@
         </div>
 
         <div class="milestones-row">
-          <div class="milestone-group"> {# Groepeert alle milestone cards binnen deze roadmap #}
+          <div class="milestone-group">                                                                                 <!-- Groepeert alle milestone cards binnen deze roadmap -->
 
             {% if r.milestones|length == 0 %}
-              <p class="text-muted-small">No milestones yet for this roadmap.</p> {# Empty-state tekst als er nog geen milestones zijn #}
+              <p class="text-muted-small">No milestones yet for this roadmap.</p>                                       <!-- Empty-state tekst als er nog geen milestones zijn -->  
             {% endif %}
 
               {% for m in r.milestones %}
@@ -114,23 +114,23 @@
                     <strong>Features:</strong>
                     <ul style="margin: 0; padding-left: 18px; font-size: 0.8rem;">
                       {% for feat in m.features %}
-                        <li>{{ feat.name_feature }}</li> {# Toon elke feature naam binnen deze milestone #}
+                        <li>{{ feat.name_feature }}</li>                                                                  <!-- Toon elke feature naam binnen deze milestone -->
                       {% endfor %}
                     </ul>
                   </div>
                 {% endif %}
                 
-                {# PM mag Edit, Founder mag Edit EN Delete #}
+                                                                                                                          <!-- PM mag Edit, Founder mag Edit EN Delete -->
                 {% if session['role'] in ['Founder', 'PM'] %} 
                   <div class="milestone-actions">
                     
-                    {# EDIT KNOP (Founder/PM) #}
+                                                                                                                          <!-- EDIT KNOP (Founder/PM) -->
                     <a href="{{ url_for('main.edit_milestone', milestone_id=m.id_milestone) }}"
                        class="edit-btn">
                       Edit
                     </a> 
-                    
-                    {# DELETE KNOP (ALLEEN Founder) #}
+
+                                                                                                                          <!-- DELETE KNOP (ALLEEN Founder) -->
                     {% if session['role'] == 'Founder' %}
                       <form method="POST"
                             action="{{ url_for('main.delete_milestone', milestone_id=m.id_milestone) }}"
