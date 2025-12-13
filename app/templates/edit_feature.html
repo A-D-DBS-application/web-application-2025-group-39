@@ -16,30 +16,25 @@
 
 <!-- FORM CONTAINER -->
 <div class="feature-form card shadow p-4 mx-auto">
-  <form method="post" action="{{ url_for('main.edit_feature', feature_id=feature.id_feature) }}"> {#stuur de ingevulde
-    velden naar de server#}
+  <form method="post" action="{{ url_for('main.edit_feature', feature_id=feature.id_feature) }}">                                                           <!--stuur de ingevulde velden naar de server-->
 
     <!--BASIC INFO SECTION-->
     <!-- BASIC INFO -->
-    <div class="mb-4"> {# mb-4: ruimte onder dit volledige “Basic Info” blok #}
+    <div class="mb-4">                                                                                                                                      <!--mb-4: ruimte onder dit volledige “Basic Info” blok-->
       <h4 class="mb-3">Basic Info</h4>
-      <div class="row g-3"> {# g-3: ruimte tussen de kolommen #}
-        <div class="col-md-6"> {# kolom: 50% breed vanaf medium schermen #}
+      <div class="row g-3">                                                                                                                                 <!-- g-3: ruimte tussen de kolommen -->
+        <div class="col-md-6">                                                                                                                              <!-- kolom: 50% breed vanaf medium schermen -->
           <label class="form-label">Title</label>
-          <input type="text" class="form-control" name="name_feature" value="{{ feature.name_feature }}" required> {#
-          required: browser blokkeert submit als dit leeg is #}
+          <input type="text" class="form-control" name="name_feature" value="{{ feature.name_feature }}" required>                                          <!-- required: browser blokkeert submit als dit leeg is -->
         </div>
         <div class="col-md-6">
           <label class="form-label">Project</label>
-          <input type="text" class="form-control" value="{{ project.project_name }}" disabled> {# disabled: niet
-          aanpasbaar én wordt niet meegestuurd in de POST #}
-          <input type="hidden" name="id_project" value="{{ project.id_project }}"> {# verborgen veld: project-id wordt
-          wel meegestuurd bij submit #}
-          <input type="hidden" name="id_company" value="{{ company.id_company }}"> {# verborgen veld: company-id wordt
-          wel meegestuurd bij submit #}
+          <input type="text" class="form-control" value="{{ project.project_name }}" disabled>                                                              <!-- disabled: niet aanpasbaar én wordt niet meegestuurd in de POST -->
+          <input type="hidden" name="id_project" value="{{ project.id_project }}">                                                                          <!-- verborgen veld: project-id wordt wel meegestuurd bij submit -->
+          <input type="hidden" name="id_company" value="{{ company.id_company }}">                                                                          <!-- verborgen veld: company-id wordt wel meegestuurd bij submit -->
         </div>
       </div>
-      <div class="mt-3"> {# mt-3: ruimte boven description veld #}
+      <div class="mt-3">                                                                                                                                    <!-- mt-3: ruimte boven description veld -->
         <label class="form-label">Description</label>
         <textarea class="form-control" name="description" rows="3">{{ feature.description }}</textarea>
       </div>
@@ -48,23 +43,20 @@
     <!-- ROI -->
     <div class="mb-4">
       <h4 class="mb-3">Return on Investment (ROI)</h4>
-      <p class="text-muted fst-italic mb-2"> {# Korte uitleg in grijze (muted) cursieve tekst; mb-2 = kleine marge onder
-        #}
+      <p class="text-muted fst-italic mb-2">                                                                                                                <!-- Korte uitleg in grijze (muted) cursieve tekst; mb-2 = kleine marge onder -->
         <strong>Total Gains =</strong> revenue + churn + cost savings<br>
         <strong>Total Costs =</strong> development + OPEX + other
       </p>
-      <div class="row g-3"> {# Bootstrap grid-rij met g-3 spacing #}
-
+      <div class="row g-3">                                                                                                                                 <!-- Bootstrap grid-rij met g-3 spacing -->
         <!-- HORIZON -->
-        <div class="col-md-6"> {# kolom: 50% breed vanaf medium schermen #}
+        <div class="col-md-6">                                                                                                                              <!-- kolom: 50% breed vanaf medium schermen -->
           <label class="form-label">
             Horizon (months)
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The number of months we look ahead to estimate the impact of this feature. During this period, we calculate expected revenue, churn reduction, and cost savings.">
-            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+            </i>                                                                                                                                            <!-- Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst -->
           </label>
-          <input type="number" class="form-control" name="horizon" min="0" value="{{ feature.horizon or '' }}"> {#
-          Numeriek veld; name bepaalt POST-key; min=0 voorkomt negatieve waarden; or '' toont leeg bij None #}
+          <input type="number" class="form-control" name="horizon" min="0" value="{{ feature.horizon or '' }}">                                             <!-- Numeriek veld; name bepaalt POST-key; min=0 voorkomt negatieve waarden; or '' toont leeg bij None -->
         </div>
 
         <!-- EXTRA REVENUE -->
@@ -73,11 +65,10 @@
             Extra Revenue
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The additional money this feature is expected to bring in during the selected time period. Use realistic estimates based on benchmarks or results from previous releases.">
-            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+            </i>                                                                                                                                            <!-- Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst -->
           </label>
           <input type="number" class="form-control" name="extra_revenue" min="0"
-            value="{{ feature.extra_revenue or '' }}"> {# Verwachte extra omzet binnen horizon; min=0; vult bestaande
-          waarde in #}
+            value="{{ feature.extra_revenue or '' }}">                                                                                                      <!-- Verwachte extra omzet binnen horizon; min=0; vult bestaande waarde in -->
         </div>
 
         <!-- CHURN REDUCTION SAVINGS -->
@@ -86,11 +77,10 @@
             Churn Reduction Savings
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The amount of money saved because fewer customers leave. If possible, use metrics like customer lifetime value or retention rates to estimate this.">
-            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+            </i>                                                                                                                                            <!-- Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst -->
           </label>
           <input type="number" class="form-control" name="churn_reduction" min="0"
-            value="{{ feature.churn_reduction or '' }}"> {# Besparing door minder churn; opgeslagen onder
-          churn_reduction #}
+            value="{{ feature.churn_reduction or '' }}">                                                                                                    <!-- Besparing door minder churn; opgeslagen onderchurn_reduction -->
         </div>
 
         <!-- COST SAVINGS -->
@@ -99,15 +89,14 @@
             Cost Savings
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The direct costs that go down thanks to this feature. Examples include fewer support tickets, automation that replaces manual work, or lower operational overhead.">
-            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+            </i>                                                                                                                                             <!-- Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst -->
           </label>
           <input type="number" class="form-control" name="cost_savings" min="0"
-            value="{{ feature.cost_savings or '' }}"> {# Directe kostenbesparing; min=0; vult bestaande waarde in #}
+            value="{{ feature.cost_savings or '' }}">                                                                                                        <!-- Directe kostenbesparing; min=0; vult bestaande waarde in -->
         </div>
       </div>
 
-      <h5 class="mt-4">Investment Cost</h5> {# Subtitel voor de kosten-kant van ROI; mt-4 = extra ruimte boven #}
-
+      <h5 class="mt-4">Investment Cost</h5>                                                                                                                  <!-- Subtitel voor de kosten-kant van ROI; mt-4 = extra ruimte boven -->
       <div class="row g-3">
 
         <!-- DEVELOPMENT EFFORT -->
@@ -116,11 +105,10 @@
             Development Effort (hours)
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="How much time the team needs to build this feature, expressed in hours or person-days. This number is used to calculate the investment cost — keep it honest and consistent.">
-            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+            </i>                                                                                                                                             <!-- Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst -->
           </label>
           <input type="number" class="form-control" name="investment_hours" min="0"
-            value="{{ feature.investment_hours or '' }}"> {# Aantal ontwikkeluren; input voor investeringskost (uren *
-          tarief) #}
+            value="{{ feature.investment_hours or '' }}">                                                                                                    <!-- Aantal ontwikkeluren; input voor investeringskost (uren * tarief) -->
         </div>
 
         <!-- COSTS PER HOUR -->
@@ -129,10 +117,10 @@
             Cost per Hour (€)
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The hourly cost of development. This can be internal cost or external billing rate.">
-            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+            </i>                                                                                                                                             <!-- Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst -->
           </label>
           <input type="number" class="form-control" name="hourly_rate" min="0" value="{{ feature.hourly_rate or '' }}">
-          {# Uurtarief in euro; combineert typisch met investment_hours voor development cost #}
+                                                                                                                                                             <!-- Uurtarief in euro; combineert typisch met investment_hours voor development cost -->
         </div>
 
         <!-- OPEX (operational costs) -->
@@ -143,8 +131,7 @@
               data-bs-content="The ongoing costs required after the feature is launched. This could be hosting, subscriptions, monitoring, or maintenance. Only include the extra costs specifically caused by this feature.">
             </i>
           </label>
-          <input type="number" class="form-control" name="opex_hours" min="0" value="{{ feature.opex_hours or '' }}"> {#
-          Doorlopende operationele kosten; veldnaam heet opex_hours (maar inhoud is “OPEX kosten”) #}
+          <input type="number" class="form-control" name="opex_hours" min="0" value="{{ feature.opex_hours or '' }}">                                        <!-- Doorlopende operationele kosten; veldnaam heet opex_hours (maar inhoud is “OPEX kosten”) -->
         </div>
 
         <!-- OTHER COSTS -->
@@ -153,19 +140,16 @@
             Other Costs (optional)
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="A category for any costs that do not fit elsewhere. This could include licensing fees, integration costs or opportunity costs.">
-            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+            </i>                                                                                                                                             <!-- Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst -->
           </label>
           <input type="number" class="form-control" name="other_costs" min="0" value="{{ feature.other_costs or '' }}">
-          {# Overige kosten (licenties, integraties, ...); optioneel veld maar nog steeds min=0 #}
+                                                                                                                                                             <!-- Overige kosten (licenties, integraties, ...); optioneel veld maar nog steeds min=0 -->
         </div>
       </div>
 
-      <div id="roi-results"> {# Container waar de (berekende) ROI-output getoond wordt; handig voor styling of dynamic
-        updates #}
-        {% set roi_percent = feature.roi_percent %} {# Zet lokale variabele roi_percent zodat de partial die meteen kan
-        gebruiken #}
-        {% include "features/_roi_partial.html" %} {# Include partial template die de ROI-resultaten rendert (bv.
-        percentage, labels, berekeningen, ...) #}
+      <div id="roi-results">                                                                                                                                 <!-- Container waar de (berekende) ROI-output getoond wordt; handig voor styling of dynamic updates -->
+        {% set roi_percent = feature.roi_percent %}                                                                                                          <!-- Zet lokale variabele roi_percent zodat de partial die meteen kangebruiken -->
+        {% include "features/_roi_partial.html" %}                                                                                                           <!-- Include partial template die de ROI-resultaten rendert (bv.percentage, labels, berekeningen, ...) -->
       </div>
     </div>
 
@@ -180,10 +164,9 @@
           <label class="form-label mt-3">Time-to-Market (weeks)
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The number of weeks needed to build and release the first usable version of the feature. This includes everything: design, development, testing and deployment.">
-            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+            </i>                                                                                                                                             <!-- Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst -->
           </label>
-          <input type="number" class="form-control" name="ttm_weeks" min="0" value="{{ feature.ttm_weeks or '' }}"> {#
-          De gekozen/verwachte TTM waarde die je effectief gebruikt #}
+          <input type="number" class="form-control" name="ttm_weeks" min="0" value="{{ feature.ttm_weeks or '' }}">                                          <!-- De gekozen/verwachte TTM waarde die je effectief gebruikt -->
         </div>
 
         <!-- TTBV -->
@@ -192,10 +175,9 @@
           <label class="form-label mt-3">Time-to-Business-Value (weeks)
             <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="top"
               data-bs-content="The number of weeks after launch before the feature starts delivering measurable value. Examples include the first paying users, an improvement in key metrics, or visible customer adoption.">
-            </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+            </i>                                                                                                                                             <!-- Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst -->
           </label>
-          <input type="number" class="form-control" name="ttbv_weeks" min="0" value="{{ feature.ttbv_weeks or '' }}"> {#
-          De gekozen/verwachte TTBV waarde die je effectief gebruikt #}
+          <input type="number" class="form-control" name="ttbv_weeks" min="0" value="{{ feature.ttbv_weeks or '' }}">                                        <!-- De gekozen/verwachte TTBV waarde die je effectief gebruikt -->
         </div>
 
         <!-- TtV RESULTS -->
@@ -214,10 +196,9 @@
         <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-html="true"
           data-bs-placement="top"
           data-bs-content="Confidence is based on the strongest available evidence. Score range: 0.01 (very weak) &rarr; 10 (strong launch data). Used for the X-axis position in the VECTR graph.">
-        </i> {# Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst #}
+        </i>                                                                                                                                                <!-- Info-icoon (Bootstrap Icons) + popover (Bootstrap JS) met uitlegtekst -->
       </label>
-      <select class="form-select" name="quality_score" required> {# Dropdown; name=quality_score => komt zo in
-        request.form terecht; required => moet gekozen zijn #}
+      <select class="form-select" name="quality_score" required>                                                                                            <!-- Dropdown; name=quality_score => komt zo in request.form terecht; required => moet gekozen zijn -->
         <option value="0" {% if feature.quality_score==0 %}selected{% endif %}>No Longer Relevant (0.0) - Evidence is
           outdated or invalid and will no longer be considered.</option>
         <option value="0.01" {% if feature.quality_score==0.01 %}selected{% endif %}>Self Conviction (0.01) - Your own
