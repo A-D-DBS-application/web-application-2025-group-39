@@ -12,21 +12,21 @@
   <h1>Welcome To VECTR</h1>
 
   <!-- Ondertitel -->
-  <p class="subtitle">Your smart feature-prioritization assistant.</p>
+  <p class="subtitle">Your smart feature-prioritization assistant.</p>                               <!-- subtitle: custom class voor kleinere, subtielere tekststijl -->
 
   <!-- Login/Register knoppen -->
-  <div class="auth-box">
+  <div class="auth-box">                                                                            <!-- auth-box: visuele “box” rond de knoppen -->
     <p>Select an option to continue:</p>
 
     <!-- Link naar loginpagina -->
-    <a href="{{ url_for('main.login') }}" class="btn btn-base btn-primary-custom me-2">Log in</a>
+    <a href="{{ url_for('main.login') }}" class="btn btn-base btn-primary-custom me-2">Log in</a>   <!-- me-2: Bootstrap margin-end voor spacing tussen knoppen -->
 
     <!-- Link naar registratiepagina -->
     <a href="{{ url_for('main.register') }}" class="btn btn-base btn-secondary-custom">Register</a>
   </div>
 
   <!-- Introductietekst over het platform -->
-  <p><i>
+  <p><i>                                                                                            <!-- <i>: italic -->
     VECTR helps founders and product managers make confident, data-driven decisions.
     Add your ideas, connect evidence, and instantly see which features bring the highest return with the least risk.
   </i></p>
