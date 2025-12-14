@@ -103,9 +103,29 @@
                         </div>
                     </th>
 
-                    <th class="text-center">VECTR Score</th>                                                                                                           <!-- Samengestelde score (vermoedelijk berekend) -->
-                    <th class="text-center">Horizon</th>                                                                                                               <!-- Horizon in maanden -->
-
+                    <!--vectr score sortable-->
+                    <th class="text-center">
+                        <div class="d-flex justify-content-center align-items-center">
+                            <div class="me-2">
+                                {% if can_sort %}
+                                <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='vectr', direction='asc') }}"
+                                    class="sort-icon {% if current_sort == 'vectr' and current_direction == 'asc' %}active{% endif %}">
+                                    &#9650;
+                                </a> 
+                                <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='vectr', direction='desc') }}"
+                                    class="sort-icon {% if current_sort == 'vectr' and current_direction == 'desc' %}active{% endif %}">
+                                    &#9660;
+                                </a> 
+                                {% else %}
+                                <span class="sort-icon-placeholder">&#9650;</span>
+                                <span class="sort-icon-placeholder">&#9660;</span>
+                                {% endif %} 
+                            </div>
+                            <strong>VECTR Score</strong>
+                        </div>
+                    </th> 
+                    <th class="text-center">Horizon</th>
+                                                                                                                             
 
                     <!-- DECISION COLUMN (SORTABLE) -->
                     <th class="text-center">Decision (set)</th>                                                                                                        <!-- Knoppen om decision te zetten -->

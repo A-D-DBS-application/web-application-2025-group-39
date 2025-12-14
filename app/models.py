@@ -210,25 +210,27 @@ class Roadmap(db.Model):
 
 
 # =====================================================
-# ASSOCIATION TABLE: MILESTONE ↔ FEATURES
+# ASSOCIATION TABLE: Many-to-Many relatie tussen Milestone en Features_ideas beheert
 # =====================================================
-milestone_features = db.Table(
-    "milestone_features",
-    db.Column(
-        "milestone_id",
+class MilestoneFeature(db.Model):
+    __tablename__ = "milestone_features"
+    __table_args__ = {"schema": "public"}
+    
+    milestone_id = db.Column(
         db.Integer,
         db.ForeignKey("public.milestone.id_milestone", ondelete="CASCADE"),
         primary_key=True,
-    ),
-    db.Column(
-        "feature_id",
-        db.String,  # matches Features_ideas.id_feature
+    )
+    
+    feature_id = db.Column(
+        db.String,
         db.ForeignKey("public.features_ideas.id_feature", ondelete="CASCADE"),
         primary_key=True,
-    ),
-    schema="public",
-)
+    )
 
+    # RELATIES NAAR DE HOOFDMODELLEN (gebruikt in de joins)
+    milestone = db.relationship("Milestone", backref="features_links")
+    feature = db.relationship("Features_ideas", backref="milestones_links")
 
 # =====================================================
 # MILESTONE
@@ -242,7 +244,12 @@ class Milestone(db.Model):
     # Many-to-many: milestone ↔ features
     features = db.relationship(
         "Features_ideas",
-        secondary=milestone_features,
+        secondary="public.milestone_features", # GEBRUIK DE TABELNAAM ALS STRING
+        
+        # Specificeer de joins (deze zijn essentieel)
+        primaryjoin="Milestone.id_milestone == MilestoneFeature.milestone_id",
+        secondaryjoin="Features_ideas.id_feature == MilestoneFeature.feature_id",
+
         backref="milestones",
         lazy="select",
     )

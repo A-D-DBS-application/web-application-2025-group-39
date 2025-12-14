@@ -2,6 +2,7 @@
 
 from flask import session, flash, redirect, url_for
 from app.models import Profile, Project, CONFIDENCE_LEVELS, Features_ideas
+from app.utils.calculations import calc_ttv_scaled
 
 # -----------------------------------
 # LOGIN / ROLE / OWNERSHIP HELPERS
@@ -83,13 +84,13 @@ def prepare_vectr_chart_data(project: Project, features_list: list):
             effective_ttv = float(f.ttm_weeks) + float(f.ttbv_weeks)
 
             # Schaling: Gebruik de lokale projectgrenzen
-            if local_TTV_MAX > local_TTV_MIN:
-                ttv_norm = (effective_ttv - local_TTV_MIN) / (
-                    local_TTV_MAX - local_TTV_MIN
-                ) * 10 # Schaal naar bereik 0-10
-                ttv_scaled = 10.0 - min(max(ttv_norm, 0), 10) # 10.0 - TTV zorgt voor omgekeerde Y-as (Fast bovenaan)
-            else:
-                ttv_scaled = 0 # Val terug op 0 als grenzen gelijk zijn
+            ttv_scaled = calc_ttv_scaled(
+                project.ttm_low_limit, 
+                project.ttm_high_limit, 
+                project.ttbv_low_limit, 
+                project.ttbv_high_limit, 
+                effective_ttv
+            )
 
             chart_data.append(
                 {
@@ -102,7 +103,6 @@ def prepare_vectr_chart_data(project: Project, features_list: list):
                 }
             )
     return chart_data
-
 
 # -----------------------------------
 # LOW-LEVEL FIELD PARSERS

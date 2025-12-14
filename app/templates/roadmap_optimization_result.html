@@ -4,28 +4,35 @@
 
 {% block content %}
 
-<h2 class="mb-4 text-center">Roadmap Optimalisatie Resultaten</h2>
+<h2 class="mb-4 text-center">Roadmap Optimization Results</h2>
 <h3 class="mb-4 text-center">Project: {{ project.project_name }}</h3>
 
 <div class="card p-4 mb-4">
     <div class="row">
         <div class="col-md-6">
-            <h4>Strategische Capaciteit</h4>
+            <h4>Strategic Capacity</h4>
             <ul>
-                <li>Beschikbare Tijd (Uren/Sprint): <strong>{{ max_time }}</strong></li>
-                <li>Beschikbaar Budget: <strong>€ {{ "{:,.0f}".format(max_cost) }}</strong></li>
-                <li>Strategische Weging (Alpha): <strong>{{ alpha | float | round(2) }}</strong> (Alpha=1.0 is Tijd-focus)</li>
+                <li>Available Time (Hours): <strong>{{ max_time }}</strong></li>
+                <li>Available Budget: <strong>€ {{ "{:,.0f}".format(max_cost) }}</strong></li>
+                <li>Strategic Weight (Alpha): <strong>{{ alpha | float | round(2) }}</strong> (Alpha=1.0 is Time Focus)
+                    <i class="bi bi-info-circle" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-html="true"
+                    data-bs-placement="top"
+                    data-bs-content="Alpha determines the priority weighting for the Knapsack algorithm. 
+                        A value of 1.0 means the algorithm prioritizes selecting features that minimize TIME (Hours). 
+                        A value of 0.0 means the algorithm prioritizes selecting features that minimize COST (Budget).">
+                    </i>
+                </li>
             </ul>
         </div>
         <div class="col-md-6">
-            <h4>Optimalisatie-actie</h4>
-            <p>Pas de strategische weging aan om het resultaat te beïnvloeden:</p>
+            <h4>Optimization Action</h4>
+            <p>Adjust the strategic weighting to influence the result:</p>
             <form method="POST" action="{{ url_for('main.roadmap_optimize', roadmap_id=roadmap.id_roadmap) }}">
                 <div class="input-group">
                     <input type="number" step="0.1" min="0.0" max="1.0" name="alpha" value="{{ alpha | float | round(1) }}" class="form-control" required>
-                    <button type="submit" class="btn btn-primary-custom">Opnieuw Optimaliseren</button>
+                    <button type="submit" class="btn btn-primary-custom">Re-optimize</button>
                 </div>
-                <small class="form-text text-muted">0.0 = Kosten Focus, 1.0 = Tijd Focus</small>
+                <small class="form-text text-muted">0.0 = Cost Focus, 1.0 = Time Focus</small>
             </form>
         </div>
     </div>
@@ -36,10 +43,10 @@
         <thead class="table-light text-center">
             <tr>
                 <th>Status</th>
-                <th>Feature Naam</th>
-                <th>VECTR Score (Waarde)</th>
-                <th>Tijd (Uren)</th>
-                <th>Kosten (€)</th>
+                <th>Feature Name</th>
+                <th>VECTR Score (Value)</th>
+                <th>Time (Hours)</th>
+                <th>Cost (€)</th>
             </tr>
         </thead>
         <tbody class="text-center">
@@ -47,12 +54,12 @@
             <tr class="{% if item.is_selected %}table-success{% else %}table-danger{% endif %}">
                 <td>
                     {% if item.is_selected %}
-                        <strong>✅ Geselecteerd</strong>
+                        <strong>✅ Selected</strong>
                     {% else %}
-                        <strong>❌ Niet Geselecteerd</strong>
+                        <strong>❌ Not Selected</strong>
                     {% endif %}
                 </td>
-                <td class="text-start">{{ item.feature.name_feature }}</td>
+                <td>{{ item.feature.name_feature }}</td>
                 <td>{{ item.feature.vectr_score | round(2) if item.feature.vectr_score is not none else 'N/A' }}</td>
                 <td>{{ item.feature.investment_hours if item.feature.investment_hours is not none else 'N/A' }}</td>
                 <td>€ {{ "{:,.0f}".format(item.cost_weight) }}</td>
@@ -62,6 +69,17 @@
     </table>
 </div>
 
+<script>
+  // Selecteer alle Popovers op de pagina
+  document.addEventListener('DOMContentLoaded', function () {
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    // Maak voor elk element een Bootstrap Popover instance
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+
+      return new bootstrap.Popover(popoverTriggerEl)
+    })
+  });
+</script>
 
 {% endblock %}
 

@@ -10,7 +10,7 @@ import matplotlib.patches as patches
 from app import db
 from app.models import Profile, Company, Project, Features_ideas, Roadmap, Milestone, Evidence, Decision, ProjectChatMessage, CONFIDENCE_LEVELS
 from app.constants import CONF_MIN, CONF_LOW_THRESHOLD, CONF_MID_HIGH_THRESHOLD, CONF_MAX, TTV_MIN, TTV_SLOW_THRESHOLD, TTV_MID_THRESHOLD, TTV_MAX
-from app.utils.calculations import calc_roi, calc_ttv, to_numeric, calculate_feature_cost
+from app.utils.calculations import calc_roi, calc_ttv, to_numeric, calculate_feature_cost, calculate_vectr_scores
 from app.utils.form_helpers import prepare_vectr_chart_data, require_login, require_role, require_company_ownership, parse_project_form, parse_feature_form, parse_roadmap_form, parse_milestone_form, parse_evidence_form, recompute_feature_confidence
 from app.utils.knapsack_optimizer import optimize_roadmap
 
@@ -193,12 +193,12 @@ def edit_profile():
 
             # 2. Basisvalidatie
             if not all([name, email, role, company_name]):
-                flash("Alle velden zijn verplicht.", "danger")
+                flash("All fields are required.", "danger")
                 return render_template("edit_profile.html", user=user, company_name=current_company_name, available_roles=AVAILABLE_ROLES)
 
             # 3. Controleer op e-mail duplicatie (uitgezonderd de huidige gebruiker)
             if Profile.query.filter(Profile.email == email, Profile.id_profile != user.id_profile).first():
-                flash("Dit e-mailadres is al in gebruik.", "danger")
+                flash("This email address is already in use.", "danger")
                 return render_template("edit_profile.html", user=user, company_name=current_company_name, available_roles=AVAILABLE_ROLES)
 
             # 4. Bedrijf Logica: Vind of Maak aan (alleen als de naam is gewijzigd)
@@ -227,13 +227,13 @@ def edit_profile():
             session["name"] = user.name
             session["role"] = user.role # Update de rol in de sessie
             
-            flash("Profiel succesvol bijgewerkt.", "success")
+            flash("Profile updated successfully.", "success")
             return redirect(url_for("main.profile"))
 
         except Exception as e:
             db.session.rollback()
-            print(f"Fout bij het bewerken van het profiel: {e}")
-            flash("Er is een onverwachte fout opgetreden bij het opslaan van de wijzigingen.", "danger")
+            print(f"Error editing profile: {e}")
+            flash("An unexpected error occurred while saving your changes.", "danger")
             return render_template("edit_profile.html", user=user, company_name=current_company_name, available_roles=AVAILABLE_ROLES)
 
     # GET verzoek: Toon het edit-formulier
@@ -262,13 +262,13 @@ def delete_profile():
         # 3. Ruim de sessie op
         session.clear()
 
-        flash("Uw profiel is succesvol verwijderd. Tot ziens!", "success")
+        flash("Your profile has been successfully deleted.", "success")
         return redirect(url_for("main.index"))  # Stuur terug naar de landingspagina
 
     except Exception as e:
         db.session.rollback()
-        print(f"Fout bij het verwijderen van het profiel: {e}")
-        flash("Er is een fout opgetreden bij het verwijderen van het profiel.", "danger")
+        print(f"Error deleting the profile: {e}")
+        flash("An error occurred while deleting the profile.", "danger")
         return redirect(url_for("main.profile"))
 
 # ==============================
@@ -490,6 +490,71 @@ def features_calc_ttv():
     ttv_weeks_result = ttv_weeks_raw if ttv_weeks_raw is not None else 0.0
     return render_template("features/_ttv_partial.html", ttv_weeks=ttv_weeks_result)
 
+# ==================================
+# LIVE CALC: VECTR (NIEUW)
+# ==================================
+
+class TempFeature:
+    """Tijdelijk object om ruwe formulierdata te verwerken als een Feature model."""
+    def __init__(self, form_data):
+        
+        # Haal alle velden op en converteer naar numerieke waarden
+        self.extra_revenue = to_numeric(form_data.get("extra_revenue"))
+        self.churn_reduction = to_numeric(form_data.get("churn_reduction"))
+        self.cost_savings = to_numeric(form_data.get("cost_savings"))
+        self.investment_hours = to_numeric(form_data.get("investment_hours"))
+        self.hourly_rate = to_numeric(form_data.get("hourly_rate"))
+        self.opex_hours = to_numeric(form_data.get("opex_hours"))
+        self.other_costs = to_numeric(form_data.get("other_costs"))
+        self.ttm_weeks = to_numeric(form_data.get("ttm_weeks"))
+        self.ttbv_weeks = to_numeric(form_data.get("ttbv_weeks"))
+        
+        # Haal de Confidence Score op
+        self.quality_score = to_numeric(form_data.get("quality_score"))
+        
+        # Bereken de afgeleide velden die nodig zijn voor VECTR
+        self.roi_percent = calc_roi(
+            self.extra_revenue, self.churn_reduction, self.cost_savings, 
+            self.investment_hours, self.hourly_rate, self.opex_hours, self.other_costs
+        )
+        self.ttv_weeks = calc_ttv(self.ttm_weeks, self.ttbv_weeks)
+
+        # Zorg voor veilige fallbacks
+        self.roi_percent = self.roi_percent if self.roi_percent is not None else 0.0
+        self.ttv_weeks = self.ttv_weeks if self.ttv_weeks is not None else 0.0
+
+@main.route("/features/calc/vectr/<int:project_id>", methods=["POST"])
+def features_calc_vectr(project_id):
+    """
+    Berekent live de VECTR-score (met TTV-schaling) en stuurt deze terug naar de frontend.
+    """
+    
+    # 1. Authenticatie check (optioneel, maar aanbevolen voor elke route)
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
+    
+    # 2. Haal Project en de TTV-schaallimieten op
+    project = Project.query.get_or_404(project_id)
+    
+    # Haal de limieten op uit het Project object
+    ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
+    ttbv_limits = (project.ttbv_low_limit, project.ttbv_high_limit)
+    
+    # 3. Maak een tijdelijke Feature aan op basis van de POST data
+    temp_feature = TempFeature(request.form)
+    
+    # 4. Bereken VECTR score
+    # calculate_vectr_scores verwacht een lijst van features
+    result_list = calculate_vectr_scores([temp_feature], ttm_limits, ttbv_limits)
+    
+    # Haal de berekende VECTR score op
+    vectr_score = getattr(result_list[0], 'vectr_score', 0.0)
+
+    # 5. Render de score en stuur deze terug naar de frontend
+    # U moet de template features/_vectr_partial.html aanmaken
+    return render_template("features/_vectr_partial.html", vectr_score=vectr_score)
+
 
 # ==============================
 # VIEW FEATURES
@@ -508,41 +573,42 @@ def view_features(project_id):
     # Company ophalen via project-relatie (aangenomen dat project.company bestaat)
     company = project.company
 
-    user_role = session.get("role")
-    can_sort = user_role == "PM"                                                # Alleen PM's mogen sorteren op berekende scores
 
-    if can_sort:
-        sort_by = request.args.get("sort_by", "roi")
-        direction = request.args.get("direction", "desc")                       # Haal de sorteerrichting op uit de URL
-    else:
-        sort_by = "name"                                                        # Als GEEN PM: De gebruiker mag de sorteerparameters niet bepalen.
-        direction = "asc"                                                       # De sortering wordt vastgezet op een neutrale, standaardkolom (naam) in oplopende volgorde.
+    can_sort = True                                              # iedereen mag sorteren op berekende scores
 
+    sort_by = request.args.get("sort_by", "vectr") # Standaard sorteren op VECTR
+    direction = request.args.get("direction", "desc")
 
-    features_query = Features_ideas.query.filter_by(id_project=project_id).options(joinedload(Features_ideas.decisions)) # Laadt de decisions voor elke feature
-        
-    if sort_by == "roi":
-        column = Features_ideas.roi_percent                                     # Sorteren op de berekende ROI in percentage
+    # HAAL ALLE FEATURES OP
+    features_query = Features_ideas.query.filter_by(id_project=project_id).options(joinedload(Features_ideas.decisions))
+    features = features_query.all() # Voer de query uit zonder ORDER BY
+
+    # BEREKEN VECTR SCORE OP ALLE FEATURES
+    ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
+    ttbv_limits = (project.ttbv_low_limit, project.ttbv_high_limit)
+    
+    # Bereken VECTR, waardoor 'vectr_score' aan elk object wordt toegevoegd
+    features = calculate_vectr_scores(features, ttm_limits, ttbv_limits)
+    
+    # Bepaal de sorteringssleutel (de lambda functie)
+    if sort_by == "vectr":
+        # Sorteren op het dynamisch berekende attribuut, met fallback naar 0.0
+        sort_key = lambda f: getattr(f, 'vectr_score', 0.0)
+    elif sort_by == "roi":
+        sort_key = lambda f: f.roi_percent if f.roi_percent is not None else 0.0
     elif sort_by == "ttv":
-        column = Features_ideas.ttm_weeks
+        # Sorteren op ruwe weken, met fallback naar 0.0
+        sort_key = lambda f: f.ttm_weeks if f.ttm_weeks is not None else 0.0
     elif sort_by == "confidence":
-        column = Features_ideas.quality_score
-    else:
-        column = Features_ideas.name_feature
+        sort_key = lambda f: f.quality_score if f.quality_score is not None else 0.0
+    else: # Standaard sorteren op naam
+        sort_key = lambda f: f.name_feature
+        
+    # Voer de sortering uit
+    features = sorted(features, 
+                      key=sort_key, 
+                      reverse=(direction == "desc"))
 
-    if direction == "desc":
-        features = features_query.order_by(column.desc()).all()                 # Order By DESC (Descending): Hoogste waarde eerst
-    else:
-        features = features_query.order_by(column.asc()).all()                  # Order By ASC (Ascending): Laagste waarde eerst
-
-
-    # Compute VECTR score
-    for f in features:
-        ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
-        roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
-        confidence_score = f.quality_score if f.quality_score is not None else 0.0
-        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score
-        setattr(f, "vectr_score", round(vectr_score, 2))
 
     return render_template(
         "view_features.html",
@@ -820,8 +886,14 @@ def roadmap_optimize(roadmap_id):
     # Dit is cruciaal. Je kunt hiervoor de calculate_vectr_scores uit calculations.py gebruiken.
     # (Let op: de calculate_vectr_scores functie in calculations.py gebruikt ttv_weeks * (roi_percent/100) * confidence_score, wat een simpele formule is, maar werkt.)
 
-    from app.utils.calculations import calculate_vectr_scores
-    features = calculate_vectr_scores(features)
+
+    # 1a. Limieten ophalen uit Project object en verpakken in tuples
+    ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
+    ttbv_limits = (project.ttbv_low_limit, project.ttbv_high_limit)
+    
+    # 1b. Correcte aanroep met de vereiste argumenten
+    # Dit zal nu de VECTR score berekenen met de GESCHAALDE TTV.
+    features = calculate_vectr_scores(features, ttm_limits, ttbv_limits)
     
     # Standaard Alpha
     alpha = 1.0 
@@ -830,7 +902,7 @@ def roadmap_optimize(roadmap_id):
         # Gebruiker kan de strategische weging (Alpha) instellen via een formulier
         alpha = to_numeric(request.form.get("alpha", 1.0))
         if not 0.0 <= alpha <= 1.0:
-            flash("Alpha moet tussen 0.0 en 1.0 liggen.", "danger")
+            flash("Alpha must be between 0.0 and 1.0.", "danger")
             alpha = 1.0 # fallback
 
     # 2. Voer het Knapzak-algoritme uit
@@ -895,12 +967,15 @@ def add_milestone(roadmap_id):
     features = Features_ideas.query.filter_by(id_project=project.id_project).all()
 
     # VECTR score berekenen voor sortering
-    for f in features:
-        ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5  # Default TtV waarde
-        roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
-        confidence_score = f.quality_score if f.quality_score is not None else 0.0
-        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score  # Basis VECTR-formule
-        setattr(f, "vectr_score", round(vectr_score, 2))  # Dynamisch attribuut toevoegen.
+
+
+    # 1a. Limieten ophalen uit Project object en verpakken in tuples
+    ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
+    ttbv_limits = (project.ttbv_low_limit, project.ttbv_high_limit)
+    
+    # 1b. Correcte aanroep met de vereiste argumenten
+    # Dit zal nu de VECTR score berekenen met de GESCHAALDE TTV.
+    features = calculate_vectr_scores(features, ttm_limits, ttbv_limits)
 
     # Features sorteren op VECTR score (beste eerst)
     features = sorted(features, key=lambda x: getattr(x, "vectr_score", 0), reverse=True)
@@ -969,12 +1044,14 @@ def edit_milestone(milestone_id):
     features = Features_ideas.query.filter_by(id_project=project.id_project).all()
 
     # VECTR score berekenen (zoals bij add_milestone)
-    for f in features:
-        ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
-        roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
-        confidence_score = f.quality_score if f.quality_score is not None else 0.0
-        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score
-        setattr(f, "vectr_score", round(vectr_score, 2))
+
+    # 1a. Limieten ophalen uit Project object en verpakken in tuples
+    ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
+    ttbv_limits = (project.ttbv_low_limit, project.ttbv_high_limit)
+    
+    # 1b. Correcte aanroep met de vereiste argumenten
+    # Dit zal nu de VECTR score berekenen met de GESCHAALDE TTV.
+    features = calculate_vectr_scores(features, ttm_limits, ttbv_limits)
 
     features = sorted(features, key=lambda x: getattr(x, "vectr_score", 0), reverse=True)
 
@@ -1380,7 +1457,7 @@ def vectr_chart_pdf(project_id):
 def set_feature_decision(feature_id, decision_value):
     # 1) Login check
     if "user_id" not in session:
-        flash("U moet inloggen om beslissingen te maken.", "danger")
+        flash("You must log in to make decisions.", "danger")
         return redirect(url_for("main.login"))
 
     # 2) Haal user + feature op
@@ -1389,7 +1466,7 @@ def set_feature_decision(feature_id, decision_value):
 
     # 3) Security: feature moet bij dezelfde company horen
     if feature.id_company != user.id_company:
-        flash("Niet toegestaan.", "danger")
+        flash("Not allowed.", "danger")
         return redirect(url_for("main.projects"))
 
     # 4) Map Yes/No naar decision types (matcht met je CSS: decision-approved / decision-rejected)
@@ -1416,13 +1493,13 @@ def set_feature_decision(feature_id, decision_value):
 
         db.session.commit()
 
-        flash(f"Beslissing opgeslagen: {decision_type}", "success")
+        flash(f"Decision saved: {decision_type}", "success")
         return redirect(url_for("main.view_features", project_id=feature.id_project))
 
     except Exception as e:
         db.session.rollback()
-        print(f"Fout bij het instellen van de beslissing: {e}")
-        flash("Er is een fout opgetreden bij het verwerken van de beslissing.", "danger")
+        print(f"Error setting decision: {e}")
+        flash("An error occurred while processing the decision.", "danger")
         return redirect(url_for("main.view_features", project_id=feature.id_project))
 
 
