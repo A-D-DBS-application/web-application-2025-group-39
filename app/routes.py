@@ -10,7 +10,7 @@ import matplotlib.patches as patches
 from app import db
 from app.models import Profile, Company, Project, Features_ideas, Roadmap, Milestone, Evidence, Decision, ProjectChatMessage, CONFIDENCE_LEVELS
 from app.constants import CONF_MIN, CONF_LOW_THRESHOLD, CONF_MID_HIGH_THRESHOLD, CONF_MAX, TTV_MIN, TTV_SLOW_THRESHOLD, TTV_MID_THRESHOLD, TTV_MAX
-from app.utils.calculations import calc_roi, calc_ttv, to_numeric, calculate_feature_cost
+from app.utils.calculations import calc_roi, calc_ttv, to_numeric, calculate_feature_cost, calculate_vectr_scores
 from app.utils.form_helpers import prepare_vectr_chart_data, require_login, require_role, require_company_ownership, parse_project_form, parse_feature_form, parse_roadmap_form, parse_milestone_form, parse_evidence_form, recompute_feature_confidence
 from app.utils.knapsack_optimizer import optimize_roadmap
 
@@ -492,6 +492,71 @@ def features_calc_ttv():
     ttv_weeks_result = ttv_weeks_raw if ttv_weeks_raw is not None else 0.0
     return render_template("features/_ttv_partial.html", ttv_weeks=ttv_weeks_result)
 
+# ==================================
+# LIVE CALC: VECTR (NIEUW)
+# ==================================
+
+class TempFeature:
+    """Tijdelijk object om ruwe formulierdata te verwerken als een Feature model."""
+    def __init__(self, form_data):
+        
+        # Haal alle velden op en converteer naar numerieke waarden
+        self.extra_revenue = to_numeric(form_data.get("extra_revenue"))
+        self.churn_reduction = to_numeric(form_data.get("churn_reduction"))
+        self.cost_savings = to_numeric(form_data.get("cost_savings"))
+        self.investment_hours = to_numeric(form_data.get("investment_hours"))
+        self.hourly_rate = to_numeric(form_data.get("hourly_rate"))
+        self.opex_hours = to_numeric(form_data.get("opex_hours"))
+        self.other_costs = to_numeric(form_data.get("other_costs"))
+        self.ttm_weeks = to_numeric(form_data.get("ttm_weeks"))
+        self.ttbv_weeks = to_numeric(form_data.get("ttbv_weeks"))
+        
+        # Haal de Confidence Score op
+        self.quality_score = to_numeric(form_data.get("quality_score"))
+        
+        # Bereken de afgeleide velden die nodig zijn voor VECTR
+        self.roi_percent = calc_roi(
+            self.extra_revenue, self.churn_reduction, self.cost_savings, 
+            self.investment_hours, self.hourly_rate, self.opex_hours, self.other_costs
+        )
+        self.ttv_weeks = calc_ttv(self.ttm_weeks, self.ttbv_weeks)
+
+        # Zorg voor veilige fallbacks
+        self.roi_percent = self.roi_percent if self.roi_percent is not None else 0.0
+        self.ttv_weeks = self.ttv_weeks if self.ttv_weeks is not None else 0.0
+
+@main.route("/features/calc/vectr/<int:project_id>", methods=["POST"])
+def features_calc_vectr(project_id):
+    """
+    Berekent live de VECTR-score (met TTV-schaling) en stuurt deze terug naar de frontend.
+    """
+    
+    # 1. Authenticatie check (optioneel, maar aanbevolen voor elke route)
+    user = require_login()
+    if not isinstance(user, Profile):
+        return user
+    
+    # 2. Haal Project en de TTV-schaallimieten op
+    project = Project.query.get_or_404(project_id)
+    
+    # Haal de limieten op uit het Project object
+    ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
+    ttbv_limits = (project.ttbv_low_limit, project.ttbv_high_limit)
+    
+    # 3. Maak een tijdelijke Feature aan op basis van de POST data
+    temp_feature = TempFeature(request.form)
+    
+    # 4. Bereken VECTR score
+    # calculate_vectr_scores verwacht een lijst van features
+    result_list = calculate_vectr_scores([temp_feature], ttm_limits, ttbv_limits)
+    
+    # Haal de berekende VECTR score op
+    vectr_score = getattr(result_list[0], 'vectr_score', 0.0)
+
+    # 5. Render de score en stuur deze terug naar de frontend
+    # U moet de template features/_vectr_partial.html aanmaken
+    return render_template("features/_vectr_partial.html", vectr_score=vectr_score)
+
 
 # ==============================
 # VIEW FEATURES
@@ -539,12 +604,15 @@ def view_features(project_id):
 
 
     # Compute VECTR score
-    for f in features:
-        ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
-        roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
-        confidence_score = f.quality_score if f.quality_score is not None else 0.0
-        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score
-        setattr(f, "vectr_score", round(vectr_score, 2))
+    from app.utils.calculations import calculate_vectr_scores
+    
+    # 1. Haal de project-specifieke limieten op
+    ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
+    ttbv_limits = (project.ttbv_low_limit, project.ttbv_high_limit)
+    
+    # 2. Bereken de VECTR scores (gebruikt nu de geschaalde TtV)
+    # De return waarde is de bijgewerkte features lijst
+    features = calculate_vectr_scores(features, ttm_limits, ttbv_limits)
 
     return render_template(
         "view_features.html",
