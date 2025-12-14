@@ -891,7 +891,14 @@ def roadmap_optimize(roadmap_id):
     # (Let op: de calculate_vectr_scores functie in calculations.py gebruikt ttv_weeks * (roi_percent/100) * confidence_score, wat een simpele formule is, maar werkt.)
 
     from app.utils.calculations import calculate_vectr_scores
-    features = calculate_vectr_scores(features)
+
+    # 1a. Limieten ophalen uit Project object en verpakken in tuples
+    ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
+    ttbv_limits = (project.ttbv_low_limit, project.ttbv_high_limit)
+    
+    # 1b. Correcte aanroep met de vereiste argumenten
+    # Dit zal nu de VECTR score berekenen met de GESCHAALDE TTV.
+    features = calculate_vectr_scores(features, ttm_limits, ttbv_limits)
     
     # Standaard Alpha
     alpha = 1.0 
@@ -965,12 +972,15 @@ def add_milestone(roadmap_id):
     features = Features_ideas.query.filter_by(id_project=project.id_project).all()
 
     # VECTR score berekenen voor sortering
-    for f in features:
-        ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5  # Default TtV waarde
-        roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
-        confidence_score = f.quality_score if f.quality_score is not None else 0.0
-        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score  # Basis VECTR-formule
-        setattr(f, "vectr_score", round(vectr_score, 2))  # Dynamisch attribuut toevoegen.
+    from app.utils.calculations import calculate_vectr_scores
+
+    # 1a. Limieten ophalen uit Project object en verpakken in tuples
+    ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
+    ttbv_limits = (project.ttbv_low_limit, project.ttbv_high_limit)
+    
+    # 1b. Correcte aanroep met de vereiste argumenten
+    # Dit zal nu de VECTR score berekenen met de GESCHAALDE TTV.
+    features = calculate_vectr_scores(features, ttm_limits, ttbv_limits)
 
     # Features sorteren op VECTR score (beste eerst)
     features = sorted(features, key=lambda x: getattr(x, "vectr_score", 0), reverse=True)
@@ -1039,12 +1049,15 @@ def edit_milestone(milestone_id):
     features = Features_ideas.query.filter_by(id_project=project.id_project).all()
 
     # VECTR score berekenen (zoals bij add_milestone)
-    for f in features:
-        ttv_weeks = f.ttv_weeks if f.ttv_weeks is not None else 5.5
-        roi_percent = f.roi_percent if f.roi_percent is not None else 0.0
-        confidence_score = f.quality_score if f.quality_score is not None else 0.0
-        vectr_score = ttv_weeks * (roi_percent/100) * confidence_score
-        setattr(f, "vectr_score", round(vectr_score, 2))
+    from app.utils.calculations import calculate_vectr_scores
+
+    # 1a. Limieten ophalen uit Project object en verpakken in tuples
+    ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
+    ttbv_limits = (project.ttbv_low_limit, project.ttbv_high_limit)
+    
+    # 1b. Correcte aanroep met de vereiste argumenten
+    # Dit zal nu de VECTR score berekenen met de GESCHAALDE TTV.
+    features = calculate_vectr_scores(features, ttm_limits, ttbv_limits)
 
     features = sorted(features, key=lambda x: getattr(x, "vectr_score", 0), reverse=True)
 
