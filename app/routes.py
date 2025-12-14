@@ -604,8 +604,6 @@ def view_features(project_id):
 
 
     # Compute VECTR score
-    from app.utils.calculations import calculate_vectr_scores
-    
     # 1. Haal de project-specifieke limieten op
     ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
     ttbv_limits = (project.ttbv_low_limit, project.ttbv_high_limit)
@@ -890,7 +888,6 @@ def roadmap_optimize(roadmap_id):
     # Dit is cruciaal. Je kunt hiervoor de calculate_vectr_scores uit calculations.py gebruiken.
     # (Let op: de calculate_vectr_scores functie in calculations.py gebruikt ttv_weeks * (roi_percent/100) * confidence_score, wat een simpele formule is, maar werkt.)
 
-    from app.utils.calculations import calculate_vectr_scores
 
     # 1a. Limieten ophalen uit Project object en verpakken in tuples
     ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
@@ -972,7 +969,7 @@ def add_milestone(roadmap_id):
     features = Features_ideas.query.filter_by(id_project=project.id_project).all()
 
     # VECTR score berekenen voor sortering
-    from app.utils.calculations import calculate_vectr_scores
+
 
     # 1a. Limieten ophalen uit Project object en verpakken in tuples
     ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
@@ -1049,7 +1046,6 @@ def edit_milestone(milestone_id):
     features = Features_ideas.query.filter_by(id_project=project.id_project).all()
 
     # VECTR score berekenen (zoals bij add_milestone)
-    from app.utils.calculations import calculate_vectr_scores
 
     # 1a. Limieten ophalen uit Project object en verpakken in tuples
     ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
