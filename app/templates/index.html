@@ -97,28 +97,41 @@
 </section>
 
 <section class="py-5 bg-light">
-  <div class="container">
-    <h2 class="text-center mb-5 fade-in-scroll">The VECTR Prioritization Map </h2>
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-        <div class="card p-4 shadow-lg border-0 fade-in-scroll">
-          <p class="card-text lead">
-            VECTR is operationalized as a two-dimensional map that makes trade-offs transparent:
-          </p>
-          <ul class="list-unstyled mt-3" style="font-size: 1.1rem;">
-            <li><i class="bi bi-arrow-right-short me-1 text-primary"></i> X-axis: Represents the Confidence Level.</li>
-            <li><i class="bi bi-arrow-up-short me-1 text-primary"></i> Y-axis: Represents Time-to-Value (TtV).</li>
-            <li><i class="bi bi-circle-fill me-1 text-primary" style="font-size: 0.7rem;"></i> Bubble Size: Represents
-              the Return on Investment (ROI).</li>
-          </ul>
-          <blockquote class="blockquote mt-4 border-start border-4 ps-3 border-primary">
-            <p class="mb-0 text-dark">Items in the upper-right corner (high Confidence, short TtV) and with larger
-              bubbles (high ROI) are the "Quick Wins".</p>
-          </blockquote>
+    <div class="container">
+        <h2 class="text-center mb-5 fade-in-scroll">The VECTR Prioritization Map </h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card p-4 shadow-lg border-0 fade-in-scroll">
+                    
+                    <div class="row align-items-start">
+                        
+                        <div class="col-md-6 mb-4 mb-md-0">
+                            <p class="card-text lead">
+                                VECTR is operationalized as a two-dimensional map that makes trade-offs transparent:
+                            </p>
+                            <ul class="list-unstyled mt-3" style="font-size: 1.1rem;">
+                                <li><i class="bi bi-arrow-right-short me-1 text-primary"></i> X-axis: Represents the Confidence Level.</li>
+                                <li><i class="bi bi-arrow-up-short me-1 text-primary"></i> Y-axis: Represents Time-to-Value (TtV).</li>
+                                <li><i class="bi bi-circle-fill me-1 text-primary" style="font-size: 0.7rem;"></i> Bubble Size: Represents the Return on Investment (ROI).</li>
+                            </ul>
+                            <blockquote class="blockquote mt-4 border-start border-4 ps-3 border-primary">
+                                <p class="mb-0 text-dark">Items in the upper-right corner (high Confidence, short TtV) and with larger
+                                    bubbles (high ROI) are the "Quick Wins".</p>
+                            </blockquote>
+                        </div>
+
+                        <div class="col-md-6 text-center">
+                            <h4 class="card-title text-center mt-2 mb-3 d-md-none">Feature Prioritization Visualized</h4>
+                            <img src="{{ url_for('static', filename='images/vectr_chart_example.png') }}" 
+                                 alt="VECTR Prioritization Map Example" 
+                                 class="img-fluid rounded shadow-sm"
+                                 style="max-width: 100%; border: 1px solid #ddd;">
+                        </div>
+                    </div>
+                    </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </section>
 
 <section class="py-5">
