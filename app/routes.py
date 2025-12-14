@@ -195,12 +195,12 @@ def edit_profile():
 
             # 2. Basisvalidatie
             if not all([name, email, role, company_name]):
-                flash("Alle velden zijn verplicht.", "danger")
+                flash("All fields are required.", "danger")
                 return render_template("edit_profile.html", user=user, company_name=current_company_name, available_roles=AVAILABLE_ROLES)
 
             # 3. Controleer op e-mail duplicatie (uitgezonderd de huidige gebruiker)
             if Profile.query.filter(Profile.email == email, Profile.id_profile != user.id_profile).first():
-                flash("Dit e-mailadres is al in gebruik.", "danger")
+                flash("This email address is already in use.", "danger")
                 return render_template("edit_profile.html", user=user, company_name=current_company_name, available_roles=AVAILABLE_ROLES)
 
             # 4. Bedrijf Logica: Vind of Maak aan (alleen als de naam is gewijzigd)
@@ -229,13 +229,13 @@ def edit_profile():
             session["name"] = user.name
             session["role"] = user.role # Update de rol in de sessie
             
-            flash("Profiel succesvol bijgewerkt.", "success")
+            flash("Profile updated successfully.", "success")
             return redirect(url_for("main.profile"))
 
         except Exception as e:
             db.session.rollback()
-            print(f"Fout bij het bewerken van het profiel: {e}")
-            flash("Er is een onverwachte fout opgetreden bij het opslaan van de wijzigingen.", "danger")
+            print(f"Error editing profile: {e}")
+            flash("An unexpected error occurred while saving your changes.", "danger")
             return render_template("edit_profile.html", user=user, company_name=current_company_name, available_roles=AVAILABLE_ROLES)
 
     # GET verzoek: Toon het edit-formulier
@@ -264,13 +264,13 @@ def delete_profile():
         # 3. Ruim de sessie op
         session.clear()
 
-        flash("Uw profiel is succesvol verwijderd. Tot ziens!", "success")
+        flash("Your profile has been successfully deleted.", "success")
         return redirect(url_for("main.index"))  # Stuur terug naar de landingspagina
 
     except Exception as e:
         db.session.rollback()
-        print(f"Fout bij het verwijderen van het profiel: {e}")
-        flash("Er is een fout opgetreden bij het verwijderen van het profiel.", "danger")
+        print(f"Error deleting the profile: {e}")
+        flash("An error occurred while deleting the profile.", "danger")
         return redirect(url_for("main.profile"))
 
 # ==============================
@@ -575,42 +575,42 @@ def view_features(project_id):
     # Company ophalen via project-relatie (aangenomen dat project.company bestaat)
     company = project.company
 
-    user_role = session.get("role")
-    can_sort = user_role == "PM"                                                # Alleen PM's mogen sorteren op berekende scores
 
-    if can_sort:
-        sort_by = request.args.get("sort_by", "roi")
-        direction = request.args.get("direction", "desc")                       # Haal de sorteerrichting op uit de URL
-    else:
-        sort_by = "name"                                                        # Als GEEN PM: De gebruiker mag de sorteerparameters niet bepalen.
-        direction = "asc"                                                       # De sortering wordt vastgezet op een neutrale, standaardkolom (naam) in oplopende volgorde.
+    can_sort = True                                              # iedereen mag sorteren op berekende scores
 
+    sort_by = request.args.get("sort_by", "vectr") # Standaard sorteren op VECTR
+    direction = request.args.get("direction", "desc")
 
-    features_query = Features_ideas.query.filter_by(id_project=project_id).options(joinedload(Features_ideas.decisions)) # Laadt de decisions voor elke feature
-        
-    if sort_by == "roi":
-        column = Features_ideas.roi_percent                                     # Sorteren op de berekende ROI in percentage
-    elif sort_by == "ttv":
-        column = Features_ideas.ttm_weeks
-    elif sort_by == "confidence":
-        column = Features_ideas.quality_score
-    else:
-        column = Features_ideas.name_feature
+    # HAAL ALLE FEATURES OP
+    features_query = Features_ideas.query.filter_by(id_project=project_id).options(joinedload(Features_ideas.decisions))
+    features = features_query.all() # Voer de query uit zonder ORDER BY
 
-    if direction == "desc":
-        features = features_query.order_by(column.desc()).all()                 # Order By DESC (Descending): Hoogste waarde eerst
-    else:
-        features = features_query.order_by(column.asc()).all()                  # Order By ASC (Ascending): Laagste waarde eerst
-
-
-    # Compute VECTR score
-    # 1. Haal de project-specifieke limieten op
+    # BEREKEN VECTR SCORE OP ALLE FEATURES
     ttm_limits = (project.ttm_low_limit, project.ttm_high_limit)
     ttbv_limits = (project.ttbv_low_limit, project.ttbv_high_limit)
     
-    # 2. Bereken de VECTR scores (gebruikt nu de geschaalde TtV)
-    # De return waarde is de bijgewerkte features lijst
+    # Bereken VECTR, waardoor 'vectr_score' aan elk object wordt toegevoegd
     features = calculate_vectr_scores(features, ttm_limits, ttbv_limits)
+    
+    # Bepaal de sorteringssleutel (de lambda functie)
+    if sort_by == "vectr":
+        # Sorteren op het dynamisch berekende attribuut, met fallback naar 0.0
+        sort_key = lambda f: getattr(f, 'vectr_score', 0.0)
+    elif sort_by == "roi":
+        sort_key = lambda f: f.roi_percent if f.roi_percent is not None else 0.0
+    elif sort_by == "ttv":
+        # Sorteren op ruwe weken, met fallback naar 0.0
+        sort_key = lambda f: f.ttm_weeks if f.ttm_weeks is not None else 0.0
+    elif sort_by == "confidence":
+        sort_key = lambda f: f.quality_score if f.quality_score is not None else 0.0
+    else: # Standaard sorteren op naam
+        sort_key = lambda f: f.name_feature
+        
+    # Voer de sortering uit
+    features = sorted(features, 
+                      key=sort_key, 
+                      reverse=(direction == "desc"))
+
 
     return render_template(
         "view_features.html",
@@ -904,7 +904,7 @@ def roadmap_optimize(roadmap_id):
         # Gebruiker kan de strategische weging (Alpha) instellen via een formulier
         alpha = to_numeric(request.form.get("alpha", 1.0))
         if not 0.0 <= alpha <= 1.0:
-            flash("Alpha moet tussen 0.0 en 1.0 liggen.", "danger")
+            flash("Alpha must be between 0.0 and 1.0.", "danger")
             alpha = 1.0 # fallback
 
     # 2. Voer het Knapzak-algoritme uit
@@ -1459,7 +1459,7 @@ def vectr_chart_pdf(project_id):
 def set_feature_decision(feature_id, decision_value):
     # 1) Login check
     if "user_id" not in session:
-        flash("U moet inloggen om beslissingen te maken.", "danger")
+        flash("You must log in to make decisions.", "danger")
         return redirect(url_for("main.login"))
 
     # 2) Haal user + feature op
@@ -1468,7 +1468,7 @@ def set_feature_decision(feature_id, decision_value):
 
     # 3) Security: feature moet bij dezelfde company horen
     if feature.id_company != user.id_company:
-        flash("Niet toegestaan.", "danger")
+        flash("Not allowed.", "danger")
         return redirect(url_for("main.projects"))
 
     # 4) Map Yes/No naar decision types (matcht met je CSS: decision-approved / decision-rejected)
@@ -1495,13 +1495,13 @@ def set_feature_decision(feature_id, decision_value):
 
         db.session.commit()
 
-        flash(f"Beslissing opgeslagen: {decision_type}", "success")
+        flash(f"Decision saved: {decision_type}", "success")
         return redirect(url_for("main.view_features", project_id=feature.id_project))
 
     except Exception as e:
         db.session.rollback()
-        print(f"Fout bij het instellen van de beslissing: {e}")
-        flash("Er is een fout opgetreden bij het verwerken van de beslissing.", "danger")
+        print(f"Error setting decision: {e}")
+        flash("An error occurred while processing the decision.", "danger")
         return redirect(url_for("main.view_features", project_id=feature.id_project))
 
 
