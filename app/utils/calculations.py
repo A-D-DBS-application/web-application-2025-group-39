@@ -124,6 +124,9 @@ def calculate_feature_cost(feature):
     Zorgt voor float conversie van de inputs.
     """
     # Gebruik to_numeric uit dit bestand om float conversie te verzekeren
-    invest_hours = to_numeric(feature.investment_hours) 
-    hourly_rate = to_numeric(feature.hourly_rate) 
-    return invest_hours * hourly_rate
+    dev_cost = to_float(feature.investment_hours) * to_float(feature.hourly_rate)
+    
+    # De totale kosten (Costs)
+    costs = dev_cost + to_float(feature.opex_hours) + to_float(feature.other_costs)
+     
+    return costs
