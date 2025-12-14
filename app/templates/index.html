@@ -1,43 +1,162 @@
 {% extends "base.html" %}
 
-{% block title %}Welcome — VECTR{% endblock %}
-{% block body_class %}index-body{% endblock %}
+{% block title %}VECTR: Prioritize Features with Confidence{% endblock %}
+{% block body_class %}landing-page-body{% endblock %}
 
 {% block content %}
 
-<!-- Hoofdcontainer van de welkomstpagina -->
-<div class="welcome-container">
+<header class="hero-section text-center">
+  <div class="container welcome-container">
+    <h1 class="display-3 fw-bold mb-3">VECTR</h1>
+    <p class="subtitle">
+      Your smart feature-prioritization assistant.
+      Get clarity and decide with confidence.
+    </p>
 
-  <!-- Hoofdtitel -->
-  <h1>Welcome To VECTR</h1>
+    <div class="auth-box">
+      {% if session.get('user_id') %}
+      <h4 class="display-8 fw-bold text-white">
+        Welcome {{ session.get('name') }}
+      </h4>
+      {% else %}
+      <a href="{{ url_for('main.login') }}" class="btn btn-base btn-login">
+        <i class="bi bi-box-arrow-in-right me-1"></i> Log in
+      </a>
+      <a href="{{ url_for('main.register') }}" class="btn btn-base btn-register">
+        <i class="bi bi-person-add me-1"></i> Register
+      </a>
+      {% endif %}
+    </div>
 
-  <!-- Ondertitel -->
-  <p class="subtitle">Your smart feature-prioritization assistant.</p>                               <!-- subtitle: custom class voor kleinere, subtielere tekststijl -->
-
-  <!-- Login/Register knoppen -->
-  <div class="auth-box">                                                                            <!-- auth-box: visuele “box” rond de knoppen -->
-    <p>Select an option to continue:</p>
-
-    <!-- Link naar loginpagina -->
-    <a href="{{ url_for('main.login') }}" class="btn btn-base btn-primary-custom me-2">Log in</a>   <!-- me-2: Bootstrap margin-end voor spacing tussen knoppen -->
-
-    <!-- Link naar registratiepagina -->
-    <a href="{{ url_for('main.register') }}" class="btn btn-base btn-secondary-custom">Register</a>
+    <p class="text-white-50 fst-italic mt-4">
+      VECTR helps founders and product managers make confident, data-driven decisions.
+      Focus on features that deliver the highest return with the least risk.
+    </p>
   </div>
+</header>
 
-  <!-- Introductietekst over het platform -->
-  <p><i>                                                                                            <!-- <i>: italic -->
-    VECTR helps founders and product managers make confident, data-driven decisions.
-    Add your ideas, connect evidence, and instantly see which features bring the highest return with the least risk.
-  </i></p>
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="text-center mb-5">Prioritize What Really Matters</h2>
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card p-4 shadow-lg border-0 fade-in-scroll">
+          <h3 class="card-title text-center text-secondary mb-3">A Lightweight Prioritization Framework for Startups
+          </h3>
+          <p class="lead text-center">
+            VECTR is specifically designed to help software startups make critical product roadmap decisions under
+            severe resource constraints and extreme uncertainty.
+          </p>
+          <p class="text-center text-muted mt-3" style="font-size: 0.9rem;">
+            The framework was validated by 17 practitioners (Founders, Product Managers, Technical Leads) and proven to
+            be intuitive, visually clear, and effective.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <p><i>Clear your roadmap with clarity and confidence.</i></p>
+<section class="py-5">
+  <div class="container">
+    <h2 class="text-center mb-5">The Three Core VECTR Criteria</h2>
+    <div class="row g-4">
 
-  <!-- Footer met branding -->
+      <div class="col-md-4">
+        <div class="card h-100 p-4 shadow-sm border-start border-5 border-success fade-in-scroll">
+          <h4 class="card-title text-success mb-3"><i class="bi bi-currency-dollar me-2"></i> 1. Return on Investment
+            (ROI)</h4>
+          <p class="card-text">
+            ROI quantifies the expected financial gain a feature will generate relative to its total investment cost
+            (revenue increase, churn reduction, or cost savings).
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 p-4 shadow-sm border-start border-5 border-warning fade-in-scroll">
+          <h4 class="card-title text-warning mb-3"><i class="bi bi-clock me-2"></i> 2. Time-to-Value (TtV)</h4>
+          <p class="card-text">
+            TtV represents how quickly a feature can be developed, launched, and begin delivering measurable business
+            value. This is crucial for managing a startup's operational 'runway'.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card h-100 p-4 shadow-sm border-start border-5 border-info fade-in-scroll">
+          <h4 class="card-title text-info mb-3"><i class="bi bi-patch-check me-2"></i> 3. Confidence Level</h4>
+          <p class="card-text">
+            Measures the reliability of the feature's underlying assumptions based on the quality of supporting evidence
+            and validation progress.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-light">
+  <div class="container">
+    <h2 class="text-center mb-5 fade-in-scroll">The VECTR Prioritization Map </h2>
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card p-4 shadow-lg border-0 fade-in-scroll">
+          <p class="card-text lead">
+            VECTR is operationalized as a two-dimensional map that makes trade-offs transparent:
+          </p>
+          <ul class="list-unstyled mt-3" style="font-size: 1.1rem;">
+            <li><i class="bi bi-arrow-right-short me-1 text-primary"></i> X-axis: Represents the Confidence Level.</li>
+            <li><i class="bi bi-arrow-up-short me-1 text-primary"></i> Y-axis: Represents Time-to-Value (TtV).</li>
+            <li><i class="bi bi-circle-fill me-1 text-primary" style="font-size: 0.7rem;"></i> Bubble Size: Represents
+              the Return on Investment (ROI).</li>
+          </ul>
+          <blockquote class="blockquote mt-4 border-start border-4 ps-3 border-primary">
+            <p class="mb-0 text-dark">Items in the upper-right corner (high Confidence, short TtV) and with larger
+              bubbles (high ROI) are the "Quick Wins".</p>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <h2 class="text-center mb-5 fade-in-scroll">The Practical Value for Your Team</h2>
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="card p-4 shadow-lg border-0 fade-in-scroll">
+          <p class="card-text lead text-center text-secondary">
+            VECTR provides a defensible basis to justify prioritization choices in strategic contexts.
+          </p>
+          <div class="row mt-4">
+            <div class="col-md-4">
+              <h5 class="text-primary"><i class="bi bi-lightbulb me-1"></i> Reduces Subjectivity</h5>
+              <p class="small text-muted">The visual and financial framework helps depersonalize debates and shifts
+                decisions from emotion-driven to data-driven.</p>
+            </div>
+            <div class="col-md-4">
+              <h5 class="text-primary"><i class="bi bi-rocket-takeoff me-1"></i> Runway Logic</h5>
+              <p class="small text-muted">The explicit link to TtV and ROI introduces a 'runway logic' that is crucial
+                for startup survival.</p>
+            </div>
+            <div class="col-md-4">
+              <h5 class="text-primary"><i class="bi bi-shield-fill-check me-1"></i> Prevents Misallocation</h5>
+              <p class="small text-muted">By emphasizing Confidence, VECTR helps prevent the waste of scarce resources
+                on assumptions with weak evidence.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="text-center py-4">
   <div class="footer">
-    <span class="brand">VECTR</span> – Prioritize Features.
+    <span class="brand">VECTR</span> – Prioritize Features. Clear your roadmap with clarity and confidence.
   </div>
-
-</div>
+</footer>
 
 {% endblock %}

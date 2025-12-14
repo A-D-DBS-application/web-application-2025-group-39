@@ -35,8 +35,6 @@ def require_editor_access():
 # ==============================
 @main.route("/", methods=["GET"])                                   # Toon de landingspagina of, indien ingelogd, ga direct naar het dashboard.
 def index():
-    if "user_id" in session:
-        return redirect(url_for("main.dashboard"))
     return render_template("index.html")                            # Toon de index pagina
 
 
