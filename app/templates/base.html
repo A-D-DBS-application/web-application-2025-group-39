@@ -15,37 +15,6 @@
   <!-- Eigen styling -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-  <!-- Styling voor chat-icoon rechts onderaan -->
-  <style>
-    .chat-icon-container {
-      position: fixed;
-      bottom: 22px;
-      right: 22px;
-      z-index: 9999;
-    }
-
-    .chat-icon-btn {
-      width: 58px;
-      height: 58px;
-      border-radius: 50%;
-      background-color: #0d6efd;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 28px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      text-decoration: none;
-    }
-
-    .chat-icon-btn:hover {
-      transform: scale(1.08);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-      color: white;
-    }
-  </style>
-
   {% block head %}{% endblock %}
 </head>
 

@@ -173,18 +173,47 @@ select[multiple] option:checked {
     display: block;                                      /* Toon het element als een blok-level element */
 }
 
+  /* Styling voor chat-icoon rechts onderaan */
+    .chat-icon-container {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      z-index: 9999;
+    }
+
+    .chat-icon-btn {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background-color: #1E46D0;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      text-decoration: none;
+    }
+
+    .chat-icon-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+      color: white;
+    }
+
 /* Project Collapse Menu Styling */
 /* Stijl voor de projectnaam link (de trigger) */
 .project-collapse-trigger {
-    display: flex !important;
+    display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;                                     /* Definieert de muisaanwijzer die getoond wordt (hier: handje) */
 
-    color: #374151 !important;
-    padding: 10px 16px !important;
+    color: #374151;
+    padding: 10px 16px;
     text-decoration: none;
-    margin: 0 !important;
+    margin: 0;
     transition: background-color 0.2s ease;
     font-weight: 500;
     width: 100%;
