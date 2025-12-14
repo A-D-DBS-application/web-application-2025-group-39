@@ -17,19 +17,7 @@ from app.utils.knapsack_optimizer import optimize_roadmap
 # Blueprint
 main = Blueprint("main", __name__)
 
-#helper om te controleren of gebruiker zaken mag doen.
-def require_editor_access(): 
-    # 1. Login check
-    user = require_login()
-    if not isinstance(user, Profile):
-        return user                                                 # Retourneert direct de redirect response
 
-    # 2. Role check (Founder EN PM)
-    role_redirect = require_role(["Founder", "PM"], user)
-    if role_redirect:
-        return role_redirect                                        # Retourneert direct de redirect response
-        
-    return user
 # ==============================
 # INDEX
 # ==============================
@@ -296,9 +284,13 @@ def projects():
 # ==============================
 @main.route("/add_project", methods=["GET", "POST"])
 def add_project():
-    user = require_editor_access()
+    user = require_login()
     if not isinstance(user, Profile):
-        return user                                                             # Afgevangen door helper: retourneert redirect/error
+        return user
+
+    role_redirect = require_role(["Founder", "PM"], user)
+    if role_redirect:
+        return role_redirect                                                             # Afgevangen door helper: retourneert redirect/error
 
     user_company = Company.query.get(user.id_company)
 
@@ -330,9 +322,13 @@ def add_project():
 # ==============================
 @main.route("/projects/edit/<int:project_id>", methods=["GET", "POST"])
 def edit_project(project_id):
-    user = require_editor_access()
+    user = require_login()
     if not isinstance(user, Profile):
-        return user                                                                 # Afgevangen door helper: retourneert redirect/error
+        return user
+
+    role_redirect = require_role(["Founder", "PM"], user)
+    if role_redirect:
+        return role_redirect                                                                 # Afgevangen door helper: retourneert redirect/error
 
     project = Project.query.get_or_404(project_id)
 
@@ -399,10 +395,14 @@ def delete_project(project_id):
 # ==============================
 @main.route("/projects/<int:project_id>/add-feature", methods=["GET", "POST"])
 def add_feature(project_id):
-    user = require_editor_access()
+    user = require_login()
     
     if not isinstance(user, Profile):
         return user
+
+    role_redirect = require_role(["Founder", "PM"], user)
+    if role_redirect:
+        return role_redirect
     
     project = Project.query.get_or_404(project_id)
     company_redirect = require_company_ownership(project.id_company, user)
@@ -869,9 +869,13 @@ def edit_roadmap(roadmap_id):
 
 @main.route("/roadmap/optimize/<int:roadmap_id>", methods=["GET", "POST"])
 def roadmap_optimize(roadmap_id):
-    user = require_editor_access()
+    user = require_login()
     if not isinstance(user, Profile):
         return user
+
+    role_redirect = require_role(["Founder", "PM"], user)
+    if role_redirect:
+        return role_redirect
     
     roadmap = Roadmap.query.get_or_404(roadmap_id)
     project = Project.query.get_or_404(roadmap.id_project)
@@ -953,7 +957,11 @@ def roadmap_optimize(roadmap_id):
 
 @main.route("/milestone/add/<int:roadmap_id>", methods=["GET", "POST"])
 def add_milestone(roadmap_id):
-    user = require_editor_access()  # Controle: enkel Founder/PM mogen milestones toevoegen.
+    user = require_login()  # Controle: enkel Founder/PM mogen milestones toevoegen.
+
+    role_redirect = require_role(["Founder", "PM"], user)
+    if role_redirect:
+        return role_redirect
 
     roadmap = Roadmap.query.get_or_404(roadmap_id)  # Haal de roadmap op; 404 bij fout.
     project = Project.query.get_or_404(roadmap.id_project)  # Project van de roadmap ophalen.
@@ -1030,7 +1038,11 @@ def add_milestone(roadmap_id):
 
 @main.route("/milestone/edit/<int:milestone_id>", methods=["GET", "POST"])
 def edit_milestone(milestone_id):
-    user = require_editor_access()  # PM/Founder check
+    user = require_login()  # Controle: enkel Founder/PM mogen milestones toevoegen.
+
+    role_redirect = require_role(["Founder", "PM"], user)
+    if role_redirect:
+        return role_redirect
 
     milestone = Milestone.query.get_or_404(milestone_id)  # Bestaande milestone ophalen
     roadmap = Roadmap.query.get_or_404(milestone.id_roadmap)
