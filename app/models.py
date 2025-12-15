@@ -306,13 +306,24 @@ class Evidence(db.Model):
 # =====================================================
 class Decision(db.Model):
     __tablename__ = "decision"
-    __table_args__ = {"schema": "public"}
+    __table_args__ = (
+        db.UniqueConstraint(
+            "id_feature", "id_profile", name="uq_decision_feature_profile"
+        ),
+        {"schema": "public"},
+    )
 
     id_decision = db.Column(db.Integer, primary_key=True)
 
     id_feature = db.Column(
         db.String,
         db.ForeignKey("public.features_ideas.id_feature", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    id_profile = db.Column(
+        db.Integer,
+        db.ForeignKey("public.profile.id_profile", ondelete="CASCADE"),
         nullable=False,
     )
 
@@ -328,6 +339,7 @@ class Decision(db.Model):
     )
 
     feature = db.relationship("Features_ideas", back_populates="decisions")
+    profile = db.relationship("Profile")
 
 # =====================================================
 # PROJECT CHAT MESSAGE

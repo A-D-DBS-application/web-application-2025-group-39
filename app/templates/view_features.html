@@ -144,11 +144,11 @@
                 <tr>
 
                                                                                                                                                                        <!-- DEZE REGEL IS DE OPLOSSING! Definieer de variabele BOVEN de cellen (<td>) die deze variabele nodig hebben. Hierdoor is 'latest_decision' beschikbaar voor de knoppen en de status -->
-                        {% set latest_decision =
-                        feature.decisions
-                        | sort(attribute='created_at', reverse=True)
-                        | first
-                        %}
+                        {% set decisions = feature.decisions %}
+                        {% set total_votes = decisions | length %}
+                        {% set yes_votes = decisions | selectattr('decision_type', 'equalto', 'Approved') | list | length %}
+                        {% set yes_percentage = (yes_votes / total_votes * 100) if total_votes > 0 else 0 %}
+                        {% set user_decision = decisions | selectattr('id_profile', 'equalto', current_user.id_profile) | list | first %}
 
 
                     <td>{{ feature.name_feature }}</td>
@@ -187,9 +187,9 @@
                             <form method="POST"
                                 action="{{ url_for('main.set_feature_decision', feature_id=feature.id_feature, decision_value='Yes') }}"
                                 style="display:inline;">
-                                <button type="submit" class="btn-base table-btn btn-decision-yes 
-                        {# CHECKT OF latest_decision BESTAAT EN DE TYPE 'Approved' IS #}
-                        {% if latest_decision and latest_decision.decision_type == 'Approved' %}is-selected{% endif %}"
+                                <button type="submit" class="btn-base table-btn btn-decision-yes
+                        {# MARKEREN ALS DE HUIDIGE GEBRUIKER VOOR JA HEEFT GESTEMD #}
+                        {% if user_decision and user_decision.decision_type == 'Approved' %}is-selected{% endif %}" 
                                     title="Keur de feature goed">
                                     Yes
                                 </button>
@@ -197,9 +197,9 @@
                             <form method="POST"
                                 action="{{ url_for('main.set_feature_decision', feature_id=feature.id_feature, decision_value='No') }}"
                                 style="display:inline;">
-                                <button type="submit" class="btn-base table-btn btn-decision-no 
-                        {# CHECKT OF latest_decision BESTAAT EN DE TYPE 'Rejected' IS #}
-                        {% if latest_decision and latest_decision.decision_type == 'Rejected' %}is-selected{% endif %}"
+                                <button type="submit" class="btn-base table-btn btn-decision-no
+                        {# MARKEREN ALS DE HUIDIGE GEBRUIKER VOOR NEE HEEFT GESTEMD #}
+                        {% if user_decision and user_decision.decision_type == 'Rejected' %}is-selected{% endif %}"
                                     title="Keur de feature af">
                                     No
                                 </button>
@@ -209,13 +209,19 @@
                     </td>
 
                     <td>
-                        {% if latest_decision %}
-                        <span class="decision-{{ latest_decision.decision_type | lower }}">
-                            {{latest_decision.decision_type }}
-                        </span>
+                        {% if total_votes > 0 %}
+                        <div class="d-flex flex-column align-items-center gap-1">
+                            <span class="decision-approved">
+                                Yes votes: {{ yes_percentage | round(0) }}% ({{ yes_votes }}/{{ total_votes }})
+                            </span>
+                            {% if user_decision %}
+                            <span class="decision-{{ user_decision.decision_type | lower }}">
+                                Your vote: {{ user_decision.decision_type }}
+                            </span>
+                            {% endif %}
+                        </div>
                         {% else %}
-                        <span class="decision-pending">No decision yet
-                        </span>
+                        <span class="decision-pending">No votes yet</span>
                         {% endif %}
                     </td>
 

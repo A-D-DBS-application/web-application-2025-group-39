@@ -618,6 +618,7 @@ def view_features(project_id):
         current_sort=sort_by,
         current_direction=direction,
         can_sort=can_sort,
+        current_user=user,
     )
 
 
@@ -1489,19 +1490,23 @@ def set_feature_decision(feature_id, decision_value):
     else:
         decision_type = "Pending"
 
-    # 5) Nieuwe Decision record opslaan
+    # 5) Nieuwe Decision record opslaan of bestaande bijwerken voor deze gebruiker
     try:
-        # Save the value the template expects
-        feature.decision = decision_type  
-        db.session.add(feature)
+        existing_decision = Decision.query.filter_by(
+            id_feature=feature.id_feature, id_profile=user.id_profile
+        ).first()
 
-        d = Decision(
-            id_feature=feature.id_feature,
-            id_company=user.id_company,
-            decision_type=decision_type,
-            reasoning=None,
-        )
-        db.session.add(d)
+        if existing_decision:
+            existing_decision.decision_type = decision_type
+        else:
+            d = Decision(
+                id_feature=feature.id_feature,
+                id_company=user.id_company,
+                id_profile=user.id_profile,
+                decision_type=decision_type,
+                reasoning=None,
+            )
+            db.session.add(d)
 
         db.session.commit()
 
