@@ -4,16 +4,12 @@
 
 {% block content %}
 
-<!-- =========================
-     PAGINATITEL
-     ========================= -->
+<!-- PAGINATITEL -->
 <h2 class="mb-4 text-center">
   Evidence for: {{ feature.name_feature }}
 </h2>
 
-<!-- =========================
-     HOOFD-CONTAINER (witte kaart)
-     ========================= -->
+<!-- HOOFD-CONTAINER (witte kaart)-->
 <div class="projects-wrapper">
 
   {% if evidence_list|length == 0 %}
@@ -24,9 +20,7 @@
 
   {% else %}
 
-    <!-- =========================
-         TABEL MET ALLE EVIDENCE
-         ========================= -->
+    <!--TABEL MET ALLE EVIDENCE -->
     <table class="table table-striped table-bordered align-middle">
       <thead class="table-light">
         <tr>
@@ -47,62 +41,53 @@
         <tr class="text-center">
 
            
-          <td>{{ ev.title }}</td>  <!-- Titel van de evidence, bv. “Customer interview #3” -->
+          <td>{{ ev.title }}</td>                                             <!-- Titel van de evidence, bv. “Customer interview #3” -->
 
           
-          <td>{{ ev.type }}</td>  <!-- Type van evidence, bv. “User/Customer Evidence”, “Market Data”, … -->
+          <td>{{ ev.type }}</td>                                              <!-- Type van evidence, bv. “User/Customer Evidence”, “Market Data”, … -->
 
           
-          <td style="max-width: 300px; white-space: normal;"> <!-- Beschrijving: max breedte zodat de tabel niet uitrekt; white-space: normal = tekst mag afbreken en meerdere lijnen vormen -->
+          <td style="max-width: 300px; white-space: normal;">                 <!-- Beschrijving: max breedte zodat de tabel niet uitrekt; white-space: normal = tekst mag afbreken en meerdere lijnen vormen -->
             {{ ev.description }}
           </td>
 
-          <!-- =========================
-               BIJLAGE (LINK NAAR BRON)
-               ========================= -->
-          <td>  <!-- opent het bewijs in een nieuwe tab zodat je de app niet verlaat -->
-            {% if ev.attachment_url %}    
-              <a href="{{ ev.attachment_url }}"
+          <!-- BIJLAGE (LINK NAAR BRON) -->
+          <td>  
+            {% if ev.attachment_url %}                                        <!-- opent het bewijs in een nieuwe tab zodat je de app niet verlaat -->
+              <a href="{{ ev.attachment_url }}"                               
                  target="_blank"                      
                  class="btn btn-base btn-vectr btn-sm">
                 View File
               </a>
             {% else %}
-              <span class="text-muted">No file</span>  <!-- duidelijk tonen dat er geen bestand is toegevoegd -->
+              <span class="text-muted">No file</span>                         <!-- duidelijk tonen dat er geen bestand is toegevoegd -->
             {% endif %}
           </td>
 
-          <!-- =========================
-               CONFIDENCE LABEL + WAARDE
-               ========================= -->
+          <!--CONFIDENCE LABEL + WAARDE -->
           <td>
-            <!-- Label is bv. “Market Data”, “Launch Data”… zodat de user niet enkel een getal ziet -->
-            <strong>{{ label }}</strong><br>
+            <strong>{{ label }}</strong><br>                                  <!-- Label is bv. “Market Data”, “Launch Data”… zodat de user niet enkel een getal ziet -->
             <small class="text-muted">
-              {{ "%.2f"|format(ev.new_confidence or 0) }}  <!-- toont het ruwe getal (0.01, 2.00, 10.00, …) met 2 decimalen voor consistentie -->
+              {{ "%.2f"|format(ev.new_confidence or 0) }}                     <!-- toont het ruwe getal (0.01, 2.00, 10.00, …) met 2 decimalen voor consistentie -->
             </small>
           </td>
 
-          <!-- =========================
-               ACTIE KNOPPEN: EDIT / DELETE
-               ========================= -->
+          <!-- ACTIE KNOPPEN: EDIT / DELETE -->
           <td>
             <div class="d-flex justify-content-center gap-2 flex-wrap">
-              <!-- EDIT opent het formulier waar je deze evidence kan aanpassen -->
               <a href="{{ url_for('main.edit_evidence', evidence_id=ev.id_evidence) }}"  
                  class="btn btn-base btn-edit table-btn">
-                Edit
+                Edit                                                          <!-- EDIT opent het formulier waar je deze evidence kan aanpassen -->
               </a>
 
-              <!-- DELETE stuurt een POST naar de delete-route.
-                   onclick=confirm(...) toont een browser-popup “Weet je het zeker?”
-                   → Dit voorkomt dat je per ongeluk bewijs verwijdert zonder bevestiging. -->
+              <!-- DELETE stuurt een POST naar de delete-route-->
               <form action="{{ url_for('main.delete_evidence', evidence_id=ev.id_evidence) }}"
                     method="post"
                     class="form-inline">
                 <button type="submit"
                         class="btn btn-base btn-danger-custom table-btn"
-                        onclick="return confirm('Are you sure you want to delete this evidence?');">
+                        onclick="return confirm('Are you sure you want to delete this evidence?');">  <!--onclick=confirm(...) toont een browser-popup “Weet je het zeker?”
+                                                                                                          → Dit voorkomt dat je per ongeluk bewijs verwijdert zonder bevestiging. -->
                   Delete
                 </button>
               </form>

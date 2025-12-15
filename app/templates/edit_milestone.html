@@ -5,9 +5,7 @@
 
 {% block content %}
 
-<!-- ==============================================
-     FORM CONTAINER VOOR NETTE UITLIJNING EN KAARTSTIJL
-     ============================================== -->
+<!-- FORM CONTAINER VOOR NETTE UITLIJNING EN KAARTSTIJL -->
 <div class="milestone-form">
 
     <h2 class="text-center mb-4">Edit Milestone</h2>
@@ -15,23 +13,18 @@
     <!-- Formulier verstuurt data terug naar dezelfde route (POST handler) -->
     <form method="POST">
 
-        <!-- ==============================================
-             MILESTONE NAAM – standaard tekstveld
-             ============================================== -->
+        <!-- MILESTONE NAAM – standaard tekstveld -->
         <div class="mb-3">
             <label class="form-label fw-bold">Milestone Name</label>
             <input type="text" name="name" class="form-control" value="{{ milestone.name }}" required>
             <!-- Browser verplicht dit veld -->
         </div>
 
-        <!-- ==============================================
-             DATUMVELDEN – 2 kolommen naast elkaar
-             ============================================== -->
+        <!-- DATUMVELDEN – 2 kolommen naast elkaar -->
         <div class="row">
             <div class="col mb-3">
                 <label class="form-label fw-bold">Start Date</label>
-                <input type="date" name="start_date" class="form-control" value="{{ milestone.start_date }}">
-                <!-- Date input accepteert YYYY-MM-DD -->
+                <input type="date" name="start_date" class="form-control" value="{{ milestone.start_date }}">   <!-- Date input accepteert YYYY-MM-DD -->
             </div>
 
             <div class="col mb-3">
@@ -40,24 +33,18 @@
             </div>
         </div>
 
-        <!-- ==============================================
-             GOAL – tekstvak met bestaande waarde vooraf ingevuld
-             ============================================== -->
+        <!-- GOAL – tekstvak met bestaande waarde vooraf ingevuld -->
         <div class="mb-3">
             <label class="form-label fw-bold">Goal</label>
-            <textarea name="goal" class="form-control" rows="3">{{ milestone.goal }}</textarea>
-            <!-- textarea sluit tag bevat bestaande tekst -->
+            <textarea name="goal" class="form-control" rows="3">{{ milestone.goal }}</textarea>                 <!-- textarea sluit tag bevat bestaande tekst -->
         </div>
 
-        <!-- ==============================================
-             STATUS DROPDOWN – ‘selected’ bepaalt vooraf ingevulde keuze
-             ============================================== -->
+        <!-- STATUS DROPDOWN – ‘selected’ bepaalt vooraf ingevulde keuze -->
         <div class="mb-3">
             <label class="form-label fw-bold">Status</label>
 
             <select name="status" class="form-select" required>
-                <option value="Planned" {% if milestone.status=="Planned" %}selected{% endif %}>
-                    <!-- Jinja vergelijkt huidige DB waarde -->
+                <option value="Planned" {% if milestone.status=="Planned" %}selected{% endif %}>                 <!-- Jinja vergelijkt huidige DB waarde -->
                     Planned
                 </option>
 
@@ -71,12 +58,7 @@
             </select>
         </div>
 
-        <!-- ==============================================
-             FEATURE MULTI-SELECT
-             - ‘multiple’ laat meerdere keuzes toe
-             - 'size' bepaalt hoogte van de lijst
-             - features gesorteerd door VECTR-score in route
-             ============================================== -->
+        <!-- FEATURE MULTI-SELECT -->
         <hr class="my-4">
         <h4 class="mb-3">Assigned Features (sorted by VECTR score)</h4>
 
@@ -86,21 +68,13 @@
             <select name="features" multiple class="form-select" size="8"> <!-- Hoogte dropdown -->
 
                 {% for f in features %}
-
-                <!-- 
-                      'selected_features' is een lijst met feature-id’s
-                      De optie wordt vooraf geselecteerd als het ID voorkomt in die lijst
-                    -->
-                <option value="{{ f.id_feature }}" {% if f.id_feature in selected_features %}selected{% endif %}>
+                <option value="{{ f.id_feature }}" {% if f.id_feature in selected_features %}selected{% endif %}>  <!-- 'selected_features' is een lijst met feature-id’s-->
                     <!-- Preselectie op basis van database-relatie -->
-
                     {{ f.name_feature }} — VECTR:
-
-                    <!-- Toon score (2 decimalen), of 'N/A' als geen score -->
                     {% if f.vectr_score %}
-                    {{ "%.2f"|format(f.vectr_score) }} <!-- "%.2f"|format → 2 decimalen formattering -->
+                    {{ "%.2f"|format(f.vectr_score) }}                      <!-- "%.2f"|format → 2 decimalen formattering -->
                     {% else %}
-                    N/A
+                    N/A                                                     <!--'N/A' als geen score -->
                     {% endif %}
                 </option>
 

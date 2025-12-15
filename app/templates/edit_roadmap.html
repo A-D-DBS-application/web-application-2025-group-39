@@ -7,16 +7,12 @@
 
 <h2 class="text-center mb-4">Edit Roadmap – {{ project.project_name }}</h2>
 
-<!-- ==============================================
-     FORM CONTAINER – visuele kaart voor nettere UI
-     ============================================== -->
+<!-- FORM CONTAINER – visuele kaart voor nettere UI -->
 <div class="roadmap-form card p-4 shadow mt-3 mx-auto">
 
 <form method="POST"> <!--  Methode: POST → verstuurt data naar de server.  De ingevulde velden worden opgeslagen in de roadmap. -->
 
-    <!-- ==============================================
-         START ROADMAP SELECTIE
-         ============================================== -->
+    <!-- START ROADMAP SELECTIE -->
     <div class="mb-3">
         <label class="form-label fw-bold">Start Date Project</label>
         <!-- Vooraf ingevuld zodat je ziet welke datum eerder was opgeslagen -->
@@ -27,9 +23,7 @@
     </div>
 
 
-    <!-- ==============================================
-         END ROADMAP SELECTIE
-         ============================================== -->
+    <!-- END ROADMAP SELECTIE -->
     <div class="mb-3">
         <label class="form-label fw-bold">End Date Project</label>
         <!-- Zelfde logica: toon bestaande waarde zodat de gebruiker niet opnieuw hoeft te gokken -->
@@ -40,9 +34,7 @@
     </div>
 
 
-    <!-- ==============================================
-         TOTAL TIME CAPACITY
-         ============================================== -->
+    <!-- TOTAL TIME CAPACITY -->
     <div class="mb-3">
         <label class="form-label">Total Time Capacity (in hours)</label>
 
@@ -54,11 +46,7 @@
                value="{{ roadmap.time_capacity }}"> <!-- toont huidige waarde -->
     </div>
 
-
-
-    <!-- ==============================================
-         BUDGET INPUT
-         ============================================== -->
+    <!-- BUDGET INPUT -->
     <div class="mb-3">
         <label class="form-label">Budget Allocation</label>
 
@@ -70,9 +58,7 @@
     </div>
 
 
-    <!-- ==============================================
-         FORM KNOPPEN: OPSLAAN EN ANNULEREN
-         ============================================== -->
+    <!-- FORM KNOPPEN: OPSLAAN EN ANNULEREN -->
     <button class="btn btn-base btn-primary-custom w-100 mt-3">
         Save Changes
     </button>
