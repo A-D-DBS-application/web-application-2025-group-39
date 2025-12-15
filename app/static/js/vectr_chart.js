@@ -3,7 +3,7 @@
 // Definieer de initialisatiefunctie globaal
 function initVECTRChart(ctx, chartData) {
         // ====================================================
-        // 1. Custom Plugin: VECTR Zes Zones (gebruik de grenzen uit de referentieafbeelding)
+        // 1. Custom Plugin: VECTR Zes Zones 
         // ====================================================
         const sixZonePlugin = {
             id: 'six_zones',
@@ -22,38 +22,30 @@ function initVECTRChart(ctx, chartData) {
                 const drawZone = (color, x1, y1, x2, y2) => {
                     ctx.fillStyle = color;
                     ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
-                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)'; // Optioneel: Border toevoegen
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)'; // Border toevoegen
                     ctx.lineWidth = 1;
                     ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
                 };
 
                 // Teken de zes zones (coördinaten van Chart.js)
+                drawZone('rgba(255, 0, 0, 0.25)', left, y_slow, x_mid_high, bottom);        // Zone 1: Rood (Laagste Prioriteit: Low/Middel Conf, Slow TtV)
 
-                // Zone 1: Rood (Laagste Prioriteit: Low/Middel Conf, Slow TtV)
-                // Dit is het grootste rode gebied onderaan
-                drawZone('rgba(255, 0, 0, 0.25)', left, y_slow, x_mid_high, bottom);
+                drawZone('rgba(255, 140, 0, 0.25)', x_low, top, x_mid_high, y_slow);        // Zone 2: Donker Oranje (Middel Conf, Middel TtV)
 
-                // Zone 2: Donker Oranje (Middel Conf, Middel TtV)
-                drawZone('rgba(255, 140, 0, 0.25)', x_low, top, x_mid_high, y_slow);
+                drawZone('rgba(255, 0, 0, 0.25)', left, top, x_low, y_slow);                // Zone 3: Rood (Very Low Conf, Fast TtV)
 
-                // Zone 3: Rood (Very Low Conf, Fast TtV)
-                drawZone('rgba(255, 0, 0, 0.25)', left, top, x_low, y_slow);
+                drawZone('rgba(0, 150, 0, 0.25)', x_mid_high, top, right, y_mid);           // Zone 4: Donkergroen (Low Conf, Fast TtV)
 
-                // Zone 4: Donkergroen (Hoogste Prioriteit: High Conf, Fast TtV)
-                drawZone('rgba(0, 150, 0, 0.25)', x_mid_high, top, right, y_mid);
+                drawZone('rgba(144, 238, 144, 0.25)', x_mid_high, y_mid, right, y_slow);    // Zone 5: Lichtgroen (Hoge Conf, Middel TtV)       
 
-                // Zone 5: Lichtgroen (Hoge Conf, Middel TtV)
-                drawZone('rgba(144, 238, 144, 0.25)', x_mid_high, y_mid, right, y_slow);
-
-                // Zone 6: Licht Oranje (High Conf, Slow TtV)
-                drawZone('rgba(255, 165, 0, 0.25)', x_mid_high, y_slow, right, bottom);
+                drawZone('rgba(255, 165, 0, 0.25)', x_mid_high, y_slow, right, bottom);     // Zone 6: Licht Oranje (High Conf, Slow TtV)
 
                 ctx.restore();
             }
         };
 
         // ====================================================
-        // 2. Data preparation: Blijft ongewijzigd
+        // 2. Data preparation
         // ====================================================
         //kleur van bol aanpassen naar kwadrankt:
         function getZoneColor(confidence, ttv) {
@@ -63,7 +55,7 @@ function initVECTRChart(ctx, chartData) {
             const y_slow = 5;
             const y_fast = 7;
 
-            // 1. HIGH CONFIDENCE zones (X >= 7)
+            // HIGH CONFIDENCE zones (X >= 7)
             if (confidence >= x_high) {
                 if (ttv >= y_fast) {
                     return 'rgba(0, 150, 0, 1)';      // Donkergroen (Zone 4: High Conf, Fast TtV)
@@ -74,7 +66,7 @@ function initVECTRChart(ctx, chartData) {
                 }
             }
 
-            // 2. LOW/MIDDEL CONFIDENCE zones (X < 7)
+            // LOW/MIDDEL CONFIDENCE zones (X < 7)
             else {
                 // X < 7
                 if (ttv < y_slow) {
@@ -91,18 +83,12 @@ function initVECTRChart(ctx, chartData) {
         const datasets = [{
             label: 'Features',
             data: chartData.map(item => {
-                // ROI/Radius berekening blijft hetzelfde
-                // Haal de ROI-waarde op (aangenomen dat deze als percentage (bv. 20.5) wordt geleverd)
-                const roiValue = item.roi; // Bijvoorbeeld: 20.5
+                // ROI/Radius berekening 
+                const roiValue = item.roi;                                      // Haal de ROI-waarde op
 
-                // Bereken de gewenste diameter volgens de formule D = 100 * sqrt(ROI/100)
-                // Met D=50 genomen om een mooiere schaling te krijgen
-                // Math.sqrt(x) is de vierkantswortel functie
-                const diameter = 50 * Math.sqrt((roiValue) / 100);
+                const diameter = 50 * Math.sqrt((roiValue) / 100);              // Bereken de gewenste diameter volgens de formule D = 100 * sqrt(ROI/100); Met D=50 genomen om een mooiere schaling te krijgen
 
-                // Bereken de straal (radius = Diameter / 2) en pas de grenzen toe
-                // Chart.js verwacht de straal 'r'. We gebruiken de Math.min/Max om de grootte te beperken.
-                const radius = Math.max(0, diameter / 2);
+                const radius = Math.max(0, diameter / 2);                       // Bereken de straal (radius = Diameter / 2) en pas de grenzen toe
 
                 const confidenceValue = item.confidence;
                 const ttvValue = item.ttv;
@@ -119,8 +105,7 @@ function initVECTRChart(ctx, chartData) {
                     roi: roiValue,
                     confidence: confidenceValue,
                     ttv_weeks: item.ttv_weeks,
-                    // Gebruik de zoneColor als de achtergrondkleur van de bubbel
-                    backgroundColor: zoneColor
+                    backgroundColor: zoneColor                                   // Gebruik de zoneColor als de achtergrondkleur van de bubbel
                 };
             }),
             // Bubbelkleur is nu de berekende zonekleur
@@ -139,11 +124,12 @@ function initVECTRChart(ctx, chartData) {
             data: { datasets: datasets },
             plugins: [sixZonePlugin],
             options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 1,
+                responsive: true,                                                       // Grafiek past zich aan de containergrootte aan
+                maintainAspectRatio: true,                                              // Behoudt de aspectverhouding (verhouding tussen breedte en hoogte)
+                aspectRatio: 1,                                                         // Stelt de verhouding in op 1:1
                 plugins: {
-                    legend: { display: false },
+                    legend: { display: false },                                         // Verberg de legenda 
+                    // Tooltip (pop-up bij hover) configuratie
                     tooltip: {
                         callbacks: {
                             label: function (context) {
@@ -163,10 +149,10 @@ function initVECTRChart(ctx, chartData) {
                     }
                 },
                 scales: {
-                    x: {
+                    x: {                                                        
                         title: {
                             display: true,
-                            text: 'Confidence'
+                            text: 'Confidence score'
                         },
                         type: 'linear',
                         position: 'bottom',
@@ -182,13 +168,13 @@ function initVECTRChart(ctx, chartData) {
                             }
                         },
                         grid: {
-                            drawOnChartArea: false
+                            drawOnChartArea: false                                                           // Verbergt rasterlijnen in de tekenzone
                         }
                     },
                     y: {
                         title: {
                             display: true,
-                            text: 'Time-to-Value (TtV)'
+                            text: 'Time-to-Value score (TtV)'
                         },
                         type: 'linear',
                         min: 0,
