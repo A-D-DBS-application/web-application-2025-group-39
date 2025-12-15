@@ -5,39 +5,30 @@
 
 {% block content %}
 
-<!-- PAGETITLE -->
 <h2 class="mb-4 text-center">Feature Ideas: {{ project.project_name }}</h2>
 
-<!-- TOP ACTION BUTTONS -->
 <div class="mb-3 d-flex justify-content-center gap-2 flex-wrap">
-    <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom">                                                <!--Link naar “add_feature” route met project_id parameter -->
+    <a href="{{ url_for('main.add_feature', project_id=project.id_project) }}" class="btn btn-base btn-primary-custom">
         + Add New Feature
     </a>
 
-    <a href="{{ url_for('main.vectr_chart', project_id=project.id_project) }}" class="btn btn-vectr btn-sm">                                                           <!-- Link naar VECTR chart pagina voor dit project -->
+    <a href="{{ url_for('main.vectr_chart', project_id=project.id_project) }}" class="btn btn-vectr btn-sm">
         📈 VECTR Chart
     </a>
 </div>
 
-<!-- FEATURES LIST CONTAINER -->
-<div class="features-container-card">                                                                                                                                   <!-- Wrapper voor styling (bv. card look, padding, achtergrond) -->
-
-    {% if features|length == 0 %}                                                                                                                                      <!-- Als er geen features zijn, toon een lege-state -->
-
-    <div class="text-center py-4 text-muted">
+<div class="features-container-card"> {% if features|length == 0 %} <div class="text-center py-4 text-muted">
         No feature ideas yet — add one soon!
     </div>
 
     {% else %}
-    <div class="table-responsive">                                                                                                                                     <!-- Bootstrap: zorgt dat de tabel horizontaal kan scrollen op kleine schermen -->
+    <div class="table-responsive">
         <table class="table table-striped table-bordered align-middle">
 
-            <!-- TABLE HEADER -->
             <thead class="table-light">
                 <tr>
                     <th class="text-center">Title</th>
 
-                    <!-- ROI COLUMN (SORTABLE) -->
                     <th class="text-center">
                         <div class="d-flex justify-content-center align-items-center">
                             <div class="me-2">
@@ -45,21 +36,19 @@
                                 <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='roi', direction='asc') }}"
                                     class="sort-icon {% if current_sort == 'roi' and current_direction == 'asc' %}active{% endif %}">
                                     &#9650;
-                                </a>                                                                                                                                    <!-- Link die ROI oplopend sorteert; active class als dit de huidige sort is -->
-                                <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='roi', direction='desc') }}"
+                                </a> <a
+                                    href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='roi', direction='desc') }}"
                                     class="sort-icon {% if current_sort == 'roi' and current_direction == 'desc' %}active{% endif %}">
                                     &#9660;
-                                </a>                                                                                                                                    <!-- Link die ROI aflopend sorteert; active class als dit de huidige sort is -->
-                                {% else %}
+                                </a> {% else %}
                                 <span class="sort-icon-placeholder">&#9650;</span>
                                 <span class="sort-icon-placeholder">&#9660;</span>
-                                {% endif %}                                                                                                                             <!-- Als sorteren niet kan: toon “dummy” pijlen voor consistente layout -->
+                                {% endif %}
                             </div>
                             <strong>ROI (%)</strong>
                         </div>
                     </th>
 
-                    <!-- TtV COLUMN (SORTABLE) -->
                     <th class="text-center">
                         <div class="d-flex justify-content-center align-items-center">
                             <div class="me-2">
@@ -67,21 +56,19 @@
                                 <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='ttv', direction='asc') }}"
                                     class="sort-icon {% if current_sort == 'ttv' and current_direction == 'asc' %}active{% endif %}">
                                     &#9650;
-                                </a>                                                                                                                                    <!-- Link die TtV oplopend sorteert; active class als dit de huidige sort is -->
-                                <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='ttv', direction='desc') }}"
+                                </a> <a
+                                    href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='ttv', direction='desc') }}"
                                     class="sort-icon {% if current_sort == 'ttv' and current_direction == 'desc' %}active{% endif %}">
                                     &#9660;
-                                </a>                                                                                                                                    <!-- Link die TtV aflopend sorteert; active class als dit de huidige sort is -->
-                                {% else %}
+                                </a> {% else %}
                                 <span class="sort-icon-placeholder">&#9650;</span>
                                 <span class="sort-icon-placeholder">&#9660;</span>
-                                {% endif %}                                                                                                                             <!-- Als sorteren niet kan: toon “dummy” pijlen voor consistente layout -->
+                                {% endif %}
                             </div>
-                            <strong>TtV (Weeks)</strong>                                                                                                                <!-- Kolom toont time-to-value in weken -->
+                            <strong>TtV (Weeks)</strong>
                         </div>
                     </th>
 
-                    <!-- CONFIDENCE COLUMN (SORTABLE) -->
                     <th class="text-center">
                         <div class="d-flex justify-content-center align-items-center">
                             <div class="me-2">
@@ -89,21 +76,20 @@
                                 <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='confidence', direction='asc') }}"
                                     class="sort-icon {% if current_sort == 'confidence' and current_direction == 'asc' %}active{% endif %}">
                                     &#9650;
-                                </a>                                                                                                                                   <!-- Link die Confidence oplopend sorteert; active class als dit de huidige sort is -->
+                                </a>
                                 <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='confidence', direction='desc') }}"
                                     class="sort-icon {% if current_sort == 'confidence' and current_direction == 'desc' %}active{% endif %}">
                                     &#9660;
-                                </a>                                                                                                                                   <!-- Link die Confidence aflopend sorteert; active class als dit de huidige sort is -->
+                                </a>
                                 {% else %}
                                 <span class="sort-icon-placeholder">&#9650;</span>
                                 <span class="sort-icon-placeholder">&#9660;</span>
-                                {% endif %}                                                                                                                            <!-- Als sorteren niet kan: toon “dummy” pijlen voor consistente layout -->
+                                {% endif %}
                             </div>
                             <strong>Confidence</strong>
                         </div>
                     </th>
 
-                    <!--vectr score sortable-->
                     <th class="text-center">
                         <div class="d-flex justify-content-center align-items-center">
                             <div class="me-2">
@@ -111,48 +97,81 @@
                                 <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='vectr', direction='asc') }}"
                                     class="sort-icon {% if current_sort == 'vectr' and current_direction == 'asc' %}active{% endif %}">
                                     &#9650;
-                                </a> 
+                                </a>
                                 <a href="{{ url_for('main.view_features', project_id=project.id_project, sort_by='vectr', direction='desc') }}"
                                     class="sort-icon {% if current_sort == 'vectr' and current_direction == 'desc' %}active{% endif %}">
                                     &#9660;
-                                </a> 
+                                </a>
                                 {% else %}
                                 <span class="sort-icon-placeholder">&#9650;</span>
                                 <span class="sort-icon-placeholder">&#9660;</span>
-                                {% endif %} 
+                                {% endif %}
                             </div>
                             <strong>VECTR Score</strong>
                         </div>
-                    </th> 
+                    </th>
                     <th class="text-center">Horizon</th>
-                                                                                                                             
+
 
                     <!-- DECISION COLUMN (SORTABLE) -->
-                    <th class="text-center">Decision (set)</th>                                                                                                        <!-- Knoppen om decision te zetten -->
-                    <th class="text-center">Decision (status)</th>                                                                                                     <!-- Laatste decision status tonen -->
-
+                    <th class="text-center">Decision (set)</th> <!-- Knoppen om decision te zetten -->
+                    <th class="text-center">Decision (status)</th> <!-- Laatste decision status tonen -->
                     <!-- EVIDENCE COLUMN -->
-                    <th class="text-center">Evidence</th>                                                                                                              <!-- Knoppen voor evidence toevoegen/bekijken -->
+                    <th class="text-center">Evidence</th> <!-- Knoppen voor evidence toevoegen/bekijken -->
                     <!-- ACTIONS COLUMN -->
-                    <th class="text-center col-actions">Actions</th>                                                                                                   <!-- Acties zoals edit/delete; col-actions is extra CSS-hook voor breedte/styling -->
+                    <th class="text-center col-actions">Actions</th>
+                    <!-- Acties zoals edit/delete; col-actions is extra CSS-hook voor breedte/styling -->
                 </tr>
             </thead>
 
-            <!-- TABLE BODY (FEATURE ROWS) -->
             <tbody class="text-center">
                 {% for feature in features %}
                 <tr>
 
-                                                                                                                                                                       <!-- DEZE REGEL IS DE OPLOSSING! Definieer de variabele BOVEN de cellen (<td>) die deze variabele nodig hebben. Hierdoor is 'latest_decision' beschikbaar voor de knoppen en de status -->
-                        {% set decisions = feature.decisions %}
-                        {% set total_votes = decisions | length %}
-                        {% set yes_votes = decisions | selectattr('decision_type', 'equalto', 'Approved') | list | length %}
-                        {% set yes_percentage = (yes_votes / total_votes * 100) if total_votes > 0 else 0 %}
-                        {% set user_decision = decisions | selectattr('id_profile', 'equalto', current_user.id_profile) | list | first %}
+                    {% set decisions = feature.decisions %}
+                    {% set total_votes = decisions | length %}
+                    {% set yes_votes = decisions | selectattr('decision_type', 'equalto', 'Approved') | list | length %}
+                    {% set yes_percentage = (yes_votes / total_votes * 100) if total_votes > 0 else 0 %}
+                    {% set user_decision = decisions | selectattr('id_profile', 'equalto', current_user.id_profile) |
+                    list | first %}
 
+                    {# START VAN DE GECORRIGEERDE FEATURE NAAM CEL #}
+                    <td>
+                        <div class="d-flex align-items-center">
 
-                    <td>{{ feature.name_feature }}</td>
+                            {% if feature.is_outlier %}
+                            <span id="{{ feature.outlier_id }}-container" class="me-2 outlier-container"
+                                data-outlier-id="{{ feature.outlier_id }}">
 
+                                {# TRIGGER (Icoon) #}
+                                <i class="bi bi-exclamation-triangle-fill outlier-icon outlier-trigger"
+                                    title="Outlier Detected" data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                    data-bs-placement="right" data-bs-html="true" data-bs-custom-class="popover-hover"
+                                    data-bs-content-id="popover-content-{{ feature.outlier_id }}"
+                                    style="cursor: pointer;">
+                                </i>
+
+                                {# VERBORGEN INHOUD VOOR DE POPOVER #}
+                                <div id="popover-content-{{ feature.outlier_id }}" style="display:none;">
+                                    <p class="mb-2 small fw-bold text-danger">
+                                        Warning: Extreme Value ({{ feature.outlier_type }}). Please check input data.
+                                    </p>
+                                    <p class="mb-2 small text-muted">
+                                        If the data has been verified and no issues remain, you may remove this warning.
+                                    </p>
+                                    <button class="btn btn-sm btn-danger-custom w-100"
+                                        onclick="removeOutlierWarning('{{ feature.outlier_id }}', this)">
+                                        Remove Warning
+                                    </button>
+                                </div>
+                                {# EINDE VERBORGEN INHOUD #}
+                            </span>
+                            {% endif %}
+
+                            {{ feature.name_feature }}
+                        </div>
+                    </td>
+                    {# EINDE VAN DE GECORRIGEERDE FEATURE NAAM CEL #}
                     <td>
                         {% if feature.roi_percent is not none %}
                         {{ "%.1f" | format(feature.roi_percent) }}%
@@ -189,7 +208,7 @@
                                 style="display:inline;">
                                 <button type="submit" class="btn-base table-btn btn-decision-yes
                         {# MARKEREN ALS DE HUIDIGE GEBRUIKER VOOR JA HEEFT GESTEMD #}
-                        {% if user_decision and user_decision.decision_type == 'Approved' %}is-selected{% endif %}" 
+                        {% if user_decision and user_decision.decision_type == 'Approved' %}is-selected{% endif %}"
                                     title="Keur de feature goed">
                                     Yes
                                 </button>
@@ -262,10 +281,6 @@
 
         </table>
     </div>
-
-
-
     {% endif %}
 </div>
-
 {% endblock %}

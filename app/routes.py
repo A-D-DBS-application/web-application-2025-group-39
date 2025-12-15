@@ -13,6 +13,7 @@ from app.constants import CONF_MIN, CONF_LOW_THRESHOLD, CONF_MID_HIGH_THRESHOLD,
 from app.utils.calculations import calc_roi, calc_ttv, to_numeric, calculate_feature_cost, calculate_vectr_scores
 from app.utils.form_helpers import prepare_vectr_chart_data, require_login, require_role, require_company_ownership, parse_project_form, parse_feature_form, parse_roadmap_form, parse_milestone_form, parse_evidence_form, recompute_feature_confidence
 from app.utils.knapsack_optimizer import optimize_roadmap
+from app.utils.outliers import detect_vectr_outliers_and_tag
 
 # Blueprint
 main = Blueprint("main", __name__)
@@ -589,6 +590,8 @@ def view_features(project_id):
     
     # Bereken VECTR, waardoor 'vectr_score' aan elk object wordt toegevoegd
     features = calculate_vectr_scores(features, ttm_limits, ttbv_limits)
+    
+    features = detect_vectr_outliers_and_tag(features)
     
     # Bepaal de sorteringssleutel (de lambda functie)
     if sort_by == "vectr":
