@@ -1,0 +1,167 @@
+/* _roadmap.css (Sectie 6) */
+
+/* =====================================
+   6. ROADMAP COMPONENTEN (Mijlpalen)
+   ===================================== */
+
+/* Titel boven de kaart*/
+.roadmap-header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 40px 0 20px 0;
+}
+
+.roadmap-header h2 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+    color: #1E46D0;
+}
+
+/* knop "Projects Overview" rechtsboven op dezelfde lijn */
+.roadmap-header .top-right {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* De witte kaart waar de pijlen op staan*/
+.roadmap-container {
+    max-width: 1100px;
+    margin: 0 auto 60px auto;
+    padding: 32px 32px 36px 32px;
+    background-color: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+/* Rij met milestones */
+.milestones-row {
+    display: flex;
+    justify-content: center;
+}
+
+/* Groep milestones (één project) */
+.milestone-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 24px;
+}
+
+/* Basisstijl voor pijl (milestones + "+ Add Milestone") */
+.milestone-card,
+.btn-add-milestone-small {
+    background-color: #1E46D0;
+    border: 1px solid #1E46D0;
+    color: #ffffff;
+    padding: 20px 28px;
+    min-height: 150px;
+    border-radius: 12px;
+    clip-path: polygon(0 0,
+            85% 0,
+            100% 50%,
+            85% 100%,
+            0 100%);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+    flex: 0 0 calc(33.333% - 24px);
+    max-width: 320px;
+    min-width: 260px;
+    transition: transform .15s ease, box-shadow .15s ease;
+}
+
+/* Hover-lift*/
+.milestone-card:hover,
+.btn-add-milestone-small:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 35px rgba(30, 70, 208, 0.35);
+}
+
+/* Tekst binnen de pijl */
+.milestone-name {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.milestone-info {
+    font-size: 0.85rem;
+    line-height: 1.35;
+    margin: 2px 0;
+}
+
+/* Status als duidelijke badge */
+.milestone-info span[class^="status-"] {
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: 0.8rem;
+}
+
+/* Statuskleuren (Deze klassen zijn hier nodig voor de tekstkleur) */
+.status-planned {
+    color: #ffc107;
+    font-weight: 600;
+}
+
+.status-in-progress {
+    color: #0dcaf0;
+    font-weight: 600;
+}
+
+.status-done {
+    color: #28a745;
+    font-weight: 600;
+}
+
+/* Edit/Delete als pill-knopjes */
+.milestone-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+.milestone-card .edit-btn,
+.milestone-card .delete-btn {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    border-radius: 999px;
+    border-width: 1px;
+}
+
+/* Edit = witte outline */
+.milestone-card .edit-btn {
+    background-color: transparent;
+    border: 1px solid #ffffff;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.milestone-card .edit-btn:hover {
+    background-color: #ffffff;
+    color: #1E46D0;
+}
+
+/* Delete = subtiele rode outline */
+.milestone-card .delete-btn {
+    background-color: transparent;
+    border: 1px solid #fecaca;
+    color: #fee2e2;
+}
+
+.milestone-card .delete-btn:hover {
+    background-color: #ef4444;
+    border-color: #ef4444;
+    color: #ffffff;
+}
+
+/* "+ Add Milestone"-pijl: tekst gecentreerd,*/
+.btn-add-milestone-small {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    text-decoration: none;
+}

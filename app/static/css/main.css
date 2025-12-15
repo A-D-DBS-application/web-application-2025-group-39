@@ -1,0 +1,17 @@
+/* main.css */
+
+/* Volgorde is cruciaal: van algemeen naar specifiek, van basis-elementen naar complexe componenten */
+
+@import url("global.css");      /* 1. Basis: body, fonts, h1-h6 */
+@import url("layout.css");       /* 2. Grid & Algemene Structuur (Main layout, Footers, Fixed elements) */
+@import url("forms.css");        /* 3. Formulier stijlen (input, label, select) */
+@import url("buttons.css");      /* 4. Knoppen & Acties (btn-primary, btn-danger, etc.) */
+
+@import url("navbar.css");       /* 5. Navigatie (gebruikt knoppen) */
+@import url("tables.css");       /* 6. Tabellen (bevat kolombreedtes) */
+@import url("components.css");    /* 7. Herbruikbare componenten (Kaarten, Statusbadges, Flash messages) */
+@import url("pages.css");        /* 8. Pagina-layouts (Login, Dashboard, Projects) */
+@import url("roadmap.css");      /* 9. Roadmap (Speciale Mijlpaal componenten) */
+@import url("chat.css");         /* 10. Chat Dashboard */
+
+@import url("responsive.css");    /* 11. Responsieve aanpassingen (moet altijd als LAATSTE) */

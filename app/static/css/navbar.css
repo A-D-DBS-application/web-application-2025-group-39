@@ -1,0 +1,170 @@
+/* _navbar.css (Sectie 2 gedeeltelijk) */
+
+/* ======================================
+   2. LAYOUT & NAVIGATIE
+   ====================================== */
+
+/* NAVIGATIEBALK STYLING (PROFESSIONEEL) */
+.navbar {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 12px 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0;
+}
+
+/* Linker sectie (VECTR logo/naam) */
+.navbar-brand a {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1E46D0;
+    text-decoration: none;
+    letter-spacing: -0.5px;
+}
+
+/* Midden sectie (Dashboard + Projects) */
+.navbar-center {
+    flex-grow: 1;
+    display: flex;
+    justify-content: flex-start;
+    margin-left: 50px;
+    width: auto;
+}
+
+.navbar-center a {
+    position: relative;
+    margin: 0 18px;
+    color: #4b5563;
+    padding: 8px 0;
+    transition: color 0.2s ease, border-bottom 0.2s ease;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.navbar-center a:hover {
+    color: #1E46D0;
+    border-bottom: 2px solid #1E46D0;
+}
+
+/* Rechter sectie (Profiel/Logout knoppen) */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    width: auto;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+/* Dropdown container (Projects) */
+.nav-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown trigger (Projects knop) */
+.nav-dropdown-btn {
+    display: inline-flex !important;
+    align-items: center;
+}
+
+/* Chevron icoon naast Projects */
+.nav-dropdown-btn i {
+    font-size: 10px;
+    margin-left: 6px;
+    transition: transform 0.2s;
+}
+
+/* Dropdown inhoud (lijst met projecten) */
+.nav-dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffff;
+    min-width: 250px;
+    box-shadow: 0px 8px 30px 0px rgba(0, 0, 0, 0.15);
+    z-index: 1010;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 6px 0;
+}
+
+/* Dropdown zichtbaar bij hover */
+.nav-dropdown:hover .nav-dropdown-content {
+    display: block;
+}
+
+/* Project Collapse Menu Styling */
+/* Stijl voor de projectnaam link (de trigger) */
+.project-collapse-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    color: #374151;
+    padding: 10px 16px;
+    text-decoration: none;
+    margin: 0;
+    transition: background-color 0.2s ease;
+    font-weight: 500;
+    width: 100%;
+    font-size: 15px;
+}
+
+.project-collapse-trigger:hover {
+    background-color: #f3f4f6;
+}
+
+/* Draai de pijl wanneer de content is uitgevouwen */
+.project-collapse-trigger[aria-expanded="true"] i {
+    transform: rotate(180deg);
+    color: #1E46D0;
+}
+
+/* Stijl voor de links in het submenu (View Features, View Roadmap) */
+.project-menu-options {
+    background-color: #fafafa;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid #f3f4f6;
+}
+
+/* Styling voor de individuele links in het submenu */
+.project-menu-options .project-menu-link {
+    color: #6b7280 !important;
+    padding: 8px 16px 8px 35px !important;
+    text-decoration: none;
+    display: block;
+    margin: 0 !important;
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.project-menu-options .project-menu-link:hover {
+    background-color: #e5e7eb;
+    color: #1E46D0 !important;
+}
+
+/* Styling voor de "Project Toevoegen" link */
+.add-project-link {
+    background-color: #ffffff;
+    font-weight: 600;
+    color: #1E46D0 !important;
+    border-top: 1px solid #e5e7eb;
+    padding: 10px 16px !important;
+    text-align: center;
+    display: block;
+}
+
+.add-project-link:hover {
+    background-color: #f3f4f6 !important;
+}

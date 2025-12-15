@@ -1,0 +1,34 @@
+/* _layout.css (Sectie 2 & 5 gedeeltelijk) */
+
+/* ======================================
+   2. LAYOUT & NAVIGATIE (Positionering)
+   ====================================== */
+
+.chat-icon-container {
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    z-index: 9999;
+}
+
+.bottom-info {
+    position: fixed;
+    bottom: 15px;
+    right: 20px;
+    font-size: 13px;
+    color: #6b7280;
+    background-color: #ffffff;
+    padding: 8px 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 998;
+}
+
+/* FLASH MESSAGES POSITIONERING (Sectie 4) */
+.flash-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 1050;
+    max-width: 350px;
+}

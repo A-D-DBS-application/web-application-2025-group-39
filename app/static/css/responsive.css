@@ -1,0 +1,296 @@
+/* _responsive.css (Sectie 8 en 10) */
+
+/* =====================================
+   8. SCROLL ANIMATION STYLING
+   ===================================== */
+.fade-in-scroll {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.6s cubic-bezier(0.165, 0.84, 0.44, 1),
+        transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.fade-in-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- De vertragingen voor het 'staggered' effect --- */
+.col-md-4:nth-child(2) .fade-in-scroll {
+    transition-delay: 0.2s;
+}
+
+.col-md-4:nth-child(3) .fade-in-scroll {
+    transition-delay: 0.4s;
+}
+
+/* =========================================================
+   10. RESPONSIVE STYLING (MOBIELE APPARATEN) - DEFINITIEVE CORRECTIE
+   ========================================================= */
+
+/* Aanpassingen voor schermen kleiner dan 768px (tablets en gsm's) */
+@media (max-width: 768px) {
+
+    /* NAVIGATIEBALK */
+    .navbar {
+        padding: 10px 15px;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Logo (VECTR) */
+    .navbar-brand a {
+        font-size: 20px;
+        min-width: fit-content;
+        order: 1;
+    }
+
+    /* MIDDEN NAVIGATIE (DASHBOARD/PROJECTS) */
+    .navbar-center {
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+        margin-left: 0;
+        order: 2;
+        flex-grow: 0;
+        justify-content: flex-start;
+    }
+
+    .navbar-center a {
+        font-size: 13px;
+        font-weight: 500;
+        padding: 6px 6px;
+        margin: 0 4px;
+        white-space: nowrap;
+    }
+
+    /* Rechter sectie (Profiel/Logout knoppen) */
+    .navbar-right {
+        gap: 4px;
+        width: auto;
+        order: 3;
+        margin-left: auto;
+    }
+
+    /* VITAL: VERBERG DE GEBRUIKERSNAAM (Profielknop) */
+    .navbar-right .btn-profile-name {
+        display: none;
+    }
+
+    /* Knoppen in de navigatie kleiner maken */
+    .btn-login,
+    .btn-register {
+        padding: 4px 8px;
+        min-width: 50px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    /* Dropdown op mobiel */
+    .nav-dropdown-content {
+        left: 0;
+        transform: none;
+        min-width: 180px;
+        box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.2);
+        top: 100%;
+        border-top: 3px solid #1E46D0;
+    }
+
+    .login-container,
+    .register-container,
+    .profile-card,
+    .form-card,
+    .roadmap-form,
+    .milestone-form {
+        max-width: 95%;
+        margin: 20px auto;
+        padding: 20px;
+    }
+
+    .hero-section {
+        min-height: 40vh;
+        padding-top: 30px;
+        padding-bottom: 30px;
+    }
+
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-section .subtitle {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+
+    .hero-section .auth-box a {
+        display: block;
+        margin-bottom: 15px;
+    }
+
+    .dashboard-wrapper h1 {
+        font-size: 2rem;
+    }
+
+    .main-buttons {
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        padding: 0 15px;
+    }
+
+    .main-buttons .btn {
+        width: 100%;
+        max-width: none;
+        height: 50px;
+        font-size: 16px;
+    }
+
+    .projects-wrapper {
+        margin: 15px auto;
+        padding: 15px;
+    }
+
+    .projects-grid-container {
+        padding: 15px 0;
+    }
+
+    .vectr-card {
+        padding: 15px;
+        margin-top: 1rem;
+    }
+
+    .features-container-card {
+        margin: 20px auto 10px auto;
+        padding: 20px 10px;
+    }
+
+    .roadmap-header {
+        margin: 20px 0 10px 0;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 15px;
+    }
+
+    .roadmap-header h2 {
+        font-size: 26px;
+    }
+
+    .roadmap-header .top-right {
+        position: static;
+        transform: none;
+        margin-top: 10px;
+        width: 100%;
+        text-align: left;
+    }
+
+    .roadmap-container {
+        padding: 20px 15px 25px 15px;
+        margin: 0 auto 40px auto;
+        border-radius: 12px;
+    }
+
+    .milestone-group {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .milestone-card,
+    .btn-add-milestone-small {
+        min-height: 120px;
+        padding: 15px 20px;
+        flex: 1 1 100%;
+        max-width: 100%;
+        min-width: unset;
+        clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+    }
+
+    .milestone-card.milestone-card:last-child,
+    .btn-add-milestone-small:last-child {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+    }
+
+    .table thead th,
+    .table tbody td {
+        padding: 0.6rem 0.8rem;
+        font-size: 14px;
+    }
+
+    .table-btn {
+        min-width: 80px;
+        height: 32px;
+        font-size: 13px;
+        padding: 0 8px;
+    }
+
+    .col-actions {
+        width: 200px;
+    }
+
+    .col-roadmap {
+        width: 150px;
+    }
+
+    .col-md-4:nth-child(2) .fade-in-scroll,
+    .col-md-4:nth-child(3) .fade-in-scroll {
+        transition-delay: 0s;
+    }
+
+    .wa-chat-container {
+        flex-direction: column;
+        height: auto;
+        min-height: calc(100vh - 120px);
+        border-radius: 12px;
+        margin: 0 10px;
+    }
+}
+
+/* Aanpassingen voor schermen kleiner dan 576px (ZEER kleine telefoons) */
+@media (max-width: 576px) {
+
+    /* Navigatie: logo kleiner */
+    .navbar-brand a {
+        font-size: 16px;
+    }
+
+    /* NAVIGATIE LINKS BLIJVEN ZICHTBAAR, maar nog compacter */
+    .navbar-center a {
+        font-size: 12px;
+        padding: 4px 5px;
+        margin: 0 2px;
+    }
+
+    /* Knoppen nog kleiner */
+    .btn-login,
+    .btn-register {
+        padding: 3px 6px;
+        min-width: 40px;
+        font-size: 11px;
+    }
+
+    /* Chat Icon knop kleiner */
+    .chat-icon-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 22px;
+        bottom: 15px;
+        right: 15px;
+    }
+
+    /* Chat Header acties */
+    .wa-header-actions {
+        gap: 4px;
+    }
+
+    .wa-header-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+    }
+
+    /* Chat Bubble breder */
+    .wa-msg-bubble {
+        max-width: 90%;
+    }
+}

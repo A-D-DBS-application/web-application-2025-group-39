@@ -1,0 +1,68 @@
+/* _forms.css (Sectie 1 gedeeltelijk) */
+
+/* Formulier Elementen */
+label {
+    font-weight: 500;
+    margin-bottom: 6px;
+    display: block;
+    color: #4b5563;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus,
+select:focus {
+    border-color: #1E46D0;
+    box-shadow: 0 0 0 3px rgba(30, 70, 208, 0.2);
+    outline: none;
+}
+
+/* Multiselect Specifiek */
+select[multiple] {
+    height: auto;
+    min-height: 150px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+select[multiple] option {
+    padding: 6px;
+    border-radius: 4px;
+}
+
+select[multiple] option:checked {
+    background-color: #1E46D0;
+    color: #ffffff;
+}
+
+input[type="submit"] {
+    margin-top: 10px;
+    background-color: #1E46D0;
+    color: white;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #163BA6;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-inline {
+    display: inline;
+}
+
+.show-custom { display: block; }
+.hide-custom { display: none; }

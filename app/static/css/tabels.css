@@ -1,0 +1,76 @@
+/* _tables.css (Sectie 7) */
+
+/* ===========================
+   7. TABEL STYLING
+   =========================== */
+.table-responsive {
+    border-radius: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 0;
+    background-color: #ffffff;
+}
+
+.table-striped>tbody>tr:nth-of-type(odd)>* {
+    background-color: #f7f9fc;
+}
+
+.table-bordered> :not(caption)>*>* {
+    border-width: 0 0 1px 0;
+    border-color: #e5e7eb;
+}
+
+.table thead th {
+    background-color: #f3f4f6;
+    color: #374151;
+    font-weight: 600;
+    border-bottom: 2px solid #d1d5db;
+    padding: 0.75rem 1rem;
+}
+
+.table tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    color: #4b5563;
+}
+
+.col-actions {
+    width: 260px;
+}
+
+.col-roadmap {
+    width: 220px;
+}
+
+/* Sorteer Iconen */
+.sort-icon,
+.sort-icon-placeholder {
+    color: #9ca3af;
+    font-size: 13px;
+    line-height: 0.5;
+    display: block;
+    text-decoration: none;
+    transition: color 0.15s ease-in-out;
+    padding: 1px 0;
+}
+
+.sort-icon.active {
+    color: #1E46D0;
+}
+
+.d-flex {
+    align-items: center;
+}
+
+.me-2 {
+    margin-right: 0.6rem;
+}
+
+.table thead th strong {
+    font-weight: 600;
+}

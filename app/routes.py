@@ -43,7 +43,7 @@ def login():
             session["user_id"] = user.id_profile                    # Sla essentiële info op in de sessie             
             session["name"] = user.name
             session["role"] = user.role
-            flash("Successfully logged in!", "success")
+            flash("Successfully logged in.", "success")
             return redirect(url_for("main.dashboard"))
 
         flash("Invalid email or password.", "danger")               # Foutmelding bij incorrecte gegevens
@@ -91,7 +91,7 @@ def register():
             db.session.add(new_user)
             db.session.commit()
 
-            flash("Registration successful! You can now log in.", "success")
+            flash("Registration successful. You can now log in.", "success")
             return redirect(url_for("main.login"))
 
         except Exception as e:
@@ -720,7 +720,7 @@ def edit_feature(feature_id):
         feature.ttv_weeks = calc_ttv(feature.ttm_weeks, feature.ttbv_weeks)
 
         db.session.commit()
-        flash("Feature updated successfully!", "success")
+        flash("Feature updated successfully.", "success")
         return redirect(url_for("main.view_features", project_id=feature.id_project))
 
     return render_template(
@@ -751,7 +751,7 @@ def delete_feature(feature_id):
     project_id = feature.id_project               # Project ID opslaan zodat we na delete kunnen redirecten
     db.session.delete(feature)                    # Feature verwijderen uit database
     db.session.commit()                           # Veranderingen opslaan
-    flash("Feature deleted successfully!", "success")  # Succesbericht tonen
+    flash("Feature deleted successfully.", "success")  # Succesbericht tonen
     return redirect(url_for("main.view_features", project_id=project_id))  # Terug naar feature-lijst
 
 
@@ -819,7 +819,7 @@ def add_roadmap(project_id):
         db.session.add(roadmap)                      # Toevoegen aan DB
         db.session.commit()                          # Opslaan
 
-        flash("Roadmap created successfully!", "success")
+        flash("Roadmap created successfully.", "success")
         return redirect(url_for("main.roadmap_overview", project_id=project_id))
 
     # GET → pagina tonen
@@ -896,7 +896,7 @@ def edit_roadmap(roadmap_id):
 
         db.session.commit()                           # Opgeslagen wijzigingen
 
-        flash("Roadmap updated successfully!", "success")
+        flash("Roadmap updated successfully.", "success")
         return redirect(url_for("main.roadmap_overview", project_id=project.id_project))
 
     # GET → formulier tonen
@@ -1059,7 +1059,7 @@ def add_milestone(roadmap_id):
         db.session.add(milestone)  # Toevoegen aan DB
         db.session.commit()        # Wijzigingen opslaan
 
-        flash("Milestone added!", "success")
+        flash("Milestone added successfully.", "success")
         return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
 
     # GET → pagina tonen
@@ -1138,7 +1138,7 @@ def edit_milestone(milestone_id):
 
         db.session.commit()  # Opslaan in database
 
-        flash("Milestone updated!", "success")
+        flash("Milestone updated successfully.", "success")
         return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
 
     return render_template(
@@ -1174,7 +1174,7 @@ def delete_milestone(milestone_id):
     db.session.delete(milestone)  # Milestone verwijderen
     db.session.commit()           # Permanent opslaan
 
-    flash("Milestone deleted!", "success")
+    flash("Milestone deleted successfully.", "success")
     return redirect(url_for("main.roadmap_overview", project_id=roadmap.id_project))
 
 
@@ -1224,7 +1224,7 @@ def add_evidence(feature_id):
 
         db.session.commit()
 
-        flash("Evidence added!", "success")
+        flash("Evidence added successfully.", "success")
         return redirect(url_for("main.view_evidence", feature_id=feature_id))
 
     return render_template("add_evidence.html", feature=feature, CONFIDENCE_LEVELS=CONFIDENCE_LEVELS)
@@ -1292,7 +1292,7 @@ def delete_evidence(evidence_id):
 
     db.session.commit()
 
-    flash("Evidence deleted!", "success")
+    flash("Evidence deleted successfully.", "success")
     return redirect(url_for("main.view_evidence", feature_id=feature.id_feature))
 
 
@@ -1341,7 +1341,7 @@ def edit_evidence(evidence_id):
 
         db.session.commit()
 
-        flash("Evidence updated!", "success")
+        flash("Evidence updated successfully.", "success")
         return redirect(url_for("main.view_evidence", feature_id=feature.id_feature))
 
     return render_template(

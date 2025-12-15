@@ -1,0 +1,294 @@
+/* _pages.css (Sectie 5 gedeeltelijk) */
+
+/* --- INDEX PAGE STYLING (VECTR Home) --- */
+.hero-section {
+    background: linear-gradient(135deg, #1E46D0 0%, #163BA6 100%);
+    color: #ffffff;
+    min-height: 50vh;
+    display: flex;
+    align-items: center;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.hero-section h1 {
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 3.5rem;
+    margin-bottom: 10px;
+}
+
+.hero-section .subtitle {
+    color: #ffffff;
+    opacity: 0.9;
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+}
+
+.hero-section .auth-box {
+    background: none;
+    box-shadow: none;
+    padding: 0;
+    margin-bottom: 40px;
+}
+
+.hero-section .auth-box a {
+    min-width: 140px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-section .btn-login {
+    border: 2px solid #ffffff;
+    background-color: #1E46D0;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.hero-section .btn-login:hover {
+    border-color: #e6e6e6;
+    background-color: #163BA6;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.hero-section .btn-register {
+    background-color: #ffffff;
+    color: #1E46D0;
+    border-color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.hero-section .btn-register:hover {
+    background-color: #e6e6e6;
+    color: #163BA6;
+    border-color: #e6e6e6;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Footer van de landingspagina */
+.landing-page-body footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e5e7eb;
+    padding: 25px 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* --- LOGIN PAGE --- */
+.login-container {
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    width: 380px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    margin-top: 6%;
+}
+
+.login-title {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 700;
+    color: #1E46D0;
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+/* --- REGISTER PAGE --- */
+.register-container {
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    width: 420px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    margin-top: 5%;
+}
+
+.register-title {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 700;
+    color: #1E46D0;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+/* --- PROFILE PAGE --- */
+.profile-card {
+    max-width: 450px;
+    margin: 40px auto;
+}
+
+/* --- DASHBOARD PAGE --- */
+.dashboard-wrapper {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.dashboard-wrapper h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #1E46D0;
+}
+
+.main-buttons {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.main-buttons .btn {
+    width: 200px;
+    height: 60px;
+    font-size: 17px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: 0.2s ease-in-out;
+    background-color: #1E46D0;
+    color: white;
+}
+
+.main-buttons .btn:hover {
+    transform: translateY(-3px);
+    background-color: #163BA6;
+    box-shadow: 0 6px 15px rgba(30, 70, 208, 0.3);
+}
+
+/* --- PROJECTS PAGE --- */
+.projects-wrapper {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+}
+
+/* Container voor de grid van kaarten */
+.projects-grid-container {
+    padding: 30px;
+}
+
+/* Stijl van de Project Kaart */
+.project-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 16px;
+    padding: 24px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    height: 100%;
+}
+
+.project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Titel en Statistieken */
+.project-card .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: #1E46D0;
+}
+
+.project-card .card-stats {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin: 0;
+}
+
+/* --- EDIT/ADD PROJECT PAGE --- */
+.form-card {
+    max-width: 650px;
+    border-radius: 12px;
+    background: #fff;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 40px auto;
+}
+
+/* --- ADD FEATURE PAGE --- */
+.feature-form {
+    max-width: 1100px;
+    border-radius: 12px;
+    background: #fff;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 40px auto;
+}
+
+/* --- ADD ROADMAP PAGE --- */
+.roadmap-form {
+    max-width: 550px;
+    border-radius: 12px;
+    background: #fff;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 40px auto;
+}
+
+/* --- MILESTONE PAGE --- */
+.milestone-form {
+    max-width: 550px;
+    border-radius: 12px;
+    background: #fff;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 40px auto;
+}
+
+/* --- VECTR CHART STYLING --- */
+.vectr-card {
+    max-width: 800px;
+    margin: 0 auto;
+    margin-top: 2rem;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+#vectrChart {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.vectr-card p {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-align: center;
+}
+
+/* --- FEATURES OVERVIEW CONTAINER --- */
+.features-container-card {
+    width: 100%;
+    max-width: none;
+    margin: 40px auto 20px auto;
+    background-color: #ffffff;
+    padding: 30px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
