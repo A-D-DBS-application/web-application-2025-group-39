@@ -217,8 +217,9 @@ def parse_roadmap_form(form):
     errors = []
         # Met floats kunnen we decimalen opslaan (bijv. 2.5 personen of 3.75 punten)
     return {
-        "start_roadmap": required_str(form, "start_roadmap", errors),
-        "end_roadmap": required_str(form, "end_roadmap", errors),
+        # De validator controleert op aanwezigheid van de YYYY-MM-DD string
+        "start_roadmap": required_str(form, "start_roadmap", errors, label="Start Date Project"),
+        "end_roadmap": required_str(form, "end_roadmap", errors, label="End Date Project"),
         "time_capacity": required_float(form, "time_capacity", errors),
         "budget_allocation": required_float(form, "budget_allocation", errors),
     }, errors
