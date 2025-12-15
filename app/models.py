@@ -26,13 +26,16 @@ CONFIDENCE_LEVELS = [
 # =====================================================
 class Company(db.Model):
     __tablename__ = "company"
-    __table_args__ = {"schema": "public"}
-
+    __table_args__ = {"schema": "public"}                                           # Gebruik het 'public' schema 
+    
+    # Primary key
     id_company = db.Column(db.Integer, primary_key=True)
     company_name = db.Column(db.String, nullable=False)
 
-    profiles = db.relationship("Profile", back_populates="company", lazy=True)
-    projects = db.relationship("Project", back_populates="company", lazy=True)
+    # Relaties:
+    profiles = db.relationship("Profile", back_populates="company", lazy=True)      # Company (1) <---> (Many) Profile
+    projects = db.relationship("Project", back_populates="company", lazy=True)      # Company (1) <---> (Many) Project
+
 
 
 # =====================================================
@@ -42,37 +45,41 @@ class Profile(db.Model):
     __tablename__ = "profile"
     __table_args__ = {"schema": "public"}
 
-    id_profile = db.Column(db.Integer, primary_key=True)
+    # primary key
+    id_profile = db.Column(db.Integer, primary_key=True)  
 
-    name = db.Column(db.String, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    role = db.Column(db.String, nullable=True)
-    password_hash = db.Column(db.String, nullable=False)
-
-    id_company = db.Column(
+    # foreign key
+    id_company = db.Column(                                                         
         db.Integer, db.ForeignKey("public.company.id_company"), nullable=False
-    )
-
-    company = db.relationship("Company", back_populates="profiles")
-
-    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    )                           
+    
+    # basis info 
+    name = db.Column(db.String, nullable=False)                                     # naam, moet ingevuld worden, (nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)                  # email met max 120 tekens en is unique
+    role = db.Column(db.String, nullable=True)
+    password_hash = db.Column(db.String, nullable=False)                            # gehashte wachtwoord
+    
+    #relaties:
+    company = db.relationship("Company", back_populates="profiles")                 # relatie: Profile (Many) <---> (1) Company
+    
+    #metadata
+    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)            # Tijdstip van creatie (standaard UTC)
 
     def __repr__(self):
         return f"<Profile {self.name}>"
 
     # Helpers voor wachtwoordbeheer
-    def set_password(self, plain_password: str):
+    def set_password(self, plain_password: str):                                    # hasht en stelt het wachtwoord in.
         self.password_hash = hash_password(plain_password)
 
-    def check_password(self, plain_password: str) -> bool:
+    def check_password(self, plain_password: str) -> bool:                          # controleert het tekstwachtwoord tegen de hash.
         return verify_password(self.password_hash, plain_password)
 
-    def maybe_upgrade_hash(self, plain_password: str) -> bool:
+    def maybe_upgrade_hash(self, plain_password: str) -> bool:                      # controleert of de hash een upgrade nodig heeft en voert deze uit indien nodig.
         if needs_rehash(self.password_hash):
             self.set_password(plain_password)
             return True
         return False
-
 
 # =====================================================
 # PROJECT
@@ -81,8 +88,9 @@ class Project(db.Model):
     __tablename__ = "project"
     __table_args__ = {"schema": "public"}
 
+    # Primary key
     id_project = db.Column(db.Integer, primary_key=True)
-
+    # foreign key (relatie met company)
     id_company = db.Column(
         db.Integer, db.ForeignKey("public.company.id_company"), nullable=False
     )
@@ -96,13 +104,13 @@ class Project(db.Model):
     ttbv_low_limit = db.Column(db.Float)
     ttbv_high_limit = db.Column(db.Float)
 
-    company = db.relationship("Company", back_populates="projects")
-
-    roadmaps = db.relationship(
+    # relaties 
+    company = db.relationship("Company", back_populates="projects")                 # relatie: Project (Many) <---> (1) Company
+    roadmaps = db.relationship(                                                     # relatie: Project (1) <---> (Many) Roadmap
         "Roadmap", back_populates="project", cascade="all, delete", passive_deletes=True
-    )
+    )                                                                               # cascade="all, delete" zorgt ervoor dat Roadmaps worden verwijderd als het Project wordt verwijderd
 
-    features_ideas = db.relationship(
+    features_ideas = db.relationship(                                               # relatie: Project (1) <---> (Many) Features_ideas  
         "Features_ideas",
         back_populates="project",
         cascade="all, delete",
@@ -165,14 +173,14 @@ class Features_ideas(db.Model):
         passive_deletes=True,
     )
 
-    @property
-    def latest_decision(self):
-        """Haalt de meest recente Decision op basis van created_at."""
+    @property                                                                       # berekeningen of database-queries uit te voeren wanneer een attribuut wordt opgevraagd
+    def latest_decision(self):                                                      # haalt de meest recente Decision op basis van created_at
         return (
             Decision.query.filter_by(id_feature=self.id_feature)
             .order_by(desc(Decision.created_at))
             .first()
         )
+
 
 
 # =====================================================
@@ -190,9 +198,9 @@ class Roadmap(db.Model):
         nullable=False,
     )
 
-    # Roadmap periodes blijven strings zodat de originele invoer bewaard blijft
-    start_roadmap = db.Column(db.String, nullable=False)  
-    end_roadmap = db.Column(db.String, nullable=False)
+    # Roadmap periodes blijven strings zodat de originele invoer bewaard blijft, zijn dates
+    start_roadmap = db.Column(db.Date, nullable=False)  
+    end_roadmap = db.Column(db.Date, nullable=False)
     # Capaciteit en budget mogen nu decimalen bevatten (bijv. 2.5 FTE)
     # Float i.p.v. Integer voorkomt dat valid decimals worden afgerond of geweigerd
     time_capacity = db.Column(db.Float, nullable=False)
@@ -210,7 +218,7 @@ class Roadmap(db.Model):
 
 
 # =====================================================
-# ASSOCIATION TABLE: Many-to-Many relatie tussen Milestone en Features_ideas beheert
+# Many-to-Many relatie tussen Milestone en Features_ideas beheert
 # =====================================================
 class MilestoneFeature(db.Model):
     __tablename__ = "milestone_features"
@@ -286,11 +294,12 @@ class Evidence(db.Model):
         db.Integer, db.ForeignKey("public.company.id_company"), nullable=False
     )
 
+
     title = db.Column(db.String)
-    type = db.Column(db.String)
-    source = db.Column(db.String)
+    type = db.Column(db.String)                                                         # Type bewijs (bijv. "Interview", "A/B Test", "Marktanalyse")
+    source = db.Column(db.String)                                                       # Bron (bijv. naam van de test, link naar document)
     description = db.Column(db.Text)
-    attachment_url = db.Column(db.Text)
+    attachment_url = db.Column(db.Text)                                                 # Link naar het bewijs
 
     # NEW SYSTEM
     old_confidence = db.Column(db.Float)  # feature score BEFORE adding this evidence
