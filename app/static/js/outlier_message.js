@@ -21,15 +21,18 @@ function confirmAndDismissWarning(outlierId) {
         // 2. Voer de POST request uit
         fetch(`/outliers/${encodeURIComponent(outlierId)}/dismiss`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
+            // headers: { 'Content-Type': 'application/json' } is niet langer nodig, maar mag blijven.
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
+        .then(res => {
+            // WIJZIGING: Controleer direct de statuscode (204 = No Content = Success)
+            if (res.status === 204) {
                 // Herlaad de pagina na succesvolle database-update
                 window.location.reload(); 
+            } else if (res.status === 404) {
+                alert('Error: Feature not found in database.');
             } else {
-                alert('Could not remove the warning. Please try again.');
+                // Behandel andere fouten (bijv. 500)
+                alert('Could not remove the warning due to a server error.');
             }
         })
         .catch(err => {
