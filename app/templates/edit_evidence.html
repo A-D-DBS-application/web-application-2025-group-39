@@ -39,17 +39,15 @@
         </div>
 
         <!-- CUSTOM EVIDENCE TYPE -->
-        <div class="mb-3" id="custom_type_group"
-             style="display: {% if evidence.type not in default_types %}block{% else %}none{% endif %};"> 
-                                                                                                                                <!-- Dit veld verschijnt als evidence.type NIET in de default_types lijst zit -->                               
-                                                                                                                                <!-- display block/none wordt meteen correct gezet bij het laden van de pagina -->
-            <label class="form-label">Custom Evidence Type</label>
+        <div class="mb-3 {% if evidence.type not in default_types %}show-custom{% else %}hide-custom{% endif %}" 
+            id="custom_type_group">
+            <label class="form-label">Custom Evidence Type</label>                                                               <!-- Label voor het invoerveld -->
             <input type="text" name="custom_type" id="custom_type"
-                   class="form-control"
-                   value="{% if evidence.type not in default_types %}{{ evidence.type }}{% endif %}">
-                                                                                                                                {# custom_type: wordt gebruikt als gebruiker een eigen type invult #}
-                                                                                                                                {# value vult alleen in wanneer het huidige type een custom type is #}
+                class="form-control"
+                value="{% if evidence.type not in default_types %}{{ evidence.type }}{% endif %}">                               <!-- Inputveld: toont huidige custom type indien niet in default lijst -->
         </div>
+
+
 
         <!--SOURCE-->
         <div class="mb-3">

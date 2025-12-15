@@ -369,6 +369,9 @@ select[multiple] option:checked {
     border-color: #063510;
     box-shadow: 0 4px 10px rgba(0, 113, 28, 0.4);
 }
+.show-custom { display: block; }                            /* Toon het custom evidence veld */
+.hide-custom { display: none; }                             /* Verberg het custom evidence veld */
+
 
 /* Logout & Delete knoppen (Gevaar) */
 .btn-danger-custom {
