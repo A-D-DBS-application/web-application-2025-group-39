@@ -4,11 +4,16 @@
    =========================== */
 
 body {
-    margin: 0;                                           /* Definieert de buitenmarge rondom een element */
-    padding: 0;                                          /* Definieert de binnenmarge (ruimte) binnen een element */
-    font-family: 'Arial', sans-serif;                    /* Gebruik Arial als lettertype, met sans-serif als fallback */
-    background-color: #f7f9fc;                         /* Definieert de achtergrondkleur van een element */
-    color: #333;                                       /* Definieert de tekstkleur van een element */
+    margin: 0;
+    /* Definieert de buitenmarge rondom een element */
+    padding: 0;
+    /* Definieert de binnenmarge (ruimte) binnen een element */
+    font-family: 'Arial', sans-serif;
+    /* Gebruik Arial als lettertype, met sans-serif als fallback */
+    background-color: #f7f9fc;
+    /* Definieert de achtergrondkleur van een element */
+    color: #333;
+    /* Definieert de tekstkleur van een element */
 }
 
 h1,
@@ -18,18 +23,21 @@ h4,
 h5,
 h6 {
     color: #1E46D0;
-    font-weight: 600;                                    /* Bepaalt de dikte van het lettertype (600 is semi-vet) */
+    font-weight: 600;
+    /* Bepaalt de dikte van het lettertype (600 is semi-vet) */
 }
 
 .content h2 {
-    margin-top: 2rem;                                    /* Verhoog de ruimte boven de titel */
+    margin-top: 2rem;
+    /* Verhoog de ruimte boven de titel */
 }
 
 /* Formulier Elementen */
 label {
     font-weight: 500;
     margin-bottom: 6px;
-    display: block;                                      /* Zorgt dat het element de volledige breedte inneemt */
+    display: block;
+    /* Zorgt dat het element de volledige breedte inneemt */
     color: #4b5563;
 }
 
@@ -39,7 +47,8 @@ select {
     padding: 10px;
     border-radius: 6px;
     border: 1px solid #d1d5db;
-    box-sizing: border-box;                              /* Verandert hoe de breedte en hoogte worden berekend (inclusief padding/border) */
+    box-sizing: border-box;
+    /* Verandert hoe de breedte en hoogte worden berekend (inclusief padding/border) */
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -47,7 +56,8 @@ input:focus,
 select:focus {
     border-color: #1E46D0;
     box-shadow: 0 0 0 3px rgba(30, 70, 208, 0.2);
-    outline: none;                                       /* Verwijdert de standaard focus-rand van de browser */
+    outline: none;
+    /* Verwijdert de standaard focus-rand van de browser */
 }
 
 /* Multiselect Specifiek */
@@ -75,44 +85,61 @@ select[multiple] option:checked {
 
 /* NAVIGATIEBALK STYLING (PROFESSIONEEL) */
 .navbar {
-    display: flex;                                       /* Schakelt flexbox lay-out in voor de container */
-    align-items: center;                                 /* Lijn flex-items verticaal in het midden uit */
+    display: flex;
+    /* Schakelt flexbox lay-out in voor de container */
+    align-items: center;
+    /* Lijn flex-items verticaal in het midden uit */
     background-color: #ffffff;
     padding: 12px 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);        /* Voegt een schaduw toe aan de box */
-    width: 100%;                                         /* Definieert de breedte van een element */
-    position: sticky;                                    /* Maakt het element "sticky" bij scrollen */
-    top: 0;                                              /* Bepaalt de positie t.o.v. de bovenkant van de viewport (alleen bij position: sticky/fixed/absolute) */
-    z-index: 1000;                                       /* Bepaalt de stapelvolgorde (hoger = meer naar voren) */
-    flex-direction: row;                                 /* Definieert de hoofd-as als horizontaal */
-    justify-content: space-between;                      /* Verdeelt de ruimte tussen flex-items */
-    gap: 0;                                              /* Definieert de ruimte (tussenruimte) tussen flex-items */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    /* Voegt een schaduw toe aan de box */
+    width: 100%;
+    /* Definieert de breedte van een element */
+    position: sticky;
+    /* Maakt het element "sticky" bij scrollen */
+    top: 0;
+    /* Bepaalt de positie t.o.v. de bovenkant van de viewport (alleen bij position: sticky/fixed/absolute) */
+    z-index: 1000;
+    /* Bepaalt de stapelvolgorde (hoger = meer naar voren) */
+    flex-direction: row;
+    /* Definieert de hoofd-as als horizontaal */
+    justify-content: space-between;
+    /* Verdeelt de ruimte tussen flex-items */
+    gap: 0;
+    /* Definieert de ruimte (tussenruimte) tussen flex-items */
 }
 
 /* Linker sectie (VECTR logo/naam) */
 .navbar-brand a {
-    font-size: 26px;                                     /* Definieert de grootte van het lettertype */
+    font-size: 26px;
+    /* Definieert de grootte van het lettertype */
     font-weight: 700;
     color: #1E46D0;
-    text-decoration: none;                               /* Definieert de decoratie van de tekst (hier: geen onderstreping) */
-    letter-spacing: -0.5px;                              /* Definieert de ruimte tussen de letters */
+    text-decoration: none;
+    /* Definieert de decoratie van de tekst (hier: geen onderstreping) */
+    letter-spacing: -0.5px;
+    /* Definieert de ruimte tussen de letters */
 }
 
 /* Midden sectie (Dashboard + Projects) */
 .navbar-center {
-    flex-grow: 1;                                        /* Bepaalt hoe een flex-item groeit om de beschikbare ruimte te vullen */
+    flex-grow: 1;
+    /* Bepaalt hoe een flex-item groeit om de beschikbare ruimte te vullen */
     display: flex;
-    justify-content: flex-start;                         /* Lijn flex-items uit aan het begin van de hoofd-as */
+    justify-content: flex-start;
+    /* Lijn flex-items uit aan het begin van de hoofd-as */
     margin-left: 50px;
     width: auto;
 }
 
 .navbar-center a {
-    position: relative;                                  /* Stelt de positioneringsmethode in (relatief aan de normale positie) */
+    position: relative;
+    /* Stelt de positioneringsmethode in (relatief aan de normale positie) */
     margin: 0 18px;
     color: #4b5563;
     padding: 8px 0;
-    transition: color 0.2s ease, border-bottom 0.2s ease;/* Maakt overgangen tussen CSS-eigenschappen vloeiend */
+    transition: color 0.2s ease, border-bottom 0.2s ease;
+    /* Maakt overgangen tussen CSS-eigenschappen vloeiend */
     text-decoration: none;
     font-weight: 500;
     font-size: 15px;
@@ -120,7 +147,8 @@ select[multiple] option:checked {
 
 .navbar-center a:hover {
     color: #1E46D0;
-    border-bottom: 2px solid #1E46D0;                    /* Definieert de rand aan de onderkant van een element */
+    border-bottom: 2px solid #1E46D0;
+    /* Definieert de rand aan de onderkant van een element */
 }
 
 /* Rechter sectie (Profiel/Logout knoppen) */
@@ -128,7 +156,8 @@ select[multiple] option:checked {
     display: flex;
     align-items: center;
     width: auto;
-    justify-content: flex-end;                           /* Lijn flex-items uit aan het einde van de hoofd-as */
+    justify-content: flex-end;
+    /* Lijn flex-items uit aan het einde van de hoofd-as */
     gap: 15px;
 }
 
@@ -136,12 +165,14 @@ select[multiple] option:checked {
 /* Dropdown container (Projects) */
 .nav-dropdown {
     position: relative;
-    display: inline-block;                               /* Toon als inline-level container die zich gedraagt als een blok */
+    display: inline-block;
+    /* Toon als inline-level container die zich gedraagt als een blok */
 }
 
 /* Dropdown trigger (Projects knop) */
 .nav-dropdown-btn {
-    display: inline-flex !important;                     /* Toon als inline-level flex container */
+    display: inline-flex !important;
+    /* Toon als inline-level flex container */
     align-items: center;
 }
 
@@ -154,53 +185,59 @@ select[multiple] option:checked {
 
 /* Dropdown inhoud (lijst met projecten) */
 .nav-dropdown-content {
-    display: none;                                       /* Verbergt het element volledig */
-    position: absolute;                                  /* Stelt de positioneringsmethode in (t.o.v. dichtstbijzijnde gepositioneerde voorouder) */
+    display: none;
+    /* Verbergt het element volledig */
+    position: absolute;
+    /* Stelt de positioneringsmethode in (t.o.v. dichtstbijzijnde gepositioneerde voorouder) */
     top: 100%;
     left: 50%;
-    transform: translateX(-50%);                         /* Past een 2D-transformatie toe (hier: horizontaal verschuiven) */
+    transform: translateX(-50%);
+    /* Past een 2D-transformatie toe (hier: horizontaal verschuiven) */
     background-color: #ffffff;
-    min-width: 250px;                                    /* Definieert de minimale breedte van een element */
+    min-width: 250px;
+    /* Definieert de minimale breedte van een element */
     box-shadow: 0px 8px 30px 0px rgba(0, 0, 0, 0.15);
     z-index: 1010;
     border-radius: 8px;
-    overflow: hidden;                                    /* Definieert hoe de inhoud wordt behandeld wanneer deze te groot is voor het element */
+    overflow: hidden;
+    /* Definieert hoe de inhoud wordt behandeld wanneer deze te groot is voor het element */
     padding: 6px 0;
 }
 
 /* Dropdown zichtbaar bij hover */
 .nav-dropdown:hover .nav-dropdown-content {
-    display: block;                                      /* Toon het element als een blok-level element */
+    display: block;
+    /* Toon het element als een blok-level element */
 }
 
-  /* Styling voor chat-icoon rechts onderaan */
-    .chat-icon-container {
-      position: fixed;
-      bottom: 22px;
-      right: 22px;
-      z-index: 9999;
-    }
+/* Styling voor chat-icoon rechts onderaan */
+.chat-icon-container {
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    z-index: 9999;
+}
 
-    .chat-icon-btn {
-      width: 58px;
-      height: 58px;
-      border-radius: 50%;
-      background-color: #1E46D0;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 28px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      text-decoration: none;
-    }
+.chat-icon-btn {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background-color: #1E46D0;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+}
 
-    .chat-icon-btn:hover {
-      transform: scale(1.08);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-      color: white;
-    }
+.chat-icon-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+    color: white;
+}
 
 /* Project Collapse Menu Styling */
 /* Stijl voor de projectnaam link (de trigger) */
@@ -208,7 +245,8 @@ select[multiple] option:checked {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    cursor: pointer;                                     /* Definieert de muisaanwijzer die getoond wordt (hier: handje) */
+    cursor: pointer;
+    /* Definieert de muisaanwijzer die getoond wordt (hier: handje) */
 
     color: #374151;
     padding: 10px 16px;
@@ -226,7 +264,8 @@ select[multiple] option:checked {
 
 /* Draai de pijl wanneer de content is uitgevouwen */
 .project-collapse-trigger[aria-expanded="true"] i {
-    transform: rotate(180deg);                           /* Draait het element 180 graden */
+    transform: rotate(180deg);
+    /* Draait het element 180 graden */
     color: #1E46D0;
 }
 
@@ -292,7 +331,8 @@ select[multiple] option:checked {
 .btn-view {
     color: #ffffff;
     background-color: #1E46D0;
-    border: 1px solid #1E46D0;                           /* Definieert de rand rondom een element */
+    border: 1px solid #1E46D0;
+    /* Definieert de rand rondom een element */
 }
 
 .btn-login:hover,
@@ -307,7 +347,8 @@ select[multiple] option:checked {
 /* Secundaire knop (Register/Logout/Terug/All Features) */
 .btn-register {
     color: #1E46D0;
-    background-color: transparent;                       /* Maakt de achtergrond transparant */
+    background-color: transparent;
+    /* Maakt de achtergrond transparant */
     border: 1px solid #1E46D0;
     font-weight: 600;
 }
@@ -357,20 +398,33 @@ select[multiple] option:checked {
 
 /* Evidence knoppen */
 .btn-success {
-    color: #fff;                                         /* Tekstkleur (wit) */
-    background-color: #00711c;                           /* Achtergrondkleur (middelgroen) */
-    border-color: #005013;                               /* Randkleur */
+    color: #fff;
+    /* Tekstkleur (wit) */
+    background-color: #00711c;
+    /* Achtergrondkleur (middelgroen) */
+    border-color: #005013;
+    /* Randkleur */
 }
 
 .btn-success:hover,
 .btn-success:focus {
     color: #4b5563;
-    background-color: #005e19;                           /* Iets donkerder groen */
+    background-color: #005e19;
+    /* Iets donkerder groen */
     border-color: #063510;
     box-shadow: 0 4px 10px rgba(0, 113, 28, 0.4);
 }
-.show-custom { display: block; }                            /* Toon het custom evidence veld */
-.hide-custom { display: none; }                             /* Verberg het custom evidence veld */
+
+.show-custom {
+    display: block;
+}
+
+/* Toon het custom evidence veld */
+.hide-custom {
+    display: none;
+}
+
+/* Verberg het custom evidence veld */
 
 
 /* Logout & Delete knoppen (Gevaar) */
@@ -422,7 +476,8 @@ select[multiple] option:checked {
 }
 
 .btn-decision-yes:hover,
-button.table-btn.btn-decision-yes.is-selected {                         /* zorgt ervoor dat de knop groen blijft wanneer deze wordt aangeklikt */
+button.table-btn.btn-decision-yes.is-selected {
+    /* zorgt ervoor dat de knop groen blijft wanneer deze wordt aangeklikt */
     background-color: #28a745;
     color: #ffffff;
     border-color: #218838;
@@ -444,7 +499,8 @@ button.table-btn.btn-decision-no.is-selected {
 /* Knoppen in tabellen */
 .table-btn {
     min-width: 100px;
-    height: 36px;                                        /* Definieert de hoogte van een element */
+    height: 36px;
+    /* Definieert de hoogte van een element */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -513,11 +569,14 @@ input[type="submit"]:hover {
 
 /* FLASH MESSAGES POSITIONERING */
 .flash-container {
-    position: fixed;                                     /* Stelt de positioneringsmethode in (t.o.v. de viewport) */
+    position: fixed;
+    /* Stelt de positioneringsmethode in (t.o.v. de viewport) */
     top: 80px;
-    right: 20px;                                         /* Bepaalt de positie t.o.v. de rechterkant van de viewport */
+    right: 20px;
+    /* Bepaalt de positie t.o.v. de rechterkant van de viewport */
     z-index: 1050;
-    max-width: 350px;                                    /* Definieert de maximale breedte van een element */
+    max-width: 350px;
+    /* Definieert de maximale breedte van een element */
 }
 
 .flash-container .alert {
@@ -570,7 +629,7 @@ input[type="submit"]:hover {
 .hero-section {
     background: linear-gradient(135deg, #1E46D0 0%, #163BA6 100%);
     color: #ffffff;
-    min-height: 50vh; 
+    min-height: 50vh;
     display: flex;
     align-items: center;
     padding-top: 50px;
@@ -600,15 +659,16 @@ input[type="submit"]:hover {
 
 /* Zorgt ervoor dat de knoppen mooi gecentreerd staan */
 .hero-section .auth-box a {
-    min-width: 140px; 
-    display: inline-flex; 
+    min-width: 140px;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
 }
 
 /* Aanpassing voor de 'login' en 'Register' knop in de Hero sectie */
 .hero-section .btn-login {
-    border: 2px solid #ffffff;                                  /* Witte rand van 2 pixels */
+    border: 2px solid #ffffff;
+    /* Witte rand van 2 pixels */
     background-color: #1E46D0;
     color: #ffffff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -616,8 +676,10 @@ input[type="submit"]:hover {
 
 /* Pas de hover state aan, zodat de rand verdwijnt/verkleint bij hover */
 .hero-section .btn-login:hover {
-    border-color: #e6e6e6;                                      /* Lichtere rand bij hover */
-    background-color: #163BA6;                                  /* Donkerder blauw bij hover (volgens uw bestaande stijlen) */
+    border-color: #e6e6e6;
+    /* Lichtere rand bij hover */
+    background-color: #163BA6;
+    /* Donkerder blauw bij hover (volgens uw bestaande stijlen) */
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
@@ -639,21 +701,34 @@ input[type="submit"]:hover {
 
 /* Groene ROI kaart randkleur */
 .border-success {
-    border-color: #00711c;                               /* Groene kleur uit uw .btn-success */
+    border-color: #00711c;
+    /* Groene kleur uit uw .btn-success */
 }
+
 /* Gele TtV kaart randkleur */
 .border-warning {
-    border-color: #ffc107;                               /* Gele kleur uit uw .status-planned */
+    border-color: #ffc107;
+    /* Gele kleur uit uw .status-planned */
 }
+
 /* Blauwe Confidence kaart randkleur */
 .border-info {
-    border-color: #0dcaf0;                               /* Blauwe kleur uit uw .status-in-progress */
+    border-color: #0dcaf0;
+    /* Blauwe kleur uit uw .status-in-progress */
 }
 
 /* Kleur van de iconen/titels van de criteria kaarten */
-.text-success { color: #00711c; }
-.text-warning { color: #ffc107; }
-.text-info { color: #0dcaf0; }
+.text-success {
+    color: #00711c;
+}
+
+.text-warning {
+    color: #ffc107;
+}
+
+.text-info {
+    color: #0dcaf0;
+}
 
 /* Algemene styling voor de kaarten (zodat ze de professionele styling behouden) */
 .card {
@@ -671,7 +746,7 @@ input[type="submit"]:hover {
 /* Zorgt ervoor dat alle h5 titels een minimum hoogte aannemen */
 .practical-value-title {
     min-height: 2.8rem;
-    display: flex;      
+    display: flex;
     align-items: flex-end;
 }
 
@@ -739,14 +814,17 @@ input[type="submit"]:hover {
 
 /* --- PROFILE PAGE --- */
 .profile-card {
-    max-width: 450px;                                    /* Definieer een maximale breedte */
-    margin: 40px auto;                                   /* Centreer de kaart horizontaal */
+    max-width: 450px;
+    /* Definieer een maximale breedte */
+    margin: 40px auto;
+    /* Centreer de kaart horizontaal */
 }
 
 
 /* --- DASHBOARD PAGE --- */
 .dashboard-wrapper {
-    min-height: 80vh;                                    /* Definieert de minimale hoogte van een element (vh = viewport height) */
+    min-height: 80vh;
+    /* Definieert de minimale hoogte van een element (vh = viewport height) */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -789,7 +867,8 @@ input[type="submit"]:hover {
 
 .bottom-info {
     position: fixed;
-    bottom: 15px;                                        /* Bepaalt de positie t.o.v. de onderkant van de viewport */
+    bottom: 15px;
+    /* Bepaalt de positie t.o.v. de onderkant van de viewport */
     right: 20px;
     font-size: 13px;
     color: #6b7280;
@@ -823,7 +902,8 @@ input[type="submit"]:hover {
     padding: 24px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    height: 100%;                                        /* Definieert de hoogte van een element */
+    height: 100%;
+    /* Definieert de hoogte van een element */
 }
 
 .project-card:hover {
@@ -858,7 +938,8 @@ input[type="submit"]:hover {
     font-weight: bold;
     font-size: 14px;
     box-shadow: 0 2px 8px rgba(30, 70, 208, 0.3);
-    flex-shrink: 0;                                      /* Bepaalt de krimpfactor van een flex-item */
+    flex-shrink: 0;
+    /* Bepaalt de krimpfactor van een flex-item */
 }
 
 /* Actie Boxen (Features/Roadmap) */
@@ -969,7 +1050,8 @@ input[type="submit"]:hover {
 }
 
 .top-right {
-    position: absolute;                                  /* Stelt de positioneringsmethode in (t.o.v. dichtstbijzijnde gepositioneerde voorouder) */
+    position: absolute;
+    /* Stelt de positioneringsmethode in (t.o.v. dichtstbijzijnde gepositioneerde voorouder) */
     top: 15px;
     right: 20px;
 }
@@ -1022,7 +1104,8 @@ input[type="submit"]:hover {
 /* Groep milestones (één project) */
 .milestone-group {
     display: flex;
-    flex-wrap: wrap;                                     /* Bepaalt of flex-items op meerdere regels mogen staan */
+    flex-wrap: wrap;
+    /* Bepaalt of flex-items op meerdere regels mogen staan */
     justify-content: center;
     gap: 24px;
 }
@@ -1042,11 +1125,13 @@ input[type="submit"]:hover {
             85% 0,
             100% 50%,
             85% 100%,
-            0 100%);                                     /* Creëert een uitsnede in de vorm van een afgeschuinde pijl */
+            0 100%);
+    /* Creëert een uitsnede in de vorm van een afgeschuinde pijl */
 
     box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
 
-    flex: 0 0 calc(33.333% - 24px);                      /* Bepaalt de flexibele eigenschappen: flex-grow, flex-shrink, basisgrootte */
+    flex: 0 0 calc(33.333% - 24px);
+    /* Bepaalt de flexibele eigenschappen: flex-grow, flex-shrink, basisgrootte */
     max-width: 320px;
     min-width: 260px;
 
@@ -1075,7 +1160,8 @@ input[type="submit"]:hover {
 
 /* Status als duidelijke badge */
 .milestone-info span[class^="status-"] {
-    text-transform: uppercase;                           /* Converteert tekst naar hoofdletters */
+    text-transform: uppercase;
+    /* Converteert tekst naar hoofdletters */
     letter-spacing: 0.03em;
     font-size: 0.8rem;
 }
@@ -1153,9 +1239,12 @@ input[type="submit"]:hover {
    =========================== */
 .table-responsive {
     border-radius: 10px;
-    overflow-x: auto;                                    /* Toont een horizontale schuifbalk indien nodig */
-    overflow-y: hidden;                                  /* Verbergt een verticale schuifbalk */
-    -webkit-overflow-scrolling: touch;                   /* Bepaalt de scroll-inertie op iOS-apparaten */
+    overflow-x: auto;
+    /* Toont een horizontale schuifbalk indien nodig */
+    overflow-y: hidden;
+    /* Verbergt een verticale schuifbalk */
+    -webkit-overflow-scrolling: touch;
+    /* Bepaalt de scroll-inertie op iOS-apparaten */
 }
 
 
@@ -1184,7 +1273,8 @@ input[type="submit"]:hover {
 
 .table tbody td {
     padding: 12px 15px;
-    vertical-align: middle;                              /* Lijn de inhoud verticaal in het midden uit */
+    vertical-align: middle;
+    /* Lijn de inhoud verticaal in het midden uit */
     color: #4b5563;
 }
 
@@ -1205,7 +1295,8 @@ input[type="submit"]:hover {
 .sort-icon-placeholder {
     color: #9ca3af;
     font-size: 13px;
-    line-height: 0.5;                                    /* Definieert de hoogte van een regel tekst */
+    line-height: 0.5;
+    /* Definieert de hoogte van een regel tekst */
     display: block;
     text-decoration: none;
     transition: color 0.15s ease-in-out;
@@ -1236,10 +1327,10 @@ input[type="submit"]:hover {
     /* Beginstaat: Onzichtbaar en 40px onder de normale positie */
     opacity: 0;
     transform: translateY(40px);
-    
+
     /* Zorgt voor een vloeiende overgang van de transform en opacity */
-    transition: opacity 0.6s cubic-bezier(0.165, 0.84, 0.44, 1), 
-                transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: opacity 0.6s cubic-bezier(0.165, 0.84, 0.44, 1),
+        transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .fade-in-scroll.is-visible {
@@ -1453,8 +1544,8 @@ input[type="submit"]:hover {
     flex-direction: column;
     gap: 14px;
     background: radial-gradient(circle at 10% 20%, rgba(30, 70, 208, 0.05) 0, transparent 25%),
-                radial-gradient(circle at 80% 0%, rgba(34, 197, 94, 0.04) 0, transparent 20%),
-                #f6f8fb;
+        radial-gradient(circle at 80% 0%, rgba(34, 197, 94, 0.04) 0, transparent 20%),
+        #f6f8fb;
 }
 
 .wa-msg-wrapper {
@@ -1571,7 +1662,7 @@ input[type="submit"]:hover {
     transform: translateY(0);
 }
 
-    /* CHAT DASHBOARD (MOBILE) */
+/* CHAT DASHBOARD (MOBILE) */
 
 .wa-chat-container {
     flex-direction: column;
@@ -1592,7 +1683,8 @@ input[type="submit"]:hover {
 
 .wa-chat-panel {
     min-height: 60vh;
-}    
+}
+
 .wa-chat-header {
     position: sticky;
     top: 0;
@@ -1615,190 +1707,295 @@ input[type="submit"]:hover {
     height: 44px;
 }
 
-/* ===========================
-   10. RESPONSIVE STYLING (MOBIELE APPARATEN)
-   =========================== */
+/* =========================================================
+   10. RESPONSIVE STYLING (MOBIELE APPARATEN) - DEFINITIEVE CORRECTIE
+   Dashboard en Projects blijven nu altijd zichtbaar, zelfs op de kleinste schermen.
+   ========================================================= */
 
+/* Aanpassingen voor schermen kleiner dan 768px (tablets en gsm's) */
 @media (max-width: 768px) {
 
-    /* LANDING PAGE (VECTR Home) */
+    /* --- 1. GLOBALE AANPASSINGEN --- */
 
-    /* Hero sectie verkleinen voor mobiel */
-    .hero-section {
-        min-height: 40vh;
-        padding: 40px 15px;
-        display: flex;
-        justify-content: center; 
-        align-items: center;
-    }
+    /* --- 2. LAYOUT & NAVIGATIE --- */
 
-    .hero-section h1 {
-        font-size: 2.5rem;                         /* Hoofdtitel verkleinen */
-    }
-
-    .hero-section .subtitle {
-        text-align: center;
-        font-size: 1.2rem;                         /* Ondertitel verkleinen */
-        margin-bottom: 30px;
-    }
-    
-    /* Zorg dat de knoppen flexibel worden, en evt. onder elkaar */
-        .hero-section .auth-box {
-        display: flex;
-        flex-direction: column;                     /* Plaats de knoppen verticaal onder elkaar */
-        align-items: center;                        /* CENTREER de knoppen in de kolom */
-        gap: 15px;
-        margin-bottom: 25px;
-    }
-
-    .hero-section .auth-box a {
-        width: 80%;                                 /* Geef de knoppen een duidelijke breedte t.o.v. de container */
-        max-width: 250px;
-    }
-
-    .landing-page-body section {
-        padding: 30px 0;
-    }
-
-    /* Navbar aanpassingen */
+    /* NAVIGATIEBALK */
     .navbar {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .nav-top {
-        width: 100%;
-        display: flex;
+        padding: 10px 15px;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
         align-items: center;
-        justify-content: space-between;
+        height: auto;
+        gap: 8px;
+        /* Minder ruimte tussen de drie hoofdsecties */
     }
 
-    .navbar-brand {
-        flex-grow: 0;
+    /* Logo (VECTR) */
+    .navbar-brand a {
+        font-size: 20px;
+        min-width: fit-content;
+        order: 1;
     }
 
-    .navbar-right {
-        width: 100%;
-        display: flex;
-        justify-content: flex-start;
-        gap: 10px;
-    }
-
+    /* MIDDEN NAVIGATIE (DASHBOARD/PROJECTS) - BLIJFT ZICHTBAAR */
     .navbar-center {
-        width: 100%;
+        display: flex;
+        flex-direction: row;
+        gap: 6px;
+        /* Minimale ruimte tussen de links */
         margin-left: 0;
+        order: 2;
+        flex-grow: 0;
         justify-content: flex-start;
-        flex-wrap: wrap;
-        gap: 10px;
     }
 
     .navbar-center a {
-        margin: 0 12px 0 0;
+        /* Maak de links zo compact mogelijk */
+        font-size: 13px;
+        /* Kleinere font-size */
+        font-weight: 500;
+        padding: 6px 6px;
+        /* Kleinere padding */
+        margin: 0 4px;
+        /* Minimale margin */
+        white-space: nowrap;
+        /* Voorkom dat de tekst 'Dashboard' of 'Projects' breekt */
     }
 
-    /* Containers en Formulier Kaarten */
+    /* Rechter sectie (Profiel/Logout knoppen) */
+    .navbar-right {
+        gap: 4px;
+        /* Minimale ruimte tussen de knoppen */
+        width: auto;
+        order: 3;
+        margin-left: auto;
+        /* Dwingt de resterende ruimte naar links */
+    }
+
+    /* VITAL: VERBERG DE GEBRUIKERSNAAM (Profielknop) */
+    .navbar-right .btn-profile-name {
+        display: none;
+    }
+
+    /* Knoppen in de navigatie kleiner maken */
+    .btn-login,
+    .btn-register {
+        padding: 4px 8px;
+        /* Nog kleinere padding */
+        min-width: 50px;
+        font-size: 12px;
+        /* Kleinere font-size voor knoppen */
+        font-weight: 500;
+    }
+
+    /* Dropdown op mobiel */
+    .nav-dropdown-content {
+        left: 0;
+        transform: none;
+        min-width: 180px;
+        box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.2);
+        top: 100%;
+        border-top: 3px solid #1E46D0;
+    }
+
+    /* --- De rest van de styling (niet-navigatie) blijft hetzelfde --- */
+
     .login-container,
     .register-container,
-    .profile-card
+    .profile-card,
     .form-card,
     .roadmap-form,
-    .milestone-form,
-    .feature-form,
-    .vectr-card {
-        width: 95%;
-        max-width: none;
+    .milestone-form {
+        max-width: 95%;
         margin: 20px auto;
-        padding: 20px 15px;
+        padding: 20px;
     }
 
-
-    /* Index / Welkomstpagina */
-    .welcome-container {
-        margin: 40px 10px;
-        padding: 30px 20px;
+    .hero-section {
+        min-height: 40vh;
+        padding-top: 30px;
+        padding-bottom: 30px;
     }
 
-    .welcome-container h1 {
-        font-size: 2.2rem;
+    .hero-section h1 {
+        font-size: 2.5rem;
     }
 
-    .subtitle {
-        font-size: 1.1rem;
+    .hero-section .subtitle {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
     }
 
-    /* Dashboard Knoppen (Verticale stapeling) */
-    .dashboard-wrapper {
-        justify-content: flex-start;
-        padding-top: 50px;
-        min-height: auto;
+    .hero-section .auth-box a {
+        display: block;
+        margin-bottom: 15px;
+    }
+
+    .dashboard-wrapper h1 {
+        font-size: 2rem;
     }
 
     .main-buttons {
         flex-direction: column;
         gap: 15px;
-        width: 80%;
-        margin: 20px auto;
+        width: 100%;
+        padding: 0 15px;
     }
 
     .main-buttons .btn {
         width: 100%;
+        max-width: none;
         height: 50px;
         font-size: 16px;
     }
 
-    .bottom-info {
-        position: static;                                    /* Stelt de positioneringsmethode in (normaal in de flow van de pagina) */
-        text-align: center;
-        margin-top: 30px;
+    .projects-wrapper {
+        margin: 15px auto;
+        padding: 15px;
     }
 
-    /* Projecten, Features en Tabellen */
-    .projects-wrapper,
+    .projects-grid-container {
+        padding: 15px 0;
+    }
+
+    .vectr-card {
+        padding: 15px;
+        margin-top: 1rem;
+    }
+
     .features-container-card {
-        padding: 10px;
-        margin: 10px auto 20px auto;
-        width: 95%;
-        box-sizing: border-box;
+        margin: 20px auto 10px auto;
+        padding: 20px 10px;
     }
 
-    table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;                                 /* Voorkomt dat de tekst van cellen afbreekt en dwingt horizontale scroll */
+    .roadmap-header {
+        margin: 20px 0 10px 0;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 15px;
+    }
+
+    .roadmap-header h2 {
+        font-size: 26px;
+    }
+
+    .roadmap-header .top-right {
+        position: static;
+        transform: none;
+        margin-top: 10px;
+        width: 100%;
+        text-align: left;
+    }
+
+    .roadmap-container {
+        padding: 20px 15px 25px 15px;
+        margin: 0 auto 40px auto;
+        border-radius: 12px;
+    }
+
+    .milestone-group {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .milestone-card,
+    .btn-add-milestone-small {
+        min-height: 120px;
+        padding: 15px 20px;
+        flex: 1 1 100%;
+        max-width: 100%;
+        min-width: unset;
+        clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+    }
+
+    .milestone-card.milestone-card:last-child,
+    .btn-add-milestone-small:last-child {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+    }
+
+    .table thead th,
+    .table tbody td {
+        padding: 0.6rem 0.8rem;
+        font-size: 14px;
     }
 
     .table-btn {
         min-width: 80px;
-        height: 30px;
-        font-size: 12px;
-        padding: 0 5px;
+        height: 32px;
+        font-size: 13px;
+        padding: 0 8px;
     }
 
     .col-actions {
-        width: 180px;
+        width: 200px;
     }
 
     .col-roadmap {
-        width: 120px;
+        width: 150px;
     }
 
-    /* Vaste elementen aanpassen */
-    .top-right-fixed,
-    .top-right {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 1000;
-        display: flex;
-        gap: 5px;
-    }
-    
-    /* Roadmap aanpassingen */
-    .milestone-card,
-    .btn-add-milestone-small {
-        flex: 0 0 100%;
-        max-width: none;
+    .col-md-4:nth-child(2) .fade-in-scroll,
+    .col-md-4:nth-child(3) .fade-in-scroll {
+        transition-delay: 0s;
     }
 
-    
+    .wa-chat-container {
+        flex-direction: column;
+        height: auto;
+        min-height: calc(100vh - 120px);
+        border-radius: 12px;
+        margin: 0 10px;
+    }
+
+}
+
+/* Aanpassingen voor schermen kleiner dan 576px (ZEER kleine telefoons) */
+@media (max-width: 576px) {
+
+    /* Navigatie: logo kleiner */
+    .navbar-brand a {
+        font-size: 16px;
+    }
+
+    /* NAVIGATIE LINKS BLIJVEN ZICHTBAAR, maar nog compacter */
+    .navbar-center a {
+        font-size: 12px;
+        /* Extra kleine font-size */
+        padding: 4px 5px;
+        /* Minimale padding */
+        margin: 0 2px;
+    }
+
+    /* Knoppen nog kleiner */
+    .btn-login,
+    .btn-register {
+        padding: 3px 6px;
+        min-width: 40px;
+        font-size: 11px;
+    }
+
+    /* Chat Icon knop kleiner */
+    .chat-icon-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 22px;
+        bottom: 15px;
+        right: 15px;
+    }
+
+    /* Chat Header acties */
+    .wa-header-actions {
+        gap: 4px;
+    }
+
+    .wa-header-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+    }
+
+    /* Chat Bubble breder */
+    .wa-msg-bubble {
+        max-width: 90%;
+    }
 }

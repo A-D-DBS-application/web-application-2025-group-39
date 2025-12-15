@@ -70,7 +70,7 @@
 
     <div class="navbar-right">
       {% if "user_id" in session %}
-      <a href="{{ url_for('main.profile') }}" class="btn btn-base btn-login">
+      <a href="{{ url_for('main.profile') }}" class="btn btn-base btn-login btn-profile-name">
         {{ session["name"] | default('Profiel') }}
       </a>
       <a href="{{ url_for('main.logout') }}" class="btn btn-base btn-login">Logout</a>
