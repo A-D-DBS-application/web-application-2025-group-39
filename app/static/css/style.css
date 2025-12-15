@@ -661,6 +661,18 @@ input[type="submit"]:hover {
     border: 1px solid transparent;
 }
 
+/* Zorgt ervoor dat het bolletje iets naar rechts schuift om uit te lijnen met de bredere pijl-iconen */
+.icon-circle-offset {
+    margin: 0.25rem;
+}
+
+/* Zorgt ervoor dat alle h5 titels een minimum hoogte aannemen */
+.practical-value-title {
+    min-height: 2.8rem;
+    display: flex;      
+    align-items: flex-end;
+}
+
 /* Footer van de landingspagina (overrides de standaard .footer positie/stijl) */
 .landing-page-body footer {
     background-color: #f8f9fa;

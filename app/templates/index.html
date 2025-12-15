@@ -39,10 +39,10 @@
   <div class="container">
     <h2 class="text-center mb-5">Prioritize What Really Matters</h2>
     <div class="row justify-content-center">
-      <div class="col-lg-10">
+      <div class="col-12">
         <div class="card p-4 shadow-lg border-0 fade-in-scroll">
-          <h3 class="card-title text-center text-secondary mb-3">A Lightweight Prioritization Framework for Startups
-          </h3>
+          <h4 class="card-title text-center text-secondary mb-3">A Lightweight Prioritization Framework for Startups
+          </h4>
           <p class="lead text-center">
             VECTR is specifically designed to help software startups make critical product roadmap decisions under
             severe resource constraints and extreme uncertainty.
@@ -60,15 +60,23 @@
 <section class="py-5">
   <div class="container">
     <h2 class="text-center mb-5">The Three Core Criteria</h2>
-    <div class="row g-4">
-
-      <div class="col-md-4">
+    <div class="row g-4 d-flex align-items-stretch"> <div class="col-md-4">
         <div class="card h-100 p-4 shadow-sm border-start border-5 border-success fade-in-scroll">
-          <h4 class="card-title text-success mb-3"><i class="bi bi-currency-dollar me-2"></i> 1. Return on Investment
+          <h4 class="card-title text-success mb-3"><i class="bi bi-currency-euro me-2"></i> 1. Return on Investment
             (ROI)</h4>
           <p class="card-text">
-            ROI quantifies the expected financial gain a feature will generate relative to its total investment cost
-            (revenue increase, churn reduction, or cost savings).
+            Return on Investment (ROI) quantifies the expected financial gain, or Expected Profit, that a feature will
+            generate relative to the Total Investment Cost. This estimation is typically made over a defined time
+            horizon H.
+            <br>
+            <br>
+            The gains (Profit) considered in this calculation can include increased revenue, churn reduction,
+            or cost savings.
+            <br>
+            <br>
+            Conversely, the investment
+            costs (Total Investment Cost) cover both development effort (hours) and associated hourly costs, as
+            well as operational expenses (OPEX) and other direct costs.
           </p>
         </div>
       </div>
@@ -77,8 +85,15 @@
         <div class="card h-100 p-4 shadow-sm border-start border-5 border-warning fade-in-scroll">
           <h4 class="card-title text-warning mb-3"><i class="bi bi-clock me-2"></i> 2. Time-to-Value (TtV)</h4>
           <p class="card-text">
-            TtV represents how quickly a feature can be developed, launched, and begin delivering measurable business
-            value. This is crucial for managing a startup's operational 'runway'.
+            Time-to-Value (TtV) represents how quickly a feature can be developed, launched, and subsequently begin
+            delivering measurable business value. This is a crucial criterion for software startups to effectively
+            manage their operational 'runway'.
+            <br>
+            <br>
+            The TtV is the sum of two components: Time-to-Market and Time-to-Business Value:
+            Time-to-Market is the period required to develop and launch the feature. Time-to-Business Value is the time
+            that passes from the launch until measurable business outcomes werden achieved, such as generating the first
+            revenue, improving user retention, or achieving a specific Key Performance Indicator (KPI).
           </p>
         </div>
       </div>
@@ -87,8 +102,15 @@
         <div class="card h-100 p-4 shadow-sm border-start border-5 border-info fade-in-scroll">
           <h4 class="card-title text-info mb-3"><i class="bi bi-patch-check me-2"></i> 3. Confidence Level</h4>
           <p class="card-text">
-            Measures the reliability of the feature's underlying assumptions based on the quality of supporting evidence
-            and validation progress.
+            The Confidence level in the VECTR framework represents the certainty in the underlying assumptions for a
+            given requirement. This confidence is assessed based on the quality of evidence.
+            <br>
+            <br>
+            The scoring uses a specific range to quantify the strength of the evidence, from 0.0 (No Longer Relevant),
+            where evidence is outdated or invalid, up to 10.0 (Launch Data), which represents the strongest evidence
+            derived from real usage data after launch.
+            Emphasizing confidence supports data-driven decision-making and helps prevent the misallocation of scarce
+            resources by exposing ideas that appear highly promising but reveal critical weaknesses after validation.
           </p>
         </div>
       </div>
@@ -97,67 +119,71 @@
 </section>
 
 <section class="py-5 bg-light">
-    <div class="container">
-        <h2 class="text-center mb-5 fade-in-scroll">The Prioritization Map </h2>
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="card p-4 shadow-lg border-0 fade-in-scroll">
-                    
-                    <div class="row align-items-start">
-                        
-                        <div class="col-md-6 mb-4 mb-md-0">
-                            <p class="card-text lead">
-                                VECTR is operationalized as a two-dimensional map that makes trade-offs transparent:
-                            </p>
-                            <ul class="list-unstyled mt-3" style="font-size: 1.1rem;">
-                                <li><i class="bi bi-arrow-right-short me-1 text-primary"></i> X-axis: Represents the Confidence Level.</li>
-                                <li><i class="bi bi-arrow-up-short me-1 text-primary"></i> Y-axis: Represents Time-to-Value (TtV).</li>
-                                <li><i class="bi bi-circle-fill me-1 text-primary" style="font-size: 0.7rem;"></i> Bubble Size: Represents the Return on Investment (ROI).</li>
-                            </ul>
-                            <blockquote class="blockquote mt-4 border-start border-4 ps-3 border-primary">
-                                <p class="mb-0 text-dark">Items in the upper-right corner (high Confidence, short TtV) and with larger
-                                    bubbles (high ROI) are the "Quick Wins".</p>
-                            </blockquote>
-                        </div>
+  <div class="container">
+    <h2 class="text-center mb-5 fade-in-scroll">The Prioritization Map </h2>
+    <div class="row justify-content-center">
+      <div class="col-12">
+        <div class="card p-4 shadow-lg border-0 fade-in-scroll">
 
-                        <div class="col-md-6 text-center">
-                            <h4 class="card-title text-center mt-2 mb-3 d-md-none">Feature Prioritization Visualized</h4>
-                            <img src="{{ url_for('static', filename='images/vectr_chart_example.png') }}" 
-                                 alt="VECTR Prioritization Map Example" 
-                                 class="img-fluid rounded shadow-sm"
-                                 style="max-width: 100%; border: 1px solid #ddd;">
-                        </div>
-                    </div>
-                    </div>
+          <div class="row align-items-start">
+
+            <div class="col-md-6 mb-4 mb-md-0">
+              <p class="card-text lead">
+                VECTR is operationalized as a two-dimensional map that makes trade-offs transparent:
+              </p>
+              <ul class="list-unstyled mt-3" style="font-size: 1.1rem;">
+                <li><i class="bi bi-arrow-right-short me-1 text-primary"></i> X-axis: Represents the Confidence Level.
+                </li>
+                <li><i class="bi bi-arrow-up-short me-1 text-primary"></i> Y-axis: Represents Time-to-Value (TtV).</li>
+                <li><i class="bi bi-circle-fill me-1 text-primary icon-circle-offset"></i> Bubble Size:
+                  Represents the Return on Investment (ROI).</li>
+              </ul>
+              <blockquote class="blockquote mt-4 border-start border-4 ps-3 border-primary">
+                <p class="mb-0 text-dark">Items in the upper-right corner (high Confidence, short TtV) and with larger
+                  bubbles (high ROI) are the "Quick Wins". The map's color zones-ranging from Green to Red provide
+                  instant guidance. Importantly, the position of a feature is dynamic: Validation moves features to the
+                  right, increasing confidence and helping to prevent misallocation of scarce resources to high-risk
+                  ideas.</p>
+              </blockquote>
             </div>
+
+            <div class="col-md-6 text-center">
+              <h4 class="card-title text-center mt-2 mb-3 d-md-none">Feature Prioritization Visualized</h4>
+              <img src="{{ url_for('static', filename='images/vectr_chart_example.png') }}"
+                alt="VECTR Prioritization Map Example" class="img-fluid rounded shadow-sm"
+                style="max-width: 100%; border: 1px solid #ddd;">
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </section>
 
 <section class="py-5">
   <div class="container">
     <h2 class="text-center mb-5 fade-in-scroll">The Practical Value for Your Team</h2>
     <div class="row justify-content-center">
-      <div class="col-lg-10">
+      <div class="col-12">
         <div class="card p-4 shadow-lg border-0 fade-in-scroll">
-          <p class="card-text lead text-center text-secondary">
+          <p class="card-text lead text-center text-secondary mt-3">
             VECTR provides a defensible basis to justify prioritization choices in strategic contexts.
           </p>
           <div class="row mt-4">
             <div class="col-md-4">
-              <h5 class="text-primary"><i class="bi bi-lightbulb me-1"></i> Reduces Subjectivity</h5>
+              <h5 class="text-primary practical-value-title"><i class="bi bi-lightbulb me-1"></i> Reduces Subjectivity</h5>
               <p class="small text-muted">The visual and financial framework helps depersonalize debates and shifts
-                decisions from emotion-driven to data-driven.</p>
+                decisions from emotion-driven to data-driven, fostering objective alignment.</p>
             </div>
             <div class="col-md-4">
-              <h5 class="text-primary"><i class="bi bi-rocket-takeoff me-1"></i> Runway Logic</h5>
-              <p class="small text-muted">The explicit link to TtV and ROI introduces a 'runway logic' that is crucial
-                for startup survival.</p>
+              <h5 class="text-primary practical-value-title"><i class="bi bi-rocket-takeoff me-1"></i> Runway Logic</h5>
+              <p class="small text-muted">The explicit link to Time-to-Value (TtV) and ROI introduces a 'runway logic'
+                that is crucial for sustainable startup survival.</p>
             </div>
             <div class="col-md-4">
-              <h5 class="text-primary"><i class="bi bi-shield-fill-check me-1"></i> Prevents Misallocation</h5>
+              <h5 class="text-primary practical-value-title"><i class="bi bi-shield-fill-check me-1"></i> Prevents Misallocation</h5>
               <p class="small text-muted">By emphasizing Confidence, VECTR helps prevent the waste of scarce resources
-                on assumptions with weak evidence.</p>
+                on risky assumptions with weak or non-existent evidence.</p>
             </div>
           </div>
         </div>
@@ -168,7 +194,7 @@
 
 <footer class="text-center py-4">
   <div class="footer">
-    <span class="brand">VECTR</span> – Prioritize Features. Clear your roadmap with clarity and confidence.
+    <span class="brand">VECTR</span> - Prioritize Features. Clear your roadmap with clarity and confidence.
   </div>
 </footer>
 
