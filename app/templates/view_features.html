@@ -135,43 +135,53 @@
                     {% set user_decision = decisions | selectattr('id_profile', 'equalto', current_user.id_profile) |
                     list | first %}
 
-                    {# START VAN DE GECORRIGEERDE FEATURE NAAM CEL #}
+                    {# START VAN OUTLIER/ZERO OR NEGATIVE VECTR CHECK #}
                     <td>
                         <div class="d-flex align-items-center">
 
-                            {% if feature.is_outlier %}
-                            <span id="{{ feature.outlier_id }}-container" class="me-2 outlier-container"
-                                data-outlier-id="{{ feature.outlier_id }}">
+                            {# Bepaal of een waarschuwing getoond moet worden (Outlier OF Score <= 0) #} {% set
+                                is_zero_or_negative_score=feature.vectr_score is not none and feature.vectr_score <=0 %}
+                                {% set show_warning=feature.is_outlier or is_zero_or_negative_score %} {% if
+                                show_warning %} {# Bepaal de unieke ID en het waarschuwingstype #} {% set
+                                warning_id=feature.outlier_id if feature.is_outlier else 'zero-neg-vectr-' ~
+                                feature.id_feature %} {% set warning_type='Extreme Value (' ~ feature.outlier_type ~ ')'
+                                if feature.is_outlier else 'Zero/Negative VECTR Score' %} {% set
+                                warning_text='VECTR Score is ' ~ feature.vectr_score|round(2)
+                                ~ '. Check input data (ROI/TtV/Confidence).' if is_zero_or_negative_score
+                                else 'Please check input data.' %} {# Gebruik ALTIJD text-danger voor de rode kleur, wat
+                                overeenkomt met de styling van de outliers #} {% set warning_class='text-danger' %}
+                                <span id="{{ warning_id }}-container" class="me-2 outlier-container"
+                                data-outlier-id="{{ warning_id }}">
 
                                 {# TRIGGER (Icoon) #}
-                                <i class="bi bi-exclamation-triangle-fill outlier-icon outlier-trigger"
-                                    title="Outlier Detected" data-bs-toggle="popover" data-bs-trigger="hover focus"
+                                <i class="bi bi-exclamation-triangle-fill outlier-icon outlier-trigger {{ warning_class }}"
+                                    title="{{ warning_type }}" data-bs-toggle="popover" data-bs-trigger="hover focus"
                                     data-bs-placement="right" data-bs-html="true" data-bs-custom-class="popover-hover"
-                                    data-bs-content-id="popover-content-{{ feature.outlier_id }}"
-                                    style="cursor: pointer;">
+                                    data-bs-content-id="popover-content-{{ warning_id }}" style="cursor: pointer;">
                                 </i>
 
                                 {# VERBORGEN INHOUD VOOR DE POPOVER #}
-                                <div id="popover-content-{{ feature.outlier_id }}" style="display:none;">
-                                    <p class="mb-2 small fw-bold text-danger">
-                                        Warning: Extreme Value ({{ feature.outlier_type }}). Please check input data.
+                                <div id="popover-content-{{ warning_id }}" style="display:none;">
+                                    <p class="mb-2 small fw-bold {{ warning_class }}">
+                                        Warning: {{ warning_type }}
                                     </p>
                                     <p class="mb-2 small text-muted">
+                                        {{ warning_text }}
                                         If the data has been verified and no issues remain, you may remove this warning.
                                     </p>
                                     <button class="btn btn-sm btn-danger-custom w-100"
-                                        onclick="removeOutlierWarning('{{ feature.outlier_id }}', this)">
+                                        onclick="removeOutlierWarning('{{ warning_id }}', this)">
                                         Remove Warning
                                     </button>
                                 </div>
                                 {# EINDE VERBORGEN INHOUD #}
-                            </span>
-                            {% endif %}
+                                </span>
+                                {% endif %}
 
-                            {{ feature.name_feature }}
+                                {{ feature.name_feature }}
                         </div>
                     </td>
-                    {# EINDE VAN DE GECORRIGEERDE FEATURE NAAM CEL #}
+                    {# EINDE OUTLIER/ZERO OR NEGATIVE VECTR CHECK #}
                     <td>
                         {% if feature.roi_percent is not none %}
                         {{ "%.1f" | format(feature.roi_percent) }}%
