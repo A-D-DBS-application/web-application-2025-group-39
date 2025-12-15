@@ -624,6 +624,38 @@ def view_features(project_id):
         current_user=user,
     )
 
+# ==============================
+# DISMISS OUTLIER WARNING
+# ==============================
+@main.route("/outliers/<string:outlier_id>/dismiss", methods=["POST"])
+def dismiss_warning(outlier_id):
+    # 1. Haal de werkelijke id_feature (UUID) op door de prefix te strippen.
+    
+    # Een UUID bestaat altijd uit 5 groepen gescheiden door dashes: A-B-C-D-E.
+    # We splitsen de URL op alle dashes en nemen de laatste 5 delen (de UUID).
+    all_parts = outlier_id.split('-') 
+    
+    # We verwachten minstens 5 delen als het een UUID is.
+    if len(all_parts) >= 5:
+        # Voeg de laatste 5 delen weer samen met dashes
+        feature_id_from_url = '-'.join(all_parts[-5:])
+    else:
+        # Als er geen 5 delen zijn, gebruiken we de volledige string als fallback
+        feature_id_from_url = outlier_id
+    
+    # 2. Zoek op de werkelijke id_feature (UUID).
+    feature = Features_ideas.query.get(feature_id_from_url) 
+    
+    if not feature:
+        # Nu zou de feature_id_from_url de correcte UUID moeten zijn
+        print(f"DEBUG: Feature with id_feature {feature_id_from_url} not found.") 
+        return jsonify({"success": False}), 404
+
+    # 3. Voer de logica uit: vlag in de database opslaan
+    feature.warning_dismissed = True
+    db.session.commit()
+    
+    return jsonify({"success": True})
 
 # ==============================
 # EDIT FEATURE
@@ -658,6 +690,7 @@ def edit_feature(feature_id):
                 company=company,
             )
 
+        # 1. Update alle feature velden met de nieuwe data
         feature.name_feature = data["name_feature"]
         feature.description = data["description"]
         feature.extra_revenue = data["extra_revenue"]
@@ -672,6 +705,11 @@ def edit_feature(feature_id):
         feature.ttbv_weeks = data["ttbv_weeks"]
         feature.quality_score = data["quality_score"]
 
+        # 2. RESET DE OUTLIER WAARSCHUWING
+        # Elke edit reset de waarschuwing, zodat de gebruiker de nieuwe VECTR/Outlier-status moet bevestigen.
+        feature.warning_dismissed = False
+
+        # 3. Herbereken afgeleide waardes (ROI en TtV)
         feature.roi_percent = calc_roi(
             feature.extra_revenue,
             feature.churn_reduction,
@@ -690,8 +728,7 @@ def edit_feature(feature_id):
     return render_template(
         "edit_feature.html", feature=feature, project=project, company=company
     )
-
-
+    
 # ==============================
 # DELETE FEATURE
 # ==============================

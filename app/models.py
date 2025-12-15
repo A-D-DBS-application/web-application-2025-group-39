@@ -165,6 +165,9 @@ class Features_ideas(db.Model):
     createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
     project = db.relationship("Project", back_populates="features_ideas")
+    
+    # Outlier warning status
+    warning_dismissed = db.Column(db.Boolean, default=False, nullable=False)
 
     decisions = db.relationship(
         "Decision",

@@ -2,66 +2,85 @@
 
 /**
  * Functie om de outlier-waarschuwing te verwijderen.
+ * Gebruikt nu de browser confirm() en verstuurt direct de POST request.
  * @param {string} outlierId - De unieke ID van de outlier.
- * @param {HTMLElement} removeButton - De 'Remove' knop die geklikt is.
  */
-function removeOutlierWarning(outlierId, btn) {
-  // Zoek de container die het icoon en de popover bevat
-  const container = document.getElementById(outlierId + "-container");
-  if (container) {
-    container.remove(); // haalt het hele icoon + popover weg
-  }
+function confirmAndDismissWarning(outlierId) {
+    // Gebruik de standaard browser confirm box
+    if (confirm('Are you sure you want to remove this warning?')) {
+        
+        // 1. Verberg de popover (indien zichtbaar)
+        const container = document.getElementById(outlierId + "-container");
+        if (container) {
+            const triggerEl = container.querySelector('.outlier-trigger');
+            // Probeer de Popover te vinden en te verbergen
+            const instance = triggerEl ? bootstrap.Popover.getInstance(triggerEl) : null;
+            if (instance) instance.hide();
+        }
 
-  // Verberg de Popover direct
-  const triggerEl = container.querySelector('.outlier-trigger');
-  const instance = triggerEl ? bootstrap.Popover.getInstance(triggerEl) : null;
-  if (instance) instance.hide();
-
-  // Open modal en sla het ID op in dataset
-  const modalEl = document.getElementById('removeConfirmModal');
-  const modal = new bootstrap.Modal(modalEl);
-  modalEl.dataset.outlierId = outlierId;
-  modal.show();
+        // 2. Voer de POST request uit
+        fetch(`/outliers/${encodeURIComponent(outlierId)}/dismiss`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Herlaad de pagina na succesvolle database-update
+                window.location.reload(); 
+            } else {
+                alert('Could not remove the warning. Please try again.');
+            }
+        })
+        .catch(err => {
+            console.error('Failed to dismiss warning:', err);
+            alert('An unexpected error occurred.');
+        });
+    }
 }
 
+
 /**
- * Controleert bij het laden van de pagina of er verborgen outliers zijn 
- * en initialiseert alle Popovers + modal logica.
+ * Initialiseert alle Popovers.
  */
 document.addEventListener('DOMContentLoaded', () => {
   
-  // NIEUW: Hulpfunctie om de Popover te controleren/sluiten
+  // Hulpfunctie om de Popover te controleren/sluiten
   const hideIfOutside = (popoverInstance, triggerEl) => {
       setTimeout(() => {
         const triggerHovered = triggerEl.matches(':hover');
+        // Controleer of de popover instantie en het DOM element bestaan voordat u verder gaat
         const popoverEl = popoverInstance.tip;
         const popoverHovered = popoverEl && popoverEl.matches(':hover');
 
         if (!triggerHovered && !popoverHovered) {
           popoverInstance.hide();
         }
-      }, 100); // Korte vertraging (100ms)
+      }, 100); 
     };
 
-  // 1. INITIALISEER ALLE POPOVERS (met de nieuwe, snellere mouseleave logica)
+  // 1. INITIALISEER ALLE POPOVERS
   document.querySelectorAll('.outlier-trigger').forEach(triggerEl => {
     const contentId = triggerEl.dataset.bsContentId;
     const contentEl = document.getElementById(contentId);
     if (!contentEl) return;
 
+    // Zorg ervoor dat de Popover niet de trigger 'focus' gebruikt, anders kan deze niet gesloten worden na de click
     const popoverInstance = new bootstrap.Popover(triggerEl, {
       content: contentEl.innerHTML,
       html: true,
       sanitize: false,
-      trigger: 'manual',
+      trigger: 'manual', // Alleen handmatig openen/sluiten
       container: 'body',
       placement: 'right'
     });
 
-    // Hover in
+    // Hover in logica
     triggerEl.addEventListener('mouseenter', () => {
       const container = triggerEl.closest('.outlier-container');
-      if (container && !container.classList.contains('is-hidden')) {
+      // Aangezien de waarschuwing in de database permanent is verwijderd, is deze klasse niet meer relevant.
+      // We checken nu alleen of de container bestaat.
+      if (container) { 
           popoverInstance.show();
           
           setTimeout(() => {
@@ -70,69 +89,18 @@ document.addEventListener('DOMContentLoaded', () => {
                   // Koppel de sluitlogica aan de Popover-box en de trigger
                   popoverEl.addEventListener('mouseleave', () => hideIfOutside(popoverInstance, triggerEl));
                   triggerEl.addEventListener('mouseleave', () => hideIfOutside(popoverInstance, triggerEl));
+                  
+                  // Voeg een click handler toe aan de knop in de popover om de popover te sluiten
+                  const button = popoverEl.querySelector('.btn-danger-custom');
+                  if (button) {
+                     button.addEventListener('click', () => popoverInstance.hide());
+                  }
               }
           }, 50);
       }
     });
-    // Oorspronkelijke mouseleave-logica is verwijderd en vervangen door de dynamische koppeling
-  });
 
-  // 2. Koppel de confirm-knop van de modal
-  const confirmBtn = document.getElementById('confirmRemoveBtn');
-  confirmBtn.addEventListener('click', () => {
-    const modalEl = document.getElementById('removeConfirmModal');
-    const outlierId = modalEl.dataset.outlierId;
-    if (!outlierId) return;
-
-    const container = document.getElementById(outlierId + '-container');
-    
-    // Zoek de trigger en de Popover instantie
-    const triggerEl = document.querySelector(
-      '.outlier-trigger[data-bs-content-id="popover-content-' + outlierId + '"]'
-    );
-    const instance = triggerEl ? bootstrap.Popover.getInstance(triggerEl) : null;
-
-    // FIX: Popover permanent verwijderen (dispose) en verbergen
-    if (instance) {
-        instance.hide(); 
-        instance.dispose(); // <-- GARANDEERT DAT DE ZWEVENDE POPUP WEG IS
-    }
-
-    // De container met het icoon verbergen
-    if (container) {
-      container.classList.add('is-hidden');
-    }
-    
-    // Bewaar status in Local Storage
-    const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 21);
-    localStorage.setItem(outlierId, JSON.stringify({ hidden: true, expiry: expiryDate.getTime() }));
-
-    const modal = bootstrap.Modal.getInstance(modalEl);
-    modal.hide();
-  });
-
-  // 3. CONTROLEER LOCAL STORAGE BIJ HET LADEN VAN DE PAGINA
-  document.querySelectorAll('.outlier-container').forEach(container => {
-    const outlierId = container.dataset.outlierId;
-    // NIEUW: Controle op lege ID
-    if (!outlierId) return; 
-    
-    const storedItem = localStorage.getItem(outlierId);
-    if (storedItem) {
-      try {
-        const data = JSON.parse(storedItem);
-        const now = Date.now();
-        // VOEG DE IS-HIDDEN CLASSE TOE ALS DE STATUS IS OPGESLAGEN EN NOG GELDIG IS
-        if (data.hidden && data.expiry > now) {
-          container.classList.add('is-hidden');
-        } else if (data.expiry <= now) {
-          localStorage.removeItem(outlierId);
-        }
-      } catch (e) {
-        console.error("Fout bij parsen van Local Storage data:", e);
-        localStorage.removeItem(outlierId);
-      }
-    }
+    // Zorg ervoor dat de popover sluit als de muis beweegt
+    triggerEl.addEventListener('mouseleave', () => hideIfOutside(popoverInstance, triggerEl));
   });
 });

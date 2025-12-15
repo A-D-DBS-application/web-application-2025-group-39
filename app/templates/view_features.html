@@ -113,15 +113,8 @@
                     <th class="text-center">Horizon</th>
 
 
-                    <!-- DECISION COLUMN (SORTABLE) -->
-                    <th class="text-center">Decision (set)</th> <!-- Knoppen om decision te zetten -->
-                    <th class="text-center">Decision (status)</th> <!-- Laatste decision status tonen -->
-                    <!-- EVIDENCE COLUMN -->
-                    <th class="text-center">Evidence</th> <!-- Knoppen voor evidence toevoegen/bekijken -->
-                    <!-- ACTIONS COLUMN -->
-                    <th class="text-center col-actions">Actions</th>
-                    <!-- Acties zoals edit/delete; col-actions is extra CSS-hook voor breedte/styling -->
-                </tr>
+                    <th class="text-center">Decision (set)</th> <th class="text-center">Decision (status)</th> <th class="text-center">Evidence</th> <th class="text-center col-actions">Actions</th>
+                    </tr>
             </thead>
 
             <tbody class="text-center">
@@ -139,17 +132,20 @@
                     <td>
                         <div class="d-flex align-items-center">
 
-                            {# Bepaal of een waarschuwing getoond moet worden (Outlier OF Score <= 0) #} {% set
-                                is_zero_or_negative_score=feature.vectr_score is not none and feature.vectr_score <=0 %}
-                                {% set show_warning=feature.is_outlier or is_zero_or_negative_score %} {% if
-                                show_warning %} {# Bepaal de unieke ID en het waarschuwingstype #} {% set
-                                warning_id=feature.outlier_id if feature.is_outlier else 'zero-neg-vectr-' ~
-                                feature.id_feature %} {% set warning_type='Extreme Value (' ~ feature.outlier_type ~ ')'
-                                if feature.is_outlier else 'Zero/Negative VECTR Score' %} {% set
-                                warning_text='VECTR Score is ' ~ feature.vectr_score|round(2)
-                                ~ '. Check input data (ROI/TtV/Confidence).' if is_zero_or_negative_score
-                                else 'Please check input data.' %} {# Gebruik ALTIJD text-danger voor de rode kleur, wat
-                                overeenkomt met de styling van de outliers #} {% set warning_class='text-danger' %}
+                            {# Bepaal of een waarschuwing getoond moet worden (Outlier OF Score <= 0) #} 
+                            {% set is_zero_or_negative_score=feature.vectr_score is not none and feature.vectr_score <=0 %}
+                            
+                            {# WIJZIGING: Toon de waarschuwing ALLEEN als deze nog NIET is afgewezen in de DB #}
+                            {% set show_warning = (feature.is_outlier or is_zero_or_negative_score) and not feature.warning_dismissed %} 
+                            
+                            {% if show_warning %} 
+                                {# Bepaal de unieke ID en het waarschuwingstype #} 
+                                {% set warning_id=feature.outlier_id if feature.is_outlier else 'zero-neg-vectr-' ~ feature.id_feature %} 
+                                {% set warning_type='Extreme Value (' ~ feature.outlier_type ~ ')' if feature.is_outlier else 'Zero/Negative VECTR Score' %} 
+                                {% set warning_text='VECTR Score is ' ~ feature.vectr_score|round(2) ~ '. Check input data (ROI/TtV/Confidence).' if is_zero_or_negative_score else 'Please check input data.' %} 
+                                {# Gebruik ALTIJD text-danger voor de rode kleur, wat overeenkomt met de styling van de outliers #} 
+                                {% set warning_class='text-danger' %}
+                                
                                 <span id="{{ warning_id }}-container" class="me-2 outlier-container"
                                 data-outlier-id="{{ warning_id }}">
 
@@ -169,8 +165,9 @@
                                         {{ warning_text }}
                                         If the data has been verified and no issues remain, you may remove this warning.
                                     </p>
+                                    {# WIJZIGING: Roept de browser confirm wrapper aan #}
                                     <button class="btn btn-sm btn-danger-custom w-100"
-                                        onclick="removeOutlierWarning('{{ warning_id }}', this)">
+                                        onclick="confirmAndDismissWarning('{{ warning_id }}')">
                                         Remove Warning
                                     </button>
                                 </div>
@@ -243,11 +240,6 @@
                             <span class="decision-approved">
                                 Yes votes: {{ yes_percentage | round(0) }}% ({{ yes_votes }}/{{ total_votes }})
                             </span>
-                            {% if user_decision %}
-                            <span class="decision-{{ user_decision.decision_type | lower }}">
-                                Your vote: {{ user_decision.decision_type }}
-                            </span>
-                            {% endif %}
                         </div>
                         {% else %}
                         <span class="decision-pending">No votes yet</span>
