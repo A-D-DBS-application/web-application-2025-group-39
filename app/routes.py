@@ -601,7 +601,7 @@ def view_features(project_id):
         sort_key = lambda f: f.roi_percent if f.roi_percent is not None else 0.0
     elif sort_by == "ttv":
         # Sorteren op ruwe weken, met fallback naar 0.0
-        sort_key = lambda f: f.ttm_weeks if f.ttm_weeks is not None else 0.0
+        sort_key = lambda f: f.ttv_weeks if f.ttv_weeks is not None else 0.0
     elif sort_by == "confidence":
         sort_key = lambda f: f.quality_score if f.quality_score is not None else 0.0
     else: # Standaard sorteren op naam
