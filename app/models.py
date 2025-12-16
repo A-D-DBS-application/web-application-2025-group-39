@@ -147,7 +147,7 @@ class Features_ideas(db.Model):
     cost_savings = db.Column(db.Integer)
     investment_hours = db.Column(db.Integer)
     hourly_rate = db.Column(db.Integer)
-    opex_hours = db.Column(db.Integer)
+    opex = db.Column(db.Integer)
     other_costs = db.Column(db.Integer)
 
     # TTV fields

@@ -202,7 +202,7 @@ def parse_feature_form(form):
         "cost_savings": optional_int_zero(form, "cost_savings", errors),
         "investment_hours": required_int(form, "investment_hours", errors),
         "hourly_rate": required_int(form, "hourly_rate", errors),
-        "opex_hours": optional_int_zero(form, "opex_hours", errors),
+        "opex": optional_int_zero(form, "opex", errors),
         "other_costs": optional_int_zero(form, "other_costs", errors),
         "horizon": required_int(form, "horizon", errors),
         "ttm_weeks": required_int(form, "ttm_weeks", errors),

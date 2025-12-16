@@ -131,7 +131,7 @@
               data-bs-content="The ongoing costs required after the feature is launched. This could be hosting, subscriptions, monitoring, or maintenance. Only include the extra costs specifically caused by this feature.">
             </i>
           </label>
-          <input type="number" class="form-control" name="opex_hours" min="0" value="{{ feature.opex_hours or '' }}">                                        <!-- Doorlopende operationele kosten; veldnaam heet opex_hours (maar inhoud is “OPEX kosten”) -->
+          <input type="number" class="form-control" name="opex" min="0" value="{{ feature.opex or '' }}">                                                   <!-- Doorlopende operationele kosten; veldnaam heet opex (maar inhoud is “OPEX kosten”) -->
         </div>
 
         <!-- OTHER COSTS -->
