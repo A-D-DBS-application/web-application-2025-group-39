@@ -32,6 +32,7 @@
 
     <!-- Edit formulier-->
     <form method="post" action="{{ url_for('main.edit_project', project_id=project.id_project) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">  
       <!--Project info-->
       <h5 class="mb-3 fw-semibold">Project Info</h5>
       

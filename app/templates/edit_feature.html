@@ -17,7 +17,7 @@
 <!-- FORM CONTAINER -->
 <div class="feature-form card shadow p-4 mx-auto">
   <form method="post" action="{{ url_for('main.edit_feature', id_feature=feature.id_feature) }}">                                                           <!--stuur de ingevulde velden naar de server-->
-
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">  
     <!--BASIC INFO SECTION-->
     <!-- BASIC INFO -->
     <div class="mb-4">                                                                                                                                      <!--mb-4: ruimte onder dit volledige “Basic Info” blok-->

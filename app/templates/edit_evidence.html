@@ -10,7 +10,7 @@
 <!-- FORM CONTAINER -->
 <div class="card p-4 mx-auto" style="max-width: 700px;">
     <form method="POST">
-
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">  
         <!-- TITLE -->
        
         <div class="mb-3">

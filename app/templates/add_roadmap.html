@@ -12,7 +12,7 @@
 <!-- FORM CONTAINER -->
   <div class="roadmap-form card p-4 shadow mt-3 mx-auto">
     <form method="POST">
-      
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">    
       <!-- START Date project -->
       <div class="mb-3">
         <label class="form-label fw-bold">Start Date Project</label>

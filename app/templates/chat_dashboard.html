@@ -53,10 +53,10 @@
         </div>
 
         <!-- INPUT BAR -->
-        <form class="wa-input-bar"
+        <form class="wa-input-bar" 
               action="{{ url_for('main.chat_dashboard_send', project_id=selected_project.id_project) }}"
               method="POST">
-
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">   
             <input type="text"
                    name="content"
                    placeholder="Type a message..."

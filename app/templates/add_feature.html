@@ -14,6 +14,7 @@
 <!-- Hoofdformulier voor het toevoegen van een nieuwe feature -->
 <div class="feature-form card shadow p-4 mx-auto">                                                      <!-- feature-form: custom class voor breedte/spacing/styling, card + shadow: Bootstrap card styling met schaduw, p-4: interne padding, mx-auto: centreren -->
   <form method="post" action="{{ url_for('main.add_feature', project_id=project.id_project) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">    
     <!-- BASIC INFO -->
     <div class="mb-4">
       <!-- BASIC INFO sectie: titel, project en beschrijving -->

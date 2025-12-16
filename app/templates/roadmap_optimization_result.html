@@ -28,6 +28,7 @@
             <h4>Optimization Action</h4>
             <p>Adjust the strategic weighting to influence the result:</p>
             <form method="POST" action="{{ url_for('main.roadmap_optimize', roadmap_id=roadmap.id_roadmap) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">  
                 <div class="input-group">
                     <input type="number" step="0.1" min="0.0" max="1.0" name="alpha" value="{{ alpha | float | round(1) }}" class="form-control" required>
                     <button type="submit" class="btn btn-primary-custom">Re-optimize</button>

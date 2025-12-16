@@ -22,6 +22,7 @@
   {% endwith %}
 
   <form method="POST" action="{{ url_for('main.add_project') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">    
     <h5 class="mb-3 fw-semibold">Project Info</h5>
 
     <div class="mb-3">

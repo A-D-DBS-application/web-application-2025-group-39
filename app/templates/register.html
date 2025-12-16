@@ -12,6 +12,7 @@
     <h1 class="register-title">Register</h1>                  
 
     <form method="post" action="{{ url_for('main.register') }}">                   <!-- method="post": gevoelige data veilig verzenden -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">  
         <!-- Invoerveld volledige naam van de gebruiker -->
         <div class="form-group">                                                   <!-- form-group: groepeert label + input en zorgt voor verticale spacing -->         
             <label for="name">Full Name:</label>

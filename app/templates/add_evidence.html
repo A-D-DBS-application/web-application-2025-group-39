@@ -12,6 +12,8 @@
 <div class="card p-4 mx-auto" style="max-width: 700px;">                                                 <!-- card: Bootstrap card styling, p-4: interne padding, mx-auto: centreren, max-width: beperkt de breedte voor betere UX -->
     <form method="POST">
 
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">    
+
         <!-- Evidence titel -->
         <div class="mb-3">                                                                               <!-- mb-3: consistente verticale spacing tussen velden -->
             <label class="form-label">Title</label>                                                      <!-- form-label: Bootstrap label styling -->

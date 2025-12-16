@@ -28,6 +28,7 @@
           </a>
            <!-- Delete profiel: POST gedaan (geen link), met confirm om accidental clicks te voorkomen  -->          
           <form action="{{ url_for('main.delete_profile') }}" method="post" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">  
               <button type="submit" 
                   onclick="return confirm('Weet je zeker dat je je profiel wilt verwijderen? Dit kan niet ongedaan gemaakt worden.');"
                   class="btn btn-danger-custom table-btn btn-sm">                    <!-- btn-danger-custom: visuele waarschuwing voor destructieve actie -->

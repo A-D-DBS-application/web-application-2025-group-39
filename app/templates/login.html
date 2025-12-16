@@ -11,7 +11,8 @@
   <h1 class="login-title">Login</h1>
 
   <!-- Loginformulier dat naar de login-route post -->
-  <form method="post" action="{{ url_for('main.login') }}">                   <!-- method="post": gevoelige data veilig verzenden -->     
+  <form method="post" action="{{ url_for('main.login') }}">                   <!-- method="post": gevoelige data veilig verzenden -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">    
     <!-- E-mailadres -->
     <div class="form-group">                                                  <!-- form-group: groepeert label + input en zorgt voor verticale spacing --> 
       <label for="email">E-mail:</label>  

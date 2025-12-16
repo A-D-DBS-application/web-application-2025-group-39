@@ -12,7 +12,7 @@
 
     <!-- Formulier verstuurt data terug naar dezelfde route (POST handler) -->
     <form method="POST">
-
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">  
         <!-- MILESTONE NAAM – standaard tekstveld -->
         <div class="mb-3">
             <label class="form-label fw-bold">Milestone Name</label>
