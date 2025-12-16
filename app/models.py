@@ -177,10 +177,10 @@ class Features_ideas(db.Model):
     )
 
     @property                                                                       # berekeningen of database-queries uit te voeren wanneer een attribuut wordt opgevraagd
-    def latest_decision(self):                                                      # haalt de meest recente Decision op basis van created_at
+    def latest_decision(self):                                                      # haalt de meest recente Decision op basis van createdat
         return (
             Decision.query.filter_by(id_feature=self.id_feature)
-            .order_by(desc(Decision.created_at))
+            .order_by(desc(Decision.createdat))
             .first()
         )
 
@@ -308,7 +308,7 @@ class Evidence(db.Model):
     old_confidence = db.Column(db.Float)  # feature score BEFORE adding this evidence
     new_confidence = db.Column(db.Float)  # confidence level selected from list
 
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
     feature = db.relationship("Features_ideas", backref="evidence")
 
@@ -346,7 +346,7 @@ class Decision(db.Model):
     decision_type = db.Column(db.String(50), nullable=False)
     reasoning = db.Column(db.Text, nullable=True)
 
-    created_at = db.Column(
+    createdat = db.Column(
         db.DateTime, nullable=False, default=datetime.datetime.utcnow
     )
 
@@ -375,7 +375,7 @@ class ProjectChatMessage(db.Model):
     )
 
     content = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
     sender = db.relationship("Profile")
     project = db.relationship("Project")

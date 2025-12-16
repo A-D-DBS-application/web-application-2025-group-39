@@ -3,7 +3,7 @@
     <div class="wa-msg-bubble">
         <div class="wa-msg-meta">
             <span class="wa-msg-sender">{{ msg.sender.name }}</span>
-            <span class="wa-msg-time">{{ msg.timestamp.strftime("%H:%M") }}</span>
+            <span class="wa-msg-time">{{ msg.createdat.strftime("%H:%M") }}</span>
         </div>
         <div class="wa-msg-text">
             {{ msg.content }}

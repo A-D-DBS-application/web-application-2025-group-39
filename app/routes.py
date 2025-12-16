@@ -1629,7 +1629,7 @@ def chat_dashboard():
     messages = (
         ProjectChatMessage.query
         .filter_by(id_project=first_project.id_project)
-        .order_by(ProjectChatMessage.timestamp.asc())
+        .order_by(ProjectChatMessage.createdat.asc())
         .all()
     )
 
@@ -1667,7 +1667,7 @@ def chat_dashboard_project(project_id):
     messages = (
         ProjectChatMessage.query
         .filter_by(id_project=project_id)
-        .order_by(ProjectChatMessage.timestamp.asc())
+        .order_by(ProjectChatMessage.createdat.asc())
         .all()
     )
 
@@ -1726,7 +1726,7 @@ def chat_project_messages(project_id):
     messages = (
         ProjectChatMessage.query
         .filter_by(id_project=project_id)
-        .order_by(ProjectChatMessage.timestamp.asc())
+        .order_by(ProjectChatMessage.createdat.asc())
         .all()
     )
 
