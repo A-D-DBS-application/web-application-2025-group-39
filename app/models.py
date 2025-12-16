@@ -344,7 +344,6 @@ class Decision(db.Model):
     )
 
     decision_type = db.Column(db.String(50), nullable=False)
-    reasoning = db.Column(db.Text, nullable=True)
 
     createdat = db.Column(
         db.DateTime, nullable=False, default=datetime.datetime.utcnow
