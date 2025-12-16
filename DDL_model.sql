@@ -1,8 +1,6 @@
--- DDL VOOR POSTGRESQL (SCHEMA PUBLIC)
-
 -- 1. COMPANY
 CREATE TABLE public.company (
-    id_company SERIAL PRIMARY KEY,                                          -- SERIAL: De primaire sleutel is een automatisch oplopende teller (auto-increment).
+    id_company SERIAL PRIMARY KEY,              -- SERIAL maakt automatisch 1, 2, 3... aan.
     company_name VARCHAR NOT NULL
 );
 
@@ -10,15 +8,18 @@ CREATE TABLE public.company (
 CREATE TABLE public.profile (
     id_profile SERIAL PRIMARY KEY,
     id_company INTEGER NOT NULL,
+    
     name VARCHAR NOT NULL,
-    email VARCHAR(120) UNIQUE NOT NULL,                                     -- UNIQUE: Zorgt ervoor dat geen twee profielen hetzelfde e-mailadres kunnen hebben.
+    email VARCHAR(120) NOT NULL UNIQUE,                                             -- UNIQUE: Voorkomt dat 2 gebruikers hetzelfde e-mailadres hebben.
     role VARCHAR,
     password_hash VARCHAR NOT NULL,
-    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     
+    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),       -- 'DEFAULT (NOW() AT TIME ZONE 'utc')' zorgt dat de huidige tijd automatisch wordt ingevuld.
+
+    -- RELATIE NAAR COMPANY:
     CONSTRAINT fk_profile_company FOREIGN KEY (id_company)
         REFERENCES public.company (id_company)
-        ON DELETE RESTRICT                                                  -- RESTRICT: Voorkomt dat een bedrijf wordt verwijderd zolang er nog profielen aan zijn gekoppeld.
+        ON DELETE RESTRICT                                                          -- ON DELETE RESTRICT: Dit is een veiligheidsmaatregel. Je mag een Company NIET verwijderen, zolang er nog Profiles aan gekoppeld zijn. Je moet eerst de profiles verwijderen.
 );
 
 -- 3. PROJECT
@@ -26,9 +27,9 @@ CREATE TABLE public.project (
     id_project SERIAL PRIMARY KEY,
     id_company INTEGER NOT NULL,
     project_name VARCHAR NOT NULL,
-    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
     
-    -- TtV Schalings limieten (Gebruikt REAL voor nauwkeurigheid)
+    -- TtV Schaling limieten (Floating point getallen voor decimalen)
     ttm_low_limit REAL,
     ttm_high_limit REAL,
     ttbv_low_limit REAL,
@@ -41,38 +42,45 @@ CREATE TABLE public.project (
 
 -- 4. FEATURES_IDEAS
 CREATE TABLE public.features_ideas (
-    id_feature VARCHAR PRIMARY KEY,                                         -- VARCHAR PRIMARY KEY: De sleutel is een String (UUID), wat ideaal is voor globaal unieke ID's die niet afhankelijk zijn van de database.
+    id_feature VARCHAR PRIMARY KEY, 
+    
     id_company INTEGER NOT NULL,
     id_project INTEGER NOT NULL,
     
     name_feature VARCHAR NOT NULL,
     description TEXT,
     
-    -- Financiële velden
+    -- Financiële velden (INTEGER is vaak veiliger dan FLOAT voor geld om afrondingsfouten te voorkomen)
     horizon INTEGER,
     extra_revenue INTEGER,
     churn_reduction INTEGER,
     cost_savings INTEGER,
     investment_hours INTEGER,
     hourly_rate INTEGER,
-    opex_hours INTEGER,
+    opex INTEGER,
     other_costs INTEGER,
 
-    
-    -- Calculated values
-    quality_score REAL,                                                     -- REAL: Gebruikt floating-point voor de berekeningen van VECTR/Confidence scores.
+    -- Time to Value (weken)
+    ttm_weeks INTEGER,
+    ttbv_weeks INTEGER,
+
+    -- Calculated values (REAL = Float)
+    quality_score REAL,
     roi_percent REAL,
     ttv_weeks REAL,
+    
+    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
+    warning_dismissed BOOLEAN NOT NULL DEFAULT FALSE,
 
-    -- Outlier warning status
-    warning_dismissed BOOLEAN DEFAULT FALSE,
-    
-    
-    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    
+    -- RELATIE 1: De Company
+    CONSTRAINT fk_feature_company FOREIGN KEY (id_company)
+        REFERENCES public.company (id_company)
+        ON DELETE RESTRICT,
+
+    -- RELATIE 2: Het Project
     CONSTRAINT fk_feature_project FOREIGN KEY (id_project)
         REFERENCES public.project (id_project)
-        ON DELETE CASCADE                                                   -- CASCADE: Als het Project wordt verwijderd, worden alle Features van dat project automatisch verwijderd.
+        ON DELETE CASCADE                                                                 -- ON DELETE CASCADE: Als je een Project verwijdert, worden alle bijbehorende, Features AUTOMATISCH ook verwijderd.
 );
 
 -- 5. ROADMAP
@@ -80,16 +88,16 @@ CREATE TABLE public.roadmap (
     id_roadmap SERIAL PRIMARY KEY,
     id_project INTEGER NOT NULL,
     
-    start_roadmap VARCHAR NOT NULL,                                         -- Opmerking: Blijft VARCHAR (tekst) conform de ORM, maar DATE is technisch beter.
-    end_roadmap VARCHAR NOT NULL,
-    time_capacity REAL NOT NULL,                                            -- REAL: Maakt het mogelijk om decimalen (bijv. 2.5 FTE) op te slaan.
-    budget_allocation REAL NOT NULL,
+    start_roadmap DATE NOT NULL,
+    end_roadmap DATE NOT NULL,
     
-    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    time_capacity REAL NOT NULL,
+    budget_allocation REAL NOT NULL,
+    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
 
     CONSTRAINT fk_roadmap_project FOREIGN KEY (id_project)
         REFERENCES public.project (id_project)
-        ON DELETE CASCADE                                                   -- CASCADE: Als het Project wordt verwijderd, worden alle Roadmaps ook verwijderd.
+        ON DELETE CASCADE
 );
 
 -- 6. MILESTONE
@@ -98,53 +106,60 @@ CREATE TABLE public.milestone (
     id_roadmap INTEGER NOT NULL,
     
     name VARCHAR NOT NULL,
-    start_date DATE,                                                        -- DATE: Dit veld is correct gedefinieerd als een datumtype.
+    start_date DATE,
     end_date DATE,
     goal VARCHAR,
     status VARCHAR,
-    
+
     CONSTRAINT fk_milestone_roadmap FOREIGN KEY (id_roadmap)
         REFERENCES public.roadmap (id_roadmap)
-        ON DELETE CASCADE                                                   -- CASCADE: Als de Roadmap wordt verwijderd, worden alle Mijlpalen daarbinnen automatisch verwijderd.
+        ON DELETE CASCADE
 );
 
--- 7. JUNCTION TABLE: MILESTONEFEATURE (M:N tussen Milestone en Features_ideas)
+-- 7. MILESTONE_FEATURES (KOPPELTABEL / JUNCTION TABLE), Dit regelt de Veel-op-Veel (M:N) relatie.
 CREATE TABLE public.milestone_features (
     milestone_id INTEGER NOT NULL,
-    feature_id VARCHAR NOT NULL,
+    id_feature VARCHAR NOT NULL,
 
-    PRIMARY KEY (milestone_id, feature_id),                                 -- COMPOSITE PRIMARY KEY: De combinatie van de twee sleutels identificeert elke rij uniek. Hierdoor kunnen we vastleggen dat een specifieke feature hoort bij een specifieke mijlpaal.
+    -- COMPOSITE PRIMARY KEY:
+    PRIMARY KEY (milestone_id, id_feature),
 
+    -- FK constraints met CASCADE:
     CONSTRAINT fk_mf_milestone FOREIGN KEY (milestone_id)
         REFERENCES public.milestone (id_milestone)
-        ON DELETE CASCADE,                                                  -- CASCADE: Als een Mijlpaal wordt verwijderd, worden de koppelingen in deze tabel ook verwijderd.
+        ON DELETE CASCADE,                                                      -- Als de milestone verdwijnt -> verbinding weg.
 
-    CONSTRAINT fk_mf_feature FOREIGN KEY (feature_id)
+    CONSTRAINT fk_mf_feature FOREIGN KEY (id_feature)
         REFERENCES public.features_ideas (id_feature)
-        ON DELETE CASCADE                                                   -- CASCADE: Als een Feature wordt verwijderd, wordt de koppeling met de Mijlpaal(en) verwijderd.
+        ON DELETE CASCADE                                                      -- Als de feature verdwijnt -> verbinding weg.
 );
-
 
 -- 8. EVIDENCE
 CREATE TABLE public.evidence (
     id_evidence SERIAL PRIMARY KEY,
     id_feature VARCHAR NOT NULL,
-    id_company INTEGER NOT NULL,
-    
+
     title VARCHAR,
-    -- ... (andere velden) ...
+    type VARCHAR,
+    source VARCHAR,
+    description TEXT,
+    attachment_url TEXT,
     
     old_confidence REAL,
     new_confidence REAL,
     
-    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    
+    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
+
     CONSTRAINT fk_evidence_feature FOREIGN KEY (id_feature)
         REFERENCES public.features_ideas (id_feature)
-        ON DELETE RESTRICT                                                  -- RESTRICT: Zorgt voor extra controle; het bewijs moet eerst worden losgekoppeld voordat de feature kan worden verwijderd (hoewel de ORM dit met CASCADE beheert).
+        ON DELETE RESTRICT,                                                     -- RESTRICT: Je kunt een feature niet wissen zolang er nog bewijs aan hangt (veiligheid).
+
+    CONSTRAINT fk_evidence_company FOREIGN KEY (id_company)
+        REFERENCES public.company (id_company)
+        ON DELETE RESTRICT
 );
 
--- 9. DECISION (met unieke constraint om dubbele stemmen te voorkomen)
+-- 9. DECISION
 CREATE TABLE public.decision (
     id_decision SERIAL PRIMARY KEY,
     id_feature VARCHAR NOT NULL,
@@ -152,32 +167,41 @@ CREATE TABLE public.decision (
     id_company INTEGER NOT NULL,
     
     decision_type VARCHAR(50) NOT NULL,
-    reasoning TEXT,                                                         -- reasoning is optioneel (nullable=True)
-    
-    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
 
-    -- UNIQUE CONSTRAINT: Zorgt ervoor dat één profiel (id_profile) slechts één beslissing/stem per feature (id_feature) kan geven.
-    CONSTRAINT uq_decision_feature_profile UNIQUE (id_feature, id_profile), 
-    
+    -- UNIQUE CONSTRAINT (Complex):
+    -- Dit dwingt af dat één profiel (id_profile) maar EEN keer een beslissing mag nemen 
+    -- voor een specifieke feature (id_feature).
+    -- Als ze opnieuw proberen te stemmen, geeft de database een foutmelding.
+    CONSTRAINT uq_decision_feature_profile UNIQUE (id_feature, id_profile),
+
     CONSTRAINT fk_decision_feature FOREIGN KEY (id_feature)
         REFERENCES public.features_ideas (id_feature)
         ON DELETE CASCADE,
 
     CONSTRAINT fk_decision_profile FOREIGN KEY (id_profile)
         REFERENCES public.profile (id_profile)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_decision_company FOREIGN KEY (id_company)
+        REFERENCES public.company (id_company)
+        ON DELETE RESTRICT
 );
 
--- 10. PROJECT CHAT MESSAGE
+-- 10. PROJECT_CHAT_MESSAGE
 CREATE TABLE public.project_chat_message (
     id_message SERIAL PRIMARY KEY,
     id_project INTEGER NOT NULL,
     id_profile INTEGER NOT NULL,
     
     content TEXT NOT NULL,
-    timestamp TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
 
     CONSTRAINT fk_chat_project FOREIGN KEY (id_project)
         REFERENCES public.project (id_project)
-        ON DELETE CASCADE                                                   -- CASCADE: Als een Project wordt verwijderd, wordt de hele chatgeschiedenis ook verwijderd.
+        ON DELETE CASCADE,                                                      -- Als project weg is, mag de chatgeschiedenis ook weg.
+
+    CONSTRAINT fk_chat_profile FOREIGN KEY (id_profile)
+        REFERENCES public.profile (id_profile)
+        ON DELETE CASCADE
 );
