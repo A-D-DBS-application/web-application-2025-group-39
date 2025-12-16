@@ -8,7 +8,7 @@ def to_float(val, default=0.0):                                       # Converte
         return default                                                # Geef de standaardwaarde (0.0) terug bij fouten
 
 def calc_roi(extra_revenue, churn_reduction, cost_savings,
-                     investment_hours, hourly_rate, opex_hours, other_costs): # Bereken de Return on Investment (ROI) in procenten.
+                     investment_hours, hourly_rate, opex, other_costs): # Bereken de Return on Investment (ROI) in procenten.
     
     # De totale verwachte financiële winst (Gains)
     gains = to_float(extra_revenue) + to_float(churn_reduction) + to_float(cost_savings)
@@ -17,7 +17,7 @@ def calc_roi(extra_revenue, churn_reduction, cost_savings,
     dev_cost = to_float(investment_hours) * to_float(hourly_rate)
     
     # De totale kosten (Costs)
-    costs = dev_cost + to_float(opex_hours) + to_float(other_costs)
+    costs = dev_cost + to_float(opex) + to_float(other_costs)
     
     if costs > 0:
         # Formule voor ROI: ((Winst - Kosten) / Kosten) * 100, afgerond op 2 decimalen
@@ -127,6 +127,6 @@ def calculate_feature_cost(feature):
     dev_cost = to_float(feature.investment_hours) * to_float(feature.hourly_rate)
     
     # De totale kosten (Costs)
-    costs = dev_cost + to_float(feature.opex_hours) + to_float(feature.other_costs)
+    costs = dev_cost + to_float(feature.opex) + to_float(feature.other_costs)
      
     return costs

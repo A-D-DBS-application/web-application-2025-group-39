@@ -99,7 +99,7 @@
     {% endwith %}
   </div>
 
-  {# Chatbutton rechtsonder: alleen tonen wanneer ingelogd en niet op een chatpagina #}
+  <!-- Chatbutton rechtsonder: alleen tonen wanneer ingelogd en niet op een chatpagina -->
   {% set on_chat_page = request.endpoint and request.endpoint.startswith('main.chat') %}
   {% if "user_id" in session and not on_chat_page %}
   <div class="chat-icon-container">

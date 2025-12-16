@@ -34,11 +34,11 @@
       <div class="d-flex flex-wrap justify-content-between align-items-center">
         <div>
           <h5 class="mb-1">
-            {{ r.start_roadmap }} → {{ r.end_roadmap }}
+            {{ r.start_roadmap or 'N/A' }} → {{ r.end_roadmap or 'N/A' }}
           </h5>
 
           <small class="text-muted">
-            Created {{ r.createdat.strftime('%d/%m/%Y') if r.createdat }}
+            Created {{ r.createdat.strftime('%Y-%m-%d') if r.createdat }}
           </small>
         </div>
 
@@ -92,11 +92,11 @@
 
           <div class="milestone-info">
             <strong>Start:</strong>
-            {{ m.start_date.strftime("%d/%m/%Y") if m.start_date else 'N/A' }}
+            {{ m.start_date if m.start_date else 'N/A' }}
           </div>
           <div class="milestone-info">
             <strong>End:</strong>
-            {{ m.end_date.strftime("%d/%m/%Y") if m.end_date else 'N/A' }}
+            {{ m.end_date if m.end_date else 'N/A' }}
           </div>
           <div class="milestone-info">
             <strong>Goal:</strong> {{ m.goal or 'N/A' }}

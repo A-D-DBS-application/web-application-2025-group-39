@@ -147,7 +147,7 @@ class Features_ideas(db.Model):
     cost_savings = db.Column(db.Integer)
     investment_hours = db.Column(db.Integer)
     hourly_rate = db.Column(db.Integer)
-    opex_hours = db.Column(db.Integer)
+    opex = db.Column(db.Integer)
     other_costs = db.Column(db.Integer)
 
     # TTV fields
@@ -158,7 +158,6 @@ class Features_ideas(db.Model):
     quality_score = db.Column(db.Float)
 
     # calculated values
-    expected_profit = db.Column(db.Integer)
     roi_percent = db.Column(db.Float)
     ttv_weeks = db.Column(db.Float)
 
@@ -177,10 +176,10 @@ class Features_ideas(db.Model):
     )
 
     @property                                                                       # berekeningen of database-queries uit te voeren wanneer een attribuut wordt opgevraagd
-    def latest_decision(self):                                                      # haalt de meest recente Decision op basis van created_at
+    def latest_decision(self):                                                      # haalt de meest recente Decision op basis van createdat
         return (
             Decision.query.filter_by(id_feature=self.id_feature)
-            .order_by(desc(Decision.created_at))
+            .order_by(desc(Decision.createdat))
             .first()
         )
 
@@ -233,7 +232,7 @@ class MilestoneFeature(db.Model):
         primary_key=True,
     )
     
-    feature_id = db.Column(
+    id_feature = db.Column(
         db.String,
         db.ForeignKey("public.features_ideas.id_feature", ondelete="CASCADE"),
         primary_key=True,
@@ -259,7 +258,7 @@ class Milestone(db.Model):
         
         # Specificeer de joins (deze zijn essentieel)
         primaryjoin="Milestone.id_milestone == MilestoneFeature.milestone_id",
-        secondaryjoin="Features_ideas.id_feature == MilestoneFeature.feature_id",
+        secondaryjoin="Features_ideas.id_feature == MilestoneFeature.id_feature",
 
         backref="milestones",
         lazy="select",
@@ -308,7 +307,7 @@ class Evidence(db.Model):
     old_confidence = db.Column(db.Float)  # feature score BEFORE adding this evidence
     new_confidence = db.Column(db.Float)  # confidence level selected from list
 
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
     feature = db.relationship("Features_ideas", backref="evidence")
 
@@ -344,9 +343,8 @@ class Decision(db.Model):
     )
 
     decision_type = db.Column(db.String(50), nullable=False)
-    reasoning = db.Column(db.Text, nullable=True)
 
-    created_at = db.Column(
+    createdat = db.Column(
         db.DateTime, nullable=False, default=datetime.datetime.utcnow
     )
 
@@ -375,7 +373,7 @@ class ProjectChatMessage(db.Model):
     )
 
     content = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
     sender = db.relationship("Profile")
     project = db.relationship("Project")
