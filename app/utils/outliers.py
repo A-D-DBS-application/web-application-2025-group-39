@@ -3,60 +3,74 @@
 def calculate_median(data):
     """Berekent de mediaan (Q2) van een gesorteerde lijst."""
     n = len(data)
+    if not data:
+        return 0.0
     if n % 2 == 1:
         return data[n // 2]
     else:
         return (data[n // 2 - 1] + data[n // 2]) / 2
 
-def detect_vectr_outliers_and_tag(features):
-    """
-    Detects outliers on the 'vectr_score' (stored as attribute after calculation)
-    using the manual IQR method.
-    """
-    if not features or len(features) < 4:
-        for feature in features:
-            feature.is_outlier = False
-        return features
+def get_iqr_bounds(features, attribute_name):
+    """Berekent de statistische grenzen voor een specifiek attribuut van de features."""
+    values = [getattr(f, attribute_name, 0.0) or 0.0 for f in features]
+    if len(values) < 4:
+        return None, None
         
-    scores = []
-    for feature_item in features:
-        score = getattr(feature_item, 'vectr_score', 0.0)
-        scores.append(score)
-        
-    sorted_scores = sorted(scores)
-    n = len(sorted_scores)
+    sorted_vals = sorted(values)
+    n = len(sorted_vals)
 
-    # --- 1: Correcte slicing voor de onderste helft ---
-    # lower_half pakt altijd de eerste helft
-    lower_half = sorted_scores[:n // 2]
-    
-    # --- 2: Correcte slicing voor de bovenste helft ---
-    # Dit zorgt ervoor dat we altijd een list slice terugkrijgen
-    # We starten de slice bij de index direct na de onderste helft
+    lower_half = sorted_vals[:n // 2]
     start_of_upper_half_index = n // 2 + (n % 2)
-    upper_half = sorted_scores[start_of_upper_half_index:] 
+    upper_half = sorted_vals[start_of_upper_half_index:] 
     
-    # Nu zijn lower_half en upper_half gegarandeerd lijsten (lists)
     Q1 = calculate_median(lower_half) 
     Q3 = calculate_median(upper_half)
-    
     IQR = Q3 - Q1
     
-    # Standard IQR bounds
-    lower_bound = Q1 - 1.5 * IQR
-    upper_bound = Q3 + 1.5 * IQR
-    
-    for feature_item in features:
-        score = getattr(feature_item, 'vectr_score', 0.0)
-        feature_item.is_outlier = False
-        feature_item.outlier_type = ""
-        feature_item.outlier_id = f"outlier-{feature_item.id_feature}" 
+    # Gebruik de standaard 1.5 * IQR regel voor uitschieters
+    return (Q1 - 1.5 * IQR), (Q3 + 1.5 * IQR)
 
-        if score < lower_bound:
-            feature_item.is_outlier = True
-            feature_item.outlier_type = "Low"
-        elif score > upper_bound:
-            feature_item.is_outlier = True
-            feature_item.outlier_type = "High"
+def detect_vectr_outliers_and_tag(features):
+    """
+    Detecteert uitschieters voor VECTR, ROI en TtV.
+    """
+    if not features:
+        return features
+
+    # Reset en initialiseer velden voor alle features
+    for f in features:
+        f.is_outlier = False
+        f.outlier_type = ""
+        f.outlier_id = f"outlier-{f.id_feature}"
+
+    # De lijst met metrieken die gecontroleerd moeten worden
+    # Hier zit 'ttv_weeks' nu expliciet bij
+    metrics = {
+        'vectr_score': 'VECTR',
+        'roi_percent': 'ROI',
+        'ttv_weeks': 'TtV'
+    }
+
+    for attr, label in metrics.items():
+        low_bound, high_bound = get_iqr_bounds(features, attr)
+        
+        if low_bound is None: 
+            continue # Te weinig data (minimaal 4 nodig)
+
+        for f in features:
+            val = getattr(f, attr, 0.0) or 0.0
+            
+            # Bestaande redenen ophalen om ze te combineren
+            reasons = f.outlier_type.split(', ') if f.outlier_type else []
+
+            if val < low_bound:
+                reasons.append(f"Low {label}")
+                f.is_outlier = True
+            elif val > high_bound:
+                reasons.append(f"High {label}")
+                f.is_outlier = True
+            
+            # Zet de samengevoegde redenen terug (bijv: "High ROI, High TtV")
+            f.outlier_type = ", ".join(reasons)
 
     return features
