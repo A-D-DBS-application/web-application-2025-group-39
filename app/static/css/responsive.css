@@ -1,7 +1,5 @@
-/* _responsive.css (Sectie 8 en 10) */
-
 /* =====================================
-   8. SCROLL ANIMATION STYLING
+    SCROLL ANIMATION STYLING
    ===================================== */
 .fade-in-scroll {
     opacity: 0;
@@ -24,9 +22,9 @@
     transition-delay: 0.4s;
 }
 
-/* =========================================================
-   10. RESPONSIVE STYLING (MOBIELE APPARATEN) - DEFINITIEVE CORRECTIE
-   ========================================================= */
+/* =========================================
+    RESPONSIVE STYLING (MOBIELE APPARATEN)
+   ========================================= */
 
 /* Aanpassingen voor schermen kleiner dan 768px (tablets en gsm's) */
 @media (max-width: 768px) {
