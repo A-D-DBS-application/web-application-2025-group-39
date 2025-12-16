@@ -233,7 +233,7 @@ class MilestoneFeature(db.Model):
         primary_key=True,
     )
     
-    feature_id = db.Column(
+    id_feature = db.Column(
         db.String,
         db.ForeignKey("public.features_ideas.id_feature", ondelete="CASCADE"),
         primary_key=True,
@@ -259,7 +259,7 @@ class Milestone(db.Model):
         
         # Specificeer de joins (deze zijn essentieel)
         primaryjoin="Milestone.id_milestone == MilestoneFeature.milestone_id",
-        secondaryjoin="Features_ideas.id_feature == MilestoneFeature.feature_id",
+        secondaryjoin="Features_ideas.id_feature == MilestoneFeature.id_feature",
 
         backref="milestones",
         lazy="select",

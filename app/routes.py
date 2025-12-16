@@ -635,13 +635,13 @@ def dismiss_warning(outlier_id):
     # We verwachten minstens 5 delen als het een UUID is.
     if len(all_parts) >= 5:
         # Voeg de laatste 5 delen weer samen met dashes
-        feature_id_from_url = '-'.join(all_parts[-5:])
+        id_feature_from_url = '-'.join(all_parts[-5:])
     else:
         # Als er geen 5 delen zijn, gebruiken we de volledige string als fallback
-        feature_id_from_url = outlier_id
+        id_feature_from_url = outlier_id
     
     # 2. Zoek op de werkelijke id_feature (UUID).
-    feature = Features_ideas.query.get(feature_id_from_url) 
+    feature = Features_ideas.query.get(id_feature_from_url) 
     
     if not feature:
         # Fout: gebruik 404 status zonder JSON
@@ -658,13 +658,13 @@ def dismiss_warning(outlier_id):
 # ==============================
 # EDIT FEATURE
 # ==============================
-@main.route("/feature/<uuid:feature_id>/edit", methods=["GET", "POST"])
-def edit_feature(feature_id):
+@main.route("/feature/<uuid:id_feature>/edit", methods=["GET", "POST"])
+def edit_feature(id_feature):
     user = require_login()
     if not isinstance(user, Profile):
         return user
 
-    feature = Features_ideas.query.get_or_404(str(feature_id))
+    feature = Features_ideas.query.get_or_404(str(id_feature))
     project = Project.query.get_or_404(feature.id_project)
     company = Company.query.get(project.id_company)
 
@@ -730,13 +730,13 @@ def edit_feature(feature_id):
 # ==============================
 # DELETE FEATURE
 # ==============================
-@main.route("/feature/<uuid:feature_id>/delete", methods=["POST"])
-def delete_feature(feature_id):
+@main.route("/feature/<uuid:id_feature>/delete", methods=["POST"])
+def delete_feature(id_feature):
     user = require_login()                      # Controleer of gebruiker ingelogd is; anders redirect
     if not isinstance(user, Profile):           # require_login() kan Response teruggeven → direct teruggeven
         return user
 
-    feature = Features_ideas.query.get_or_404(str(feature_id))  # Haalt feature op; 404 als niet gevonden
+    feature = Features_ideas.query.get_or_404(str(id_feature))  # Haalt feature op; 404 als niet gevonden
     project = Project.query.get_or_404(feature.id_project)      # Haalt project op waar feature toe behoort
 
     company_redirect = require_company_ownership(project.id_company, user)  # Check dat user van juiste company is
@@ -1182,13 +1182,13 @@ def delete_milestone(milestone_id):
 # ==============================
 # EVIDENCE: ADD
 # ==============================
-@main.route("/feature/<feature_id>/add-evidence", methods=["GET", "POST"])
-def add_evidence(feature_id):
+@main.route("/feature/<id_feature>/add-evidence", methods=["GET", "POST"])
+def add_evidence(id_feature):
     user = require_login()                     # Login check
     if not isinstance(user, Profile):
         return user
 
-    feature = Features_ideas.query.get_or_404(feature_id)  # Feature ophalen
+    feature = Features_ideas.query.get_or_404(id_feature)  # Feature ophalen
     project = Project.query.get_or_404(feature.id_project)
 
     company_redirect = require_company_ownership(project.id_company, user)
@@ -1206,7 +1206,7 @@ def add_evidence(feature_id):
 
         ev = Evidence(
             id_company=user.id_company,
-            id_feature=feature_id,
+            id_feature=id_feature,
             title=data["title"],
             type=data["final_type"],           # Standaard type of custom type
             source=data["source"],
@@ -1225,7 +1225,7 @@ def add_evidence(feature_id):
         db.session.commit()
 
         flash("Evidence added successfully.", "success")
-        return redirect(url_for("main.view_evidence", feature_id=feature_id))
+        return redirect(url_for("main.view_evidence", id_feature=id_feature))
 
     return render_template("add_evidence.html", feature=feature, CONFIDENCE_LEVELS=CONFIDENCE_LEVELS)
 
@@ -1234,17 +1234,17 @@ def add_evidence(feature_id):
 # ==============================
 # EVIDENCE: LIST
 # ==============================
-@main.route("/feature/<feature_id>/evidence")
-def view_evidence(feature_id):
+@main.route("/feature/<id_feature>/evidence")
+def view_evidence(id_feature):
     user = require_login()
     if isinstance(user, Response):  # require_login() kan redirect teruggeven
         return user
 
-    feature = Features_ideas.query.get_or_404(feature_id)
+    feature = Features_ideas.query.get_or_404(id_feature)
 
     # Evidence oplijsten: hoogste confidence eerst
     evidence_list = (
-        Evidence.query.filter_by(id_feature=feature_id)
+        Evidence.query.filter_by(id_feature=id_feature)
         .order_by(Evidence.new_confidence.desc())
         .all()
     )
@@ -1293,7 +1293,7 @@ def delete_evidence(evidence_id):
     db.session.commit()
 
     flash("Evidence deleted successfully.", "success")
-    return redirect(url_for("main.view_evidence", feature_id=feature.id_feature))
+    return redirect(url_for("main.view_evidence", id_feature=feature.id_feature))
 
 
 
@@ -1342,7 +1342,7 @@ def edit_evidence(evidence_id):
         db.session.commit()
 
         flash("Evidence updated successfully.", "success")
-        return redirect(url_for("main.view_evidence", feature_id=feature.id_feature))
+        return redirect(url_for("main.view_evidence", id_feature=feature.id_feature))
 
     return render_template(
         "edit_evidence.html",
@@ -1504,8 +1504,8 @@ def vectr_chart_pdf(project_id):
 # ==============================
 # FEATURE DECISION ROUTE 
 # ==============================
-@main.route("/set_feature_decision/<string:feature_id>/<string:decision_value>", methods=["POST"])
-def set_feature_decision(feature_id, decision_value):
+@main.route("/set_feature_decision/<string:id_feature>/<string:decision_value>", methods=["POST"])
+def set_feature_decision(id_feature, decision_value):
     # 1) Login check
     if "user_id" not in session:
         flash("You must log in to make decisions.", "danger")
@@ -1513,7 +1513,7 @@ def set_feature_decision(feature_id, decision_value):
 
     # 2) Haal user + feature op
     user = Profile.query.get(session["user_id"])
-    feature = Features_ideas.query.get_or_404(feature_id)
+    feature = Features_ideas.query.get_or_404(id_feature)
 
     # 3) Security: feature moet bij dezelfde company horen
     if feature.id_company != user.id_company:
