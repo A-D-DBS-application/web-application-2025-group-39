@@ -158,7 +158,6 @@ class Features_ideas(db.Model):
     quality_score = db.Column(db.Float)
 
     # calculated values
-    expected_profit = db.Column(db.Integer)
     roi_percent = db.Column(db.Float)
     ttv_weeks = db.Column(db.Float)
 
