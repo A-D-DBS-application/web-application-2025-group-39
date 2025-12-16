@@ -26,11 +26,11 @@ def detect_vectr_outliers_and_tag(features):
     sorted_scores = sorted(scores)
     n = len(sorted_scores)
 
-    # --- FIX 1: Correcte slicing voor de onderste helft ---
+    # --- 1: Correcte slicing voor de onderste helft ---
     # lower_half pakt altijd de eerste helft
     lower_half = sorted_scores[:n // 2]
     
-    # --- FIX 2: Correcte slicing voor de bovenste helft ---
+    # --- 2: Correcte slicing voor de bovenste helft ---
     # Dit zorgt ervoor dat we altijd een list slice terugkrijgen
     # We starten de slice bij de index direct na de onderste helft
     start_of_upper_half_index = n // 2 + (n % 2)
