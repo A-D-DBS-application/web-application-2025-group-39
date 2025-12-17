@@ -74,7 +74,16 @@ def optimize_roadmap(roadmap, features, alpha=0.5):
             hourly_rate = 0.0
 
         # Bereken kosten van feature: Tijd * Tarief = Kosten
-        cost_weight = time_weight * hourly_rate
+        # Haal de extra kostenvelden op (met fallback naar 0.0)
+        try:
+            opex = float(getattr(f, 'opex', 0.0) or 0.0)
+            other_costs = float(getattr(f, 'other_costs', 0.0) or 0.0)
+        except Exception:
+            opex = 0.0
+            other_costs = 0.0
+
+        # Bereken de VOLLEDIGE kosten van de feature
+        cost_weight = (time_weight * hourly_rate) + opex + other_costs
 
         # Harde filter: als één van de gewichten groter is dan totale capaciteit -> overslaan
         # Deze feature kan per definitie niet in de roadmap passen.
