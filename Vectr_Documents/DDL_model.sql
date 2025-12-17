@@ -1,6 +1,6 @@
 -- 1. COMPANY
 CREATE TABLE public.company (
-    id_company SERIAL PRIMARY KEY,              -- SERIAL maakt automatisch 1, 2, 3... aan.
+    id_company SERIAL PRIMARY KEY,                                                  -- SERIAL maakt automatisch 1, 2, 3... aan.
     company_name VARCHAR NOT NULL
 );
 
@@ -10,11 +10,11 @@ CREATE TABLE public.profile (
     id_company INTEGER NOT NULL,
     
     name VARCHAR NOT NULL,
-    email VARCHAR(120) NOT NULL UNIQUE,                                             -- UNIQUE: Voorkomt dat 2 gebruikers hetzelfde e-mailadres hebben.
+    email VARCHAR NOT NULL UNIQUE,                                             -- UNIQUE: Voorkomt dat 2 gebruikers hetzelfde e-mailadres hebben.
     role VARCHAR,
-    password_hash VARCHAR NOT NULL,
+    password_hash TEXT NOT NULL,
     
-    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),       -- 'DEFAULT (NOW() AT TIME ZONE 'utc')' zorgt dat de huidige tijd automatisch wordt ingevuld.
+    createdat TIMESTAMPTZ DEFAULT NOW(),       
 
     -- RELATIE NAAR COMPANY:
     CONSTRAINT fk_profile_company FOREIGN KEY (id_company)
@@ -27,13 +27,13 @@ CREATE TABLE public.project (
     id_project SERIAL PRIMARY KEY,
     id_company INTEGER NOT NULL,
     project_name VARCHAR NOT NULL,
-    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
+    createdat TIMESTAMPTZ DEFAULT NOW(),
     
-    -- TtV Schaling limieten (Floating point getallen voor decimalen)
-    ttm_low_limit REAL,
-    ttm_high_limit REAL,
-    ttbv_low_limit REAL,
-    ttbv_high_limit REAL,
+    -- TtV Schaling limieten (INTEGER en met DEFAULT waarden)
+    ttm_low_limit INTEGER DEFAULT 0,
+    ttm_high_limit INTEGER DEFAULT 10,
+    ttbv_low_limit INTEGER DEFAULT 0,
+    ttbv_high_limit INTEGER DEFAULT 10,
 
     CONSTRAINT fk_project_company FOREIGN KEY (id_company)
         REFERENCES public.company (id_company)
@@ -42,9 +42,7 @@ CREATE TABLE public.project (
 
 -- 4. FEATURES_IDEAS
 CREATE TABLE public.features_ideas (
-    id_feature VARCHAR PRIMARY KEY, 
-    
-    id_company INTEGER NOT NULL,
+    id_feature TEXT PRIMARY KEY, 
     id_project INTEGER NOT NULL,
     
     name_feature VARCHAR NOT NULL,
@@ -67,17 +65,12 @@ CREATE TABLE public.features_ideas (
     -- Calculated values (REAL = Float)
     quality_score REAL,
     roi_percent REAL,
-    ttv_weeks REAL,
+    ttv_weeks INTEGER,                                                                    -- integer, want is som van 2 int getallen
     
-    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
     warning_dismissed BOOLEAN NOT NULL DEFAULT FALSE,
+    createdat TIMESTAMPTZ DEFAULT NOW(),
 
-    -- RELATIE 1: De Company
-    CONSTRAINT fk_feature_company FOREIGN KEY (id_company)
-        REFERENCES public.company (id_company)
-        ON DELETE RESTRICT,
-
-    -- RELATIE 2: Het Project
+    -- RELATIE met Het Project
     CONSTRAINT fk_feature_project FOREIGN KEY (id_project)
         REFERENCES public.project (id_project)
         ON DELETE CASCADE                                                                 -- ON DELETE CASCADE: Als je een Project verwijdert, worden alle bijbehorende, Features AUTOMATISCH ook verwijderd.
@@ -91,9 +84,9 @@ CREATE TABLE public.roadmap (
     start_roadmap DATE NOT NULL,
     end_roadmap DATE NOT NULL,
     
-    time_capacity REAL NOT NULL,
-    budget_allocation REAL NOT NULL,
-    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
+    time_capacity INTEGER NOT NULL,
+    budget_allocation INTEGER NOT NULL,
+    createdat TIMESTAMPTZ DEFAULT NOW(),
 
     CONSTRAINT fk_roadmap_project FOREIGN KEY (id_project)
         REFERENCES public.project (id_project)
@@ -104,11 +97,11 @@ CREATE TABLE public.roadmap (
 CREATE TABLE public.milestone (
     id_milestone SERIAL PRIMARY KEY,
     id_roadmap INTEGER NOT NULL,
-    
+
     name VARCHAR NOT NULL,
     start_date DATE,
     end_date DATE,
-    goal VARCHAR,
+    goal TEXT,
     status VARCHAR,
 
     CONSTRAINT fk_milestone_roadmap FOREIGN KEY (id_roadmap)
@@ -148,15 +141,12 @@ CREATE TABLE public.evidence (
     old_confidence REAL,
     new_confidence REAL,
     
-    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
+    createdat TIMESTAMPTZ DEFAULT NOW(),
 
     CONSTRAINT fk_evidence_feature FOREIGN KEY (id_feature)
         REFERENCES public.features_ideas (id_feature)
         ON DELETE RESTRICT,                                                     -- RESTRICT: Je kunt een feature niet wissen zolang er nog bewijs aan hangt (veiligheid).
 
-    CONSTRAINT fk_evidence_company FOREIGN KEY (id_company)
-        REFERENCES public.company (id_company)
-        ON DELETE RESTRICT
 );
 
 -- 9. DECISION
@@ -166,26 +156,17 @@ CREATE TABLE public.decision (
     id_profile INTEGER NOT NULL,
     id_company INTEGER NOT NULL,
     
-    decision_type VARCHAR(50) NOT NULL,
-    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
+    decision_type VARCHAR NOT NULL,
+    createdat TIMESTAMPTZ DEFAULT NOW(),
 
-    -- UNIQUE CONSTRAINT (Complex):
-    -- Dit dwingt af dat één profiel (id_profile) maar EEN keer een beslissing mag nemen 
-    -- voor een specifieke feature (id_feature).
-    -- Als ze opnieuw proberen te stemmen, geeft de database een foutmelding.
+    
     CONSTRAINT uq_decision_feature_profile UNIQUE (id_feature, id_profile),
-
-    CONSTRAINT fk_decision_feature FOREIGN KEY (id_feature)
-        REFERENCES public.features_ideas (id_feature)
+    CONSTRAINT fk_decision_feature FOREIGN KEY (id_feature) 
+        REFERENCES public.features_ideas (id_feature) 
         ON DELETE CASCADE,
-
-    CONSTRAINT fk_decision_profile FOREIGN KEY (id_profile)
-        REFERENCES public.profile (id_profile)
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_decision_company FOREIGN KEY (id_company)
-        REFERENCES public.company (id_company)
-        ON DELETE RESTRICT
+    CONSTRAINT fk_decision_profile FOREIGN KEY (id_profile) 
+        REFERENCES public.profile (id_profile) 
+        ON DELETE CASCADE
 );
 
 -- 10. PROJECT_CHAT_MESSAGE
@@ -195,7 +176,7 @@ CREATE TABLE public.project_chat_message (
     id_profile INTEGER NOT NULL,
     
     content TEXT NOT NULL,
-    createdat TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
+    createdat TIMESTAMPTZ DEFAULT NOW(),
 
     CONSTRAINT fk_chat_project FOREIGN KEY (id_project)
         REFERENCES public.project (id_project)

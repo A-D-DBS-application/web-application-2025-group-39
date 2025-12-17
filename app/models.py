@@ -55,15 +55,15 @@ class Profile(db.Model):
     
     # basis info 
     name = db.Column(db.String, nullable=False)                                     # naam, moet ingevuld worden, (nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)                  # email met max 120 tekens en is unique
+    email = db.Column(db.String, unique=True, nullable=False)                       # email is unique
     role = db.Column(db.String, nullable=True)
-    password_hash = db.Column(db.String, nullable=False)                            # gehashte wachtwoord
+    password_hash = db.Column(db.Text, nullable=False)                              # gehashte wachtwoord
     
     #relaties:
     company = db.relationship("Company", back_populates="profiles")                 # relatie: Profile (Many) <---> (1) Company
     
     #metadata
-    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)            # Tijdstip van creatie (standaard UTC)
+    createdat = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)            # Tijdstip van creatie 
 
     def __repr__(self):
         return f"<Profile {self.name}>"
@@ -96,13 +96,12 @@ class Project(db.Model):
     )
 
     project_name = db.Column(db.String, nullable=False)
-    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    
+    createdat = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)    
     # TtV Schalings limiet
-    ttm_low_limit = db.Column(db.Float)
-    ttm_high_limit = db.Column(db.Float)
-    ttbv_low_limit = db.Column(db.Float)
-    ttbv_high_limit = db.Column(db.Float)
+    ttm_low_limit = db.Column(db.Integer, nullable=True, default=0)
+    ttm_high_limit = db.Column(db.Integer, nullable=True, default=10)
+    ttbv_low_limit = db.Column(db.Integer, nullable=True, default=0)
+    ttbv_high_limit = db.Column(db.Integer, nullable=True, default=10)
 
     # relaties 
     company = db.relationship("Company", back_populates="projects")                 # relatie: Project (Many) <---> (1) Company
@@ -156,14 +155,16 @@ class Features_ideas(db.Model):
 
     # calculated values
     roi_percent = db.Column(db.Float)
-    ttv_weeks = db.Column(db.Float)
+    ttv_weeks = db.Column(db.Integer)
 
-    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    # Outlier warning status
+    warning_dismissed = db.Column(db.Boolean, default=False, nullable=False)
+
+    createdat = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)
 
     project = db.relationship("Project", back_populates="features_ideas")
     
-    # Outlier warning status
-    warning_dismissed = db.Column(db.Boolean, default=False, nullable=False)
+    
 
     decisions = db.relationship(
         "Decision",
@@ -201,10 +202,9 @@ class Roadmap(db.Model):
     start_roadmap = db.Column(db.Date, nullable=False)  
     end_roadmap = db.Column(db.Date, nullable=False)
     # Capaciteit en budget mogen nu decimalen bevatten (bijv. 2.5 FTE)
-    # Float i.p.v. Integer voorkomt dat valid decimals worden afgerond of geweigerd
-    time_capacity = db.Column(db.Float, nullable=False)
-    budget_allocation = db.Column(db.Float, nullable=False)
-    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    time_capacity = db.Column(db.Integer, nullable=False)
+    budget_allocation = db.Column(db.Integer, nullable=False)
+    createdat = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)
 
     project = db.relationship("Project", back_populates="roadmaps")
 
@@ -241,7 +241,7 @@ class MilestoneFeature(db.Model):
         primary_key=True,
     )
 
-    # 🔗 Relaties naar de hoofdtabellen
+    #  Relaties naar de hoofdtabellen
     milestone = db.relationship(
         "Milestone",
         back_populates="milestone_features"
@@ -262,7 +262,7 @@ class Milestone(db.Model):
 
     id_milestone = db.Column(db.Integer, primary_key=True)
 
-    # 🔑 FK naar roadmap (1 roadmap → meerdere milestones)
+    #  FK naar roadmap (1 roadmap → meerdere milestones)
     id_roadmap = db.Column(
         db.Integer,
         db.ForeignKey("public.roadmap.id_roadmap", ondelete="CASCADE"),
@@ -272,30 +272,27 @@ class Milestone(db.Model):
     name = db.Column(db.String, nullable=False)
     start_date = db.Column(db.Date)
     end_date = db.Column(db.Date)
-    goal = db.Column(db.String)
-    status = db.Column(db.String)  # Planned / In Progress / Done
+    goal = db.Column(db.Text)
+    status = db.Column(db.String)                                                       # Planned / In Progress / Done
 
     roadmap = db.relationship(
         "Roadmap",
         back_populates="milestones"
     )
 
-    # ✅ BELANGRIJKSTE FIX
     # 1 milestone → meerdere MilestoneFeature links
     milestone_features = db.relationship(
         "MilestoneFeature",
-        cascade="all, delete-orphan",   # 🔥 verwijder links automatisch
-        passive_deletes=True,           # 🔥 vertrouw DB cascade
+        cascade="all, delete-orphan",                                                   # verwijder links automatisch
+        passive_deletes=True,                                                           # vertrouw DB cascade
         back_populates="milestone",
         lazy="select",
     )
 
-    # ✅ Convenience-relatie (READ-ONLY)
-    # Zo kan je: milestone.features gebruiken in templates
     features = db.relationship(
         "Features_ideas",
         secondary="public.milestone_features",
-        viewonly=True,                  # ❗ voorkomt delete-conflicten
+        viewonly=True,                                                                  #  voorkomt delete-conflicten
         lazy="select",
     )
 
@@ -321,10 +318,10 @@ class Evidence(db.Model):
     attachment_url = db.Column(db.Text)                                                 # Link naar het bewijs
 
     # NEW SYSTEM
-    old_confidence = db.Column(db.Float)  # feature score BEFORE adding this evidence
-    new_confidence = db.Column(db.Float)  # confidence level selected from list
+    old_confidence = db.Column(db.Float)                                                # feature score BEFORE adding this evidence
+    new_confidence = db.Column(db.Float)                                                # confidence level selected from list
 
-    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    createdat = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)
 
     feature = db.relationship("Features_ideas", backref="evidence")
 
@@ -356,7 +353,7 @@ class Decision(db.Model):
     )
 
 
-    decision_type = db.Column(db.String(50), nullable=False)
+    decision_type = db.Column(db.String, nullable=False)
 
     createdat = db.Column(
         db.DateTime, nullable=False, default=datetime.datetime.utcnow
@@ -387,7 +384,7 @@ class ProjectChatMessage(db.Model):
     )
 
     content = db.Column(db.Text, nullable=False)
-    createdat = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    createdat = db.Column(db.DateTime(timezone=True), default=datetime.datetime.utcnow)
 
     sender = db.relationship("Profile")
     project = db.relationship("Project")
