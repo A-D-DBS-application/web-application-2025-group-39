@@ -1,5 +1,5 @@
 # app/utils/form_helpers.py
-
+import datetime
 from flask import session, flash, redirect, url_for
 from app.models import Profile, Project, CONFIDENCE_LEVELS, Features_ideas
 from app.utils.calculations import calc_ttv_scaled
@@ -216,21 +216,79 @@ def parse_feature_form(form):
 def parse_roadmap_form(form):
     errors = []
         # Met floats kunnen we decimalen opslaan (bijv. 2.5 personen of 3.75 punten)
+    def parse_date(value, label):
+        try:
+            return datetime.datetime.strptime(value, "%Y-%m-%d").date()
+        except (TypeError, ValueError):
+            errors.append(f"{label} must be in YYYY-MM-DD format.")
+            return None
+
+    start_raw = form.get("start_roadmap") or None
+    end_raw = form.get("end_roadmap") or None
+
+    if not start_raw:
+        errors.append("Start Date Project is required.")
+    if not end_raw:
+        errors.append("End Date Project is required.")
+
+    start_date = parse_date(start_raw, "Start Date Project") if start_raw else None
+    end_date = parse_date(end_raw, "End Date Project") if end_raw else None
+
+    if start_date and end_date and start_date > end_date:
+        errors.append("Roadmap start date cannot be after end date.")
     return {
         # De validator controleert op aanwezigheid van de YYYY-MM-DD string
-        "start_roadmap": required_str(form, "start_roadmap", errors, label="Start Date Project"),
-        "end_roadmap": required_str(form, "end_roadmap", errors, label="End Date Project"),
+        "start_roadmap": start_date,
+        "end_roadmap": end_date,
         "time_capacity": required_float(form, "time_capacity", errors),
         "budget_allocation": required_float(form, "budget_allocation", errors),
     }, errors
 
 
-def parse_milestone_form(form):
+def parse_milestone_form(form, roadmap=None):
     errors = []
+
+    def parse_date(value, label):
+        try:
+            return datetime.datetime.strptime(value, "%Y-%m-%d").date()
+        except (TypeError, ValueError):
+            errors.append(f"{label} must be in YYYY-MM-DD format.")
+            return None
+
+    start_raw = form.get("start_date") or None
+    end_raw = form.get("end_date") or None
+
+    start_date = parse_date(start_raw, "Start date") if start_raw else None
+    end_date = parse_date(end_raw, "End date") if end_raw else None
+
+    if start_date and end_date and start_date > end_date:
+        errors.append("Start date cannot be after end date.")
+
+    if roadmap:
+        def ensure_date(value):
+            if isinstance(value, datetime.datetime):
+                return value.date()
+            if isinstance(value, datetime.date):
+                return value
+            if isinstance(value, str):
+                try:
+                    return datetime.datetime.strptime(value, "%Y-%m-%d").date()
+                except ValueError:
+                    errors.append("Roadmap dates must be valid YYYY-MM-DD values.")
+            return None
+
+        roadmap_start = ensure_date(getattr(roadmap, "start_roadmap", None))
+        roadmap_end = ensure_date(getattr(roadmap, "end_roadmap", None))
+
+        if roadmap_start and start_date and start_date < roadmap_start:
+            errors.append("Milestone start date cannot be before the roadmap start date.")
+        if roadmap_end and end_date and end_date > roadmap_end:
+            errors.append("Milestone end date cannot be after the roadmap end date.")
+
     return {
         "name": required_str(form, "name", errors),
-        "start_date": form.get("start_date") or None,
-        "end_date": form.get("end_date") or None,
+        "start_date": start_date,
+        "end_date": end_date,
         "goal": form.get("goal") or None,
         "status": form.get("status") or None,
     }, errors

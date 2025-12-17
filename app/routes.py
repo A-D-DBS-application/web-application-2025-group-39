@@ -1028,7 +1028,7 @@ def add_milestone(roadmap_id):
     features = sorted(features, key=lambda x: getattr(x, "vectr_score", 0), reverse=True)
 
     if request.method == "POST":  # Wanneer het formulier verzonden is:
-        data, errors = parse_milestone_form(request.form)  # Validatie
+        data, errors = parse_milestone_form(request.form, roadmap)  # Validatie
 
         if errors:
             for e in errors:
