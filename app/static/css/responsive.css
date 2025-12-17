@@ -95,6 +95,15 @@
         top: 100%;
         border-top: 3px solid #1E46D0;
     }
+    .project-menu-options .project-menu-link {
+        color: #6b7280 !important;
+        padding: 8px 16px 8px 35px !important;
+        text-decoration: none;
+        display: block;
+        margin: 0 !important;
+        font-weight: 400;
+        font-size: 11px;
+    }
 
     .login-container,
     .register-container,
@@ -183,32 +192,49 @@
         text-align: left;
     }
 
+    /* Roadmap aanpassingen voor mobiel */
     .roadmap-container {
-        padding: 20px 15px 25px 15px;
-        margin: 0 auto 40px auto;
-        border-radius: 12px;
+        padding: 20px 15px; /* Iets minder padding */
+    }
+
+    .milestones-row {
+        display: block; /* Zorg dat ze onder elkaar komen */
     }
 
     .milestone-group {
+        display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 20px;
     }
 
     .milestone-card,
     .btn-add-milestone-small {
-        min-height: 120px;
-        padding: 15px 20px;
-        flex: 1 1 100%;
+        /* Reset de hoogte en breedte */
+        min-height: auto;
+        width: 100%;
         max-width: 100%;
-        min-width: unset;
-        clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+        flex: none;
+        
+        /* 1. DE PIJLVORM NAAR ONDEREN */
+        clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%) !important;
+        
+        /* 2. EXTRA RUIMTE ONDERAAN */
+        padding: 20px 20px 55px 20px; 
+        margin-bottom: 5px; 
+        background-color: #1E46D0; /* Zorg dat achtergrondkleur zeker goed staat */
+        border-radius: 12px; 
     }
 
-    .milestone-card.milestone-card:last-child,
+    /* 3. DE LAATSTE KAART */
+    /* De laatste kaart wijst nergens meer heen, dus die maken we vaak weer recht (of juist ook met punt) */
+    .milestone-card:last-child,
     .btn-add-milestone-small:last-child {
-        clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%) !important; /* Gewoon rechthoek */
+        padding-bottom: 20px; /* Normale padding herstellen */
+        margin-bottom: 0;
+        border-radius: 12px; /* Hier staat ronde hoekjes wel weer netjes */
     }
-
+    
     .table thead th,
     .table tbody td {
         padding: 0.6rem 0.8rem;

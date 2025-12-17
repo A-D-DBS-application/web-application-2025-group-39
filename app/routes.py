@@ -1,4 +1,5 @@
 import matplotlib
+import math
 matplotlib.use("Agg") 
 import uuid, datetime
 from io import BytesIO
@@ -1457,7 +1458,13 @@ def vectr_chart_pdf(project_id):
         
         # De effectieve TTV (ttm_weeks + ttbv_weeks) zit in item["ttv_weeks"] indien nodig
         
-        size_mpl_area = max(50, min(2000, max(0, roi_val) * 15))  # bubble size
+        if roi_val and roi_val > 0:
+            # Als ROI positief is: bereken de wortel
+            size_mpl_area = 32 * math.sqrt(roi_val/100) *32 * math.sqrt(roi_val/100)* math.pi           # bubble size (straal = 25 * math.sqrt(roi_val/100) )
+        else:
+            # Als ROI negatief of 0 is: geef de bubble een grootte van 0 (of een kleine vaste waarde)
+            size_mpl_area = 0  
+
         color = get_zone_color_mpl(conf, ttv_scaled)              # kleur bepalen via helperfunctie
         
         # Voegt data toe aan de lijsten
@@ -1465,7 +1472,8 @@ def vectr_chart_pdf(project_id):
         scatter_y.append(ttv_scaled)
         scatter_s.append(size_mpl_area)
         scatter_c.append(color)
-        scatter_labels.append(item["name"])
+        if size_mpl_area > 0:
+            scatter_labels.append(item["name"])
 
     # 11) Plot scatter chart
     ax.scatter(

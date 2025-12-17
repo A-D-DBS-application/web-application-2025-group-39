@@ -88,10 +88,9 @@ function initVECTRChart(ctx, chartData) {
 
                 // Op mobiel maken we de bollen kleiner (factor 20) dan op desktop (factor 50)
                 const isMobile = window.innerWidth < 768;
-                const scaleFactor = isMobile ? 20 : 50; 
+                const scaleFactor = isMobile ? 16 : 50; 
 
                 const diameter = scaleFactor * Math.sqrt((roiValue) / 100);
-                
                 const radius = Math.max(0, diameter / 2);                       // Bereken de straal (radius = Diameter / 2) en pas de grenzen toe
 
                 const confidenceValue = item.confidence;
