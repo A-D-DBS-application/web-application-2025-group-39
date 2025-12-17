@@ -1563,7 +1563,6 @@ def set_feature_decision(id_feature, decision_value):
                 id_company=user.id_company,
                 id_profile=user.id_profile,
                 decision_type=decision_type,
-                reasoning=None,
             )
             db.session.add(d)
 
