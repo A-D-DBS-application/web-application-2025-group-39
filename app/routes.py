@@ -1,5 +1,4 @@
 import matplotlib
-import math
 matplotlib.use("Agg") 
 import uuid, datetime
 from io import BytesIO
@@ -9,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from app import db
-from app.models import Profile, Company, Project, Features_ideas, Roadmap, Milestone, Evidence, Decision, ProjectChatMessage, CONFIDENCE_LEVELS
+from app.models import MilestoneFeature, Profile, Company, Project, Features_ideas, Roadmap, Milestone, Evidence, Decision, ProjectChatMessage, CONFIDENCE_LEVELS
 from app.constants import CONF_MIN, CONF_LOW_THRESHOLD, CONF_MID_HIGH_THRESHOLD, CONF_MAX, TTV_MIN, TTV_SLOW_THRESHOLD, TTV_MID_THRESHOLD, TTV_MAX
 from app.utils.calculations import calc_roi, calc_ttv, to_numeric, calculate_feature_cost, calculate_vectr_scores
 from app.utils.form_helpers import prepare_vectr_chart_data, require_login, require_role, require_company_ownership, parse_project_form, parse_feature_form, parse_roadmap_form, parse_milestone_form, parse_evidence_form, recompute_feature_confidence
@@ -426,7 +425,7 @@ def add_feature(project_id):
             data["cost_savings"],
             data["investment_hours"],
             data["hourly_rate"],
-            data["opex"],
+            data["opex_hours"],
             data["other_costs"],
         )
         ttv_weeks = calc_ttv(data["ttm_weeks"], data["ttbv_weeks"])
@@ -442,7 +441,7 @@ def add_feature(project_id):
             cost_savings=data["cost_savings"],
             investment_hours=data["investment_hours"],
             hourly_rate=data["hourly_rate"],
-            opex=data["opex"],
+            opex_hours=data["opex_hours"],
             other_costs=data["other_costs"],
             horizon=data["horizon"],
             ttm_weeks=data["ttm_weeks"],
@@ -472,7 +471,7 @@ def features_calc_roi():
         request.form.get("cost_savings"),
         request.form.get("investment_hours"),
         request.form.get("hourly_rate"),
-        request.form.get("opex"),
+        request.form.get("opex_hours"),
         request.form.get("other_costs"),
     )
 
@@ -506,7 +505,7 @@ class TempFeature:
         self.cost_savings = to_numeric(form_data.get("cost_savings"))
         self.investment_hours = to_numeric(form_data.get("investment_hours"))
         self.hourly_rate = to_numeric(form_data.get("hourly_rate"))
-        self.opex = to_numeric(form_data.get("opex"))
+        self.opex_hours = to_numeric(form_data.get("opex_hours"))
         self.other_costs = to_numeric(form_data.get("other_costs"))
         self.ttm_weeks = to_numeric(form_data.get("ttm_weeks"))
         self.ttbv_weeks = to_numeric(form_data.get("ttbv_weeks"))
@@ -517,7 +516,7 @@ class TempFeature:
         # Bereken de afgeleide velden die nodig zijn voor VECTR
         self.roi_percent = calc_roi(
             self.extra_revenue, self.churn_reduction, self.cost_savings, 
-            self.investment_hours, self.hourly_rate, self.opex, self.other_costs
+            self.investment_hours, self.hourly_rate, self.opex_hours, self.other_costs
         )
         self.ttv_weeks = calc_ttv(self.ttm_weeks, self.ttbv_weeks)
 
@@ -697,7 +696,7 @@ def edit_feature(id_feature):
         feature.cost_savings = data["cost_savings"]
         feature.investment_hours = data["investment_hours"]
         feature.hourly_rate = data["hourly_rate"]
-        feature.opex = data["opex"]
+        feature.opex_hours = data["opex_hours"]
         feature.other_costs = data["other_costs"]
         feature.horizon = data["horizon"]
         feature.ttm_weeks = data["ttm_weeks"]
@@ -715,7 +714,7 @@ def edit_feature(id_feature):
             feature.cost_savings,
             feature.investment_hours,
             feature.hourly_rate,
-            feature.opex,
+            feature.opex_hours,
             feature.other_costs,
         )
         feature.ttv_weeks = calc_ttv(feature.ttm_weeks, feature.ttbv_weeks)
@@ -1051,12 +1050,15 @@ def add_milestone(roadmap_id):
             status=data["status"],
         )
 
-        # 🎯 Meerdere features koppelen (via de associatietabel milestone_features)
-        selected = request.form.getlist("features")  # IDs van geselecteerde features
-        milestone.features = Features_ideas.query.filter(
-            Features_ideas.id_feature.in_(selected)
-        ).all()
+        # 🎯 Meerdere features koppelen via MilestoneFeature (CORRECT)
+        selected = request.form.getlist("features")
 
+        for feature_id in selected:
+            link = MilestoneFeature(
+                milestone=milestone,
+                id_feature=feature_id,
+            )
+            db.session.add(link)
         db.session.add(milestone)  # Toevoegen aan DB
         db.session.commit()        # Wijzigingen opslaan
 
@@ -1111,7 +1113,7 @@ def edit_milestone(milestone_id):
     existing_selected = [f.id_feature for f in milestone.features]
 
     if request.method == "POST":
-        data, errors = parse_milestone_form(request.form)
+        data, errors = parse_milestone_form(request.form, roadmap)
 
         if errors:
             for e in errors:
@@ -1133,9 +1135,19 @@ def edit_milestone(milestone_id):
 
         # Nieuwe selectie van features koppelen
         selected = request.form.getlist("features")
-        milestone.features = Features_ideas.query.filter(
-            Features_ideas.id_feature.in_(selected)
-        ).all()
+        # 🔥 Eerst bestaande links verwijderen
+        milestone.milestone_features.clear()
+
+        # 🔗 Nieuwe selectie koppelen
+        selected = request.form.getlist("features")
+
+        for feature_id in selected:
+            link = MilestoneFeature(
+                milestone=milestone,
+                id_feature=feature_id,
+            )
+            db.session.add(link)
+
 
         db.session.commit()  # Opslaan in database
 
@@ -1443,13 +1455,9 @@ def vectr_chart_pdf(project_id):
         ttv_scaled = item["ttv"]                        # geschaalde TTV (0-10)
         roi_val = item["roi"]                           # ROI waarde
         
+        # De effectieve TTV (ttm_weeks + ttbv_weeks) zit in item["ttv_weeks"] indien nodig
         
-        if roi_val and roi_val > 0:
-            # Als ROI positief is: bereken de wortel
-            size_mpl_area = 25 * math.sqrt(roi_val/100) *25 * math.sqrt(roi_val/100)* math.pi           # bubble size (straal = 25 * math.sqrt(roi_val/100) )
-        else:
-            # Als ROI negatief of 0 is: geef de bubble een grootte van 0 (of een kleine vaste waarde)
-            size_mpl_area = 0            
+        size_mpl_area = max(50, min(2000, max(0, roi_val) * 15))  # bubble size
         color = get_zone_color_mpl(conf, ttv_scaled)              # kleur bepalen via helperfunctie
         
         # Voegt data toe aan de lijsten
@@ -1457,8 +1465,7 @@ def vectr_chart_pdf(project_id):
         scatter_y.append(ttv_scaled)
         scatter_s.append(size_mpl_area)
         scatter_c.append(color)
-        if size_mpl_area > 0:
-            scatter_labels.append(item["name"])
+        scatter_labels.append(item["name"])
 
     # 11) Plot scatter chart
     ax.scatter(
@@ -1548,6 +1555,7 @@ def set_feature_decision(id_feature, decision_value):
                 id_company=user.id_company,
                 id_profile=user.id_profile,
                 decision_type=decision_type,
+                reasoning=None,
             )
             db.session.add(d)
 
