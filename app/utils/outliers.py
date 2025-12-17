@@ -46,7 +46,7 @@ def detect_vectr_outliers_and_tag(features):
     # De lijst met metrieken die gecontroleerd moeten worden
     # Hier zit 'ttv_weeks' nu expliciet bij
     metrics = {
-        'vectr_score': 'VECTR',
+        'vectr_score': 'VECTR score',
         'roi_percent': 'ROI',
         'ttv_weeks': 'TtV'
     }
