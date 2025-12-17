@@ -129,9 +129,6 @@ class Features_ideas(db.Model):
     id_feature = db.Column(db.String, primary_key=True)
 
     # Foreign keys
-    id_company = db.Column(
-        db.Integer, db.ForeignKey("public.company.id_company"), nullable=False
-    )
     id_project = db.Column(
         db.Integer, db.ForeignKey("public.project.id_project"), nullable=False
     )
@@ -226,7 +223,7 @@ class MilestoneFeature(db.Model):
     __tablename__ = "milestone_features"
     __table_args__ = {"schema": "public"}
 
-    milestone_id = db.Column(
+    id_milestone = db.Column(
         db.Integer,
         db.ForeignKey(
             "public.milestone.id_milestone",
@@ -317,11 +314,6 @@ class Evidence(db.Model):
         db.String, db.ForeignKey("public.features_ideas.id_feature"), nullable=False
     )
 
-    id_company = db.Column(
-        db.Integer, db.ForeignKey("public.company.id_company"), nullable=False
-    )
-
-
     title = db.Column(db.String)
     type = db.Column(db.String)                                                         # Type bewijs (bijv. "Interview", "A/B Test", "Marktanalyse")
     source = db.Column(db.String)                                                       # Bron (bijv. naam van de test, link naar document)
@@ -363,9 +355,6 @@ class Decision(db.Model):
         nullable=False,
     )
 
-    id_company = db.Column(
-        db.Integer, db.ForeignKey("public.company.id_company"), nullable=False
-    )
 
     decision_type = db.Column(db.String(50), nullable=False)
 

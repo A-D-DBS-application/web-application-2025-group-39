@@ -118,14 +118,14 @@ CREATE TABLE public.milestone (
 
 -- 7. MILESTONE_FEATURES (KOPPELTABEL / JUNCTION TABLE), Dit regelt de Veel-op-Veel (M:N) relatie.
 CREATE TABLE public.milestone_features (
-    milestone_id INTEGER NOT NULL,
+    id_milestone INTEGER NOT NULL,
     id_feature VARCHAR NOT NULL,
 
     -- COMPOSITE PRIMARY KEY:
-    PRIMARY KEY (milestone_id, id_feature),
+    PRIMARY KEY (id_milestone, id_feature),
 
     -- FK constraints met CASCADE:
-    CONSTRAINT fk_mf_milestone FOREIGN KEY (milestone_id)
+    CONSTRAINT fk_mf_milestone FOREIGN KEY (id_milestone)
         REFERENCES public.milestone (id_milestone)
         ON DELETE CASCADE,                                                      -- Als de milestone verdwijnt -> verbinding weg.
 
