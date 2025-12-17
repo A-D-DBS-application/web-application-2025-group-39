@@ -433,7 +433,6 @@ def add_feature(project_id):
 
         new_feature = Features_ideas(
             id_feature=str(uuid.uuid4()),
-            id_company=company.id_company,
             id_project=project.id_project,
             name_feature=data["name_feature"],
             description=data["description"],
@@ -1219,7 +1218,6 @@ def add_evidence(id_feature):
         old_conf = feature.quality_score or 0.0  # Bewaar oude confidence
 
         ev = Evidence(
-            id_company=user.id_company,
             id_feature=id_feature,
             title=data["title"],
             type=data["final_type"],           # Standaard type of custom type
@@ -1536,12 +1534,8 @@ def set_feature_decision(id_feature, decision_value):
     user = Profile.query.get(session["user_id"])
     feature = Features_ideas.query.get_or_404(id_feature)
 
-    # 3) Security: feature moet bij dezelfde company horen
-    if feature.id_company != user.id_company:
-        flash("Not allowed.", "danger")
-        return redirect(url_for("main.projects"))
 
-    # 4) Map Yes/No naar decision types (matcht met je CSS: decision-approved / decision-rejected)
+    # 3) Map Yes/No naar decision types (matcht met je CSS: decision-approved / decision-rejected)
     if decision_value == "Yes":
         decision_type = "Approved"
     elif decision_value == "No":
@@ -1549,7 +1543,7 @@ def set_feature_decision(id_feature, decision_value):
     else:
         decision_type = "Pending"
 
-    # 5) Nieuwe Decision record opslaan of bestaande bijwerken voor deze gebruiker
+    # 4) Nieuwe Decision record opslaan of bestaande bijwerken voor deze gebruiker
     try:
         existing_decision = Decision.query.filter_by(
             id_feature=feature.id_feature, id_profile=user.id_profile
@@ -1560,7 +1554,6 @@ def set_feature_decision(id_feature, decision_value):
         else:
             d = Decision(
                 id_feature=feature.id_feature,
-                id_company=user.id_company,
                 id_profile=user.id_profile,
                 decision_type=decision_type,
             )
