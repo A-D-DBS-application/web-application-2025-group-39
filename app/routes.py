@@ -426,7 +426,7 @@ def add_feature(project_id):
             data["cost_savings"],
             data["investment_hours"],
             data["hourly_rate"],
-            data["opex_hours"],
+            data["opex"],
             data["other_costs"],
         )
         ttv_weeks = calc_ttv(data["ttm_weeks"], data["ttbv_weeks"])
@@ -442,7 +442,7 @@ def add_feature(project_id):
             cost_savings=data["cost_savings"],
             investment_hours=data["investment_hours"],
             hourly_rate=data["hourly_rate"],
-            opex_hours=data["opex_hours"],
+            opex=data["opex"],
             other_costs=data["other_costs"],
             horizon=data["horizon"],
             ttm_weeks=data["ttm_weeks"],
@@ -472,7 +472,7 @@ def features_calc_roi():
         request.form.get("cost_savings"),
         request.form.get("investment_hours"),
         request.form.get("hourly_rate"),
-        request.form.get("opex_hours"),
+        request.form.get("opex"),
         request.form.get("other_costs"),
     )
 
@@ -506,7 +506,7 @@ class TempFeature:
         self.cost_savings = to_numeric(form_data.get("cost_savings"))
         self.investment_hours = to_numeric(form_data.get("investment_hours"))
         self.hourly_rate = to_numeric(form_data.get("hourly_rate"))
-        self.opex_hours = to_numeric(form_data.get("opex_hours"))
+        self.opex = to_numeric(form_data.get("opex"))
         self.other_costs = to_numeric(form_data.get("other_costs"))
         self.ttm_weeks = to_numeric(form_data.get("ttm_weeks"))
         self.ttbv_weeks = to_numeric(form_data.get("ttbv_weeks"))
@@ -517,7 +517,7 @@ class TempFeature:
         # Bereken de afgeleide velden die nodig zijn voor VECTR
         self.roi_percent = calc_roi(
             self.extra_revenue, self.churn_reduction, self.cost_savings, 
-            self.investment_hours, self.hourly_rate, self.opex_hours, self.other_costs
+            self.investment_hours, self.hourly_rate, self.opex, self.other_costs
         )
         self.ttv_weeks = calc_ttv(self.ttm_weeks, self.ttbv_weeks)
 
@@ -697,7 +697,7 @@ def edit_feature(id_feature):
         feature.cost_savings = data["cost_savings"]
         feature.investment_hours = data["investment_hours"]
         feature.hourly_rate = data["hourly_rate"]
-        feature.opex_hours = data["opex_hours"]
+        feature.opex = data["opex"]
         feature.other_costs = data["other_costs"]
         feature.horizon = data["horizon"]
         feature.ttm_weeks = data["ttm_weeks"]
@@ -715,7 +715,7 @@ def edit_feature(id_feature):
             feature.cost_savings,
             feature.investment_hours,
             feature.hourly_rate,
-            feature.opex_hours,
+            feature.opex,
             feature.other_costs,
         )
         feature.ttv_weeks = calc_ttv(feature.ttm_weeks, feature.ttbv_weeks)
@@ -1054,10 +1054,10 @@ def add_milestone(roadmap_id):
         # 🎯 Meerdere features koppelen via MilestoneFeature (CORRECT)
         selected = request.form.getlist("features")
 
-        for feature_id in selected:
+        for id_feature in selected:
             link = MilestoneFeature(
                 milestone=milestone,
-                id_feature=feature_id,
+                id_feature=id_feature,
             )
             db.session.add(link)
         db.session.add(milestone)  # Toevoegen aan DB
@@ -1142,10 +1142,10 @@ def edit_milestone(milestone_id):
         # 🔗 Nieuwe selectie koppelen
         selected = request.form.getlist("features")
 
-        for feature_id in selected:
+        for id_feature in selected:
             link = MilestoneFeature(
                 milestone=milestone,
-                id_feature=feature_id,
+                id_feature=id_feature,
             )
             db.session.add(link)
 
