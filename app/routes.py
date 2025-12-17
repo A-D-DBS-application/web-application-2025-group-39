@@ -1078,15 +1078,15 @@ def add_milestone(roadmap_id):
 # ==============================
 
 
-@main.route("/milestone/edit/<int:milestone_id>", methods=["GET", "POST"])
-def edit_milestone(milestone_id):
+@main.route("/milestone/edit/<int:id_milestone>", methods=["GET", "POST"])
+def edit_milestone(id_milestone):
     user = require_login()  # Controle: enkel Founder/PM mogen milestones toevoegen.
 
     role_redirect = require_role(["Founder", "PM"], user)
     if role_redirect:
         return role_redirect
 
-    milestone = Milestone.query.get_or_404(milestone_id)  # Bestaande milestone ophalen
+    milestone = Milestone.query.get_or_404(id_milestone)  # Bestaande milestone ophalen
     roadmap = Roadmap.query.get_or_404(milestone.id_roadmap)
     project = Project.query.get_or_404(roadmap.id_project)
 
@@ -1165,8 +1165,8 @@ def edit_milestone(milestone_id):
 # DELETE MILESTONE
 # ==============================
 
-@main.route("/milestone/delete/<int:milestone_id>", methods=["POST"])
-def delete_milestone(milestone_id):
+@main.route("/milestone/delete/<int:id_milestone>", methods=["POST"])
+def delete_milestone(id_milestone):
     user = require_login()  # Login check
     if not isinstance(user, Profile):
         return user
@@ -1176,7 +1176,7 @@ def delete_milestone(milestone_id):
     if role_redirect:
         return role_redirect
 
-    milestone = Milestone.query.get_or_404(milestone_id)  # Opzoeken of 404
+    milestone = Milestone.query.get_or_404(id_milestone)  # Opzoeken of 404
     roadmap = Roadmap.query.get_or_404(milestone.id_roadmap)
     project = Project.query.get_or_404(roadmap.id_project)
 

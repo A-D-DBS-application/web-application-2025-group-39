@@ -223,7 +223,7 @@ class MilestoneFeature(db.Model):
     __tablename__ = "milestone_features"
     __table_args__ = {"schema": "public"}
 
-    milestone_id = db.Column(
+    id_milestone = db.Column(
         db.Integer,
         db.ForeignKey(
             "public.milestone.id_milestone",
