@@ -225,22 +225,36 @@ class Roadmap(db.Model):
 class MilestoneFeature(db.Model):
     __tablename__ = "milestone_features"
     __table_args__ = {"schema": "public"}
-    
+
     milestone_id = db.Column(
         db.Integer,
-        db.ForeignKey("public.milestone.id_milestone", ondelete="CASCADE"),
-        primary_key=True,
-    )
-    
-    id_feature = db.Column(
-        db.String,
-        db.ForeignKey("public.features_ideas.id_feature", ondelete="CASCADE"),
+        db.ForeignKey(
+            "public.milestone.id_milestone",
+            ondelete="CASCADE"
+        ),
         primary_key=True,
     )
 
-    # RELATIES NAAR DE HOOFDMODELLEN (gebruikt in de joins)
-    milestone = db.relationship("Milestone", backref="features_links")
-    feature = db.relationship("Features_ideas", backref="milestones_links")
+    id_feature = db.Column(
+        db.String,
+        db.ForeignKey(
+            "public.features_ideas.id_feature",
+            ondelete="CASCADE"
+        ),
+        primary_key=True,
+    )
+
+    # 🔗 Relaties naar de hoofdtabellen
+    milestone = db.relationship(
+        "Milestone",
+        back_populates="milestone_features"
+    )
+
+    feature = db.relationship(
+        "Features_ideas",
+        backref="milestone_features"
+    )
+
 
 # =====================================================
 # MILESTONE
@@ -251,19 +265,7 @@ class Milestone(db.Model):
 
     id_milestone = db.Column(db.Integer, primary_key=True)
 
-    # Many-to-many: milestone ↔ features
-    features = db.relationship(
-        "Features_ideas",
-        secondary="public.milestone_features", # GEBRUIK DE TABELNAAM ALS STRING
-        
-        # Specificeer de joins (deze zijn essentieel)
-        primaryjoin="Milestone.id_milestone == MilestoneFeature.milestone_id",
-        secondaryjoin="Features_ideas.id_feature == MilestoneFeature.id_feature",
-
-        backref="milestones",
-        lazy="select",
-    )
-
+    # 🔑 FK naar roadmap (1 roadmap → meerdere milestones)
     id_roadmap = db.Column(
         db.Integer,
         db.ForeignKey("public.roadmap.id_roadmap", ondelete="CASCADE"),
@@ -276,7 +278,30 @@ class Milestone(db.Model):
     goal = db.Column(db.String)
     status = db.Column(db.String)  # Planned / In Progress / Done
 
-    roadmap = db.relationship("Roadmap", back_populates="milestones")
+    roadmap = db.relationship(
+        "Roadmap",
+        back_populates="milestones"
+    )
+
+    # ✅ BELANGRIJKSTE FIX
+    # 1 milestone → meerdere MilestoneFeature links
+    milestone_features = db.relationship(
+        "MilestoneFeature",
+        cascade="all, delete-orphan",   # 🔥 verwijder links automatisch
+        passive_deletes=True,           # 🔥 vertrouw DB cascade
+        back_populates="milestone",
+        lazy="select",
+    )
+
+    # ✅ Convenience-relatie (READ-ONLY)
+    # Zo kan je: milestone.features gebruiken in templates
+    features = db.relationship(
+        "Features_ideas",
+        secondary="public.milestone_features",
+        viewonly=True,                  # ❗ voorkomt delete-conflicten
+        lazy="select",
+    )
+
 
 
 # =====================================================

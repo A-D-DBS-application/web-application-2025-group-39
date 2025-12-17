@@ -86,8 +86,11 @@ function initVECTRChart(ctx, chartData) {
                 // ROI/Radius berekening 
                 const roiValue = item.roi;                                      // Haal de ROI-waarde op
 
-                const diameter = 50 * Math.sqrt((roiValue) / 100);              // Bereken de gewenste diameter volgens de formule D = 100 * sqrt(ROI/100); Met D=50 genomen om een mooiere schaling te krijgen
+                // Op mobiel maken we de bollen kleiner (factor 20) dan op desktop (factor 50)
+                const isMobile = window.innerWidth < 768;
+                const scaleFactor = isMobile ? 16 : 50; 
 
+                const diameter = scaleFactor * Math.sqrt((roiValue) / 100);
                 const radius = Math.max(0, diameter / 2);                       // Bereken de straal (radius = Diameter / 2) en pas de grenzen toe
 
                 const confidenceValue = item.confidence;
