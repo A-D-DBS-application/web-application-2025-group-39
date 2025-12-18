@@ -2,6 +2,7 @@ from . import db  # haal db uit __init__.py
 import datetime  # datetime importeren
 from .security import hash_password, verify_password, needs_rehash
 from sqlalchemy import desc
+import uuid
 
 # ------------------------------------
 # Confidence Levels
@@ -125,7 +126,7 @@ class Features_ideas(db.Model):
     __table_args__ = {"schema": "public"}
 
     # Primary key (UUID string)
-    id_feature = db.Column(db.String, primary_key=True)
+    id_feature = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
 
     # Foreign keys
     id_project = db.Column(
