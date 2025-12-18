@@ -19,6 +19,8 @@ Please use the links below to watch the recordings:
 
 
 
+HOW TO INSTALL
+
 VECTR – Feature Prioritization Platform
 
 VECTR is a web-based decision-support platform that helps teams prioritize product features using a structured, data-driven approach based on ROI, Time to Value (TtV), and Confidence.
