@@ -157,6 +157,7 @@
     .projects-wrapper {
         margin: 15px auto;
         padding: 15px;
+        width: 95%;
     }
 
     .projects-grid-container {

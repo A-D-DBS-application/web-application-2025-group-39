@@ -1,4 +1,4 @@
-/* --- INDEX PAGE STYLING (VECTR Home) --- */
+/* --- INDEX PAGE STYLING --- */
 .hero-section {
     background: linear-gradient(135deg, #1E46D0 0%, #163BA6 100%);
     color: #ffffff;
@@ -65,7 +65,7 @@
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Footer van de landingspagina */
+/* Footer van de indexpagina */
 .landing-page-body footer {
     background-color: #f8f9fa;
     border-top: 1px solid #e5e7eb;
