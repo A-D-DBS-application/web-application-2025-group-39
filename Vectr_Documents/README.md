@@ -19,8 +19,6 @@ Please use the links below to watch the recordings:
 
 
 
-Readme.md: This file must contain clear instructions on how to install and run the Flask app and the link to your UI prototype (if used).
-
 VECTR – Feature Prioritization Platform
 
 VECTR is a web-based decision-support platform that helps teams prioritize product features using a structured, data-driven approach based on ROI, Time to Value (TtV), and Confidence.
