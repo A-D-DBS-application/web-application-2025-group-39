@@ -21,6 +21,70 @@ Please use the links below to watch the recordings:
 
 Readme.md: This file must contain clear instructions on how to install and run the Flask app and the link to your UI prototype (if used).
 
+VECTR – Feature Prioritization Platform
+
+VECTR is a web-based decision-support platform that helps teams prioritize product features using a structured, data-driven approach based on ROI, Time to Value (TtV), and Confidence.
+It supports visual prioritization through a VECTR chart, roadmap planning with milestones, evidence-based validation, per-user decisions, and project-based collaboration.
+
+
+
+Tech Stack
+
+Backend: Python (Flask)
+Database: PostgreSQL (Supabase)
+ORM: SQLAlchemy
+Frontend: HTML, Jinja2, Bootstrap 5
+Authentication: Session-based login
+Styling: Bootstrap + custom CSS
+
+
+
+Prerequisites
+
+Ensure the following are installed:
+
+Python 
+Git
+PostgreSQL database (local or Supabase)
+pip
+
+
+
+Installation & Setup
+
+Clone the Repository
+
+git clone https://github.com/<your-username>/<your-repository-name>.gitcd <your-repository-name>
+
+
+
+Create a Virtual Environment
+
+Windows
+
+python -m venv venv
+venv\Scripts\activate
+
+macOS / Linux
+
+python3 -m venv venvsource venv/bin/activate
+
+
+
+Install Dependencies
+
+pip install -r requirements.txt
+
+
+
+Environment Variables
+
+Create a .env file in the project root ( sent through email )
+
+Run the Application
+
+flask run
+
 
 
 <img width="1446" height="706" alt="image" src="https://github.com/user-attachments/assets/fcb270a4-35b6-4c3a-9625-4d0b293f1291" />
