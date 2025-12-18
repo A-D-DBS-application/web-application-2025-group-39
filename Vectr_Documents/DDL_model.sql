@@ -42,7 +42,7 @@ CREATE TABLE public.project (
 
 -- 4. FEATURES_IDEAS
 CREATE TABLE public.features_ideas (
-    id_feature TEXT PRIMARY KEY, 
+    id_feature UUID PRIMARY KEY DEFAULT gen_random_uuid(), 
     id_project INTEGER NOT NULL,
     
     name_feature VARCHAR NOT NULL,
