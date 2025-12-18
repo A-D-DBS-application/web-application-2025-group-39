@@ -16,3 +16,11 @@ Please use the links below to watch the recordings:
 - [Watch video - Sprint 3 part 1](https://drive.google.com/file/d/19HzqdRwAsp6PtW9johogoR5P16EsI8zR/view?usp=drive_link)
 - [Watch video - Sprint 3 part 2](https://drive.google.com/file/d/16LKCjIwDeAIuaM8Tg4rRZsc0jpcUMrIP/view?usp=sharing)
 - [Watch video - Sprint 3 part 3](https://drive.google.com/file/d/1EAl4ZUXQ9bi88qVH7UdlPoU1rPTevSOx/view?usp=sharing)
+
+
+
+Readme.md: This file must contain clear instructions on how to install and run the Flask app and the link to your UI prototype (if used).
+
+
+
+<img width="1446" height="706" alt="image" src="https://github.com/user-attachments/assets/fcb270a4-35b6-4c3a-9625-4d0b293f1291" />
