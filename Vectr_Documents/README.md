@@ -93,5 +93,6 @@ Run the Application
 flask run
 
 
+# User stories
+<img width="1416" height="653" alt="image" src="https://github.com/user-attachments/assets/f492352e-f261-4f61-8c0d-2b7ec9b4ffd2" />
 
-<img width="1446" height="706" alt="image" src="https://github.com/user-attachments/assets/fcb270a4-35b6-4c3a-9625-4d0b293f1291" />
