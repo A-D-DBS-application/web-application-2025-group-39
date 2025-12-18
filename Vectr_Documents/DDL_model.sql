@@ -154,7 +154,6 @@ CREATE TABLE public.decision (
     id_decision SERIAL PRIMARY KEY,
     id_feature VARCHAR NOT NULL,
     id_profile INTEGER NOT NULL,
-    id_company INTEGER NOT NULL,
     
     decision_type VARCHAR NOT NULL,
     createdat TIMESTAMPTZ DEFAULT NOW(),
