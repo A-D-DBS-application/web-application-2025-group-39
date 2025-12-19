@@ -95,3 +95,6 @@ https://drive.google.com/file/d/1UEULXApCka3Q_thxLJ9BnAYO_K2QLO9z/view?usp=shari
 
 # Link to VECTR
 https://web-application-2025-group-39.onrender.com
+
+# Link to Canva presentation
+https://www.canva.com/design/DAG7IRt59ag/orinU8M6RF3WVkxNphJ99w/edit?utm_content=DAG7IRt59ag&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
