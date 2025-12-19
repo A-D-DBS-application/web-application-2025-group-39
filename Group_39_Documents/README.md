@@ -70,7 +70,8 @@ https://www.figma.com/design/gnKfmVfhmxbFcTmQ5awSJ1/VECTR?node-id=0-1&p=f&t=3T5i
 # Kanban board
 https://miro.com/app/board/uXjVJxWFF5s=/
 
-
+# Database (link supabase)
+https://supabase.com/dashboard/project/qxyhmqragbcmncabexyo/editor/17544?schema=public
 
 # Video’s (extern)
 The demo videos are not included in this GitHub repository because they exceed GitHub’s file size limit.  
@@ -94,3 +95,6 @@ https://drive.google.com/file/d/1UEULXApCka3Q_thxLJ9BnAYO_K2QLO9z/view?usp=shari
 
 # Link to VECTR
 https://web-application-2025-group-39.onrender.com
+
+# Link to Canva presentation
+https://www.canva.com/design/DAG7IRt59ag/orinU8M6RF3WVkxNphJ99w/edit?utm_content=DAG7IRt59ag&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
