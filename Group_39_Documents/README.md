@@ -68,7 +68,7 @@ https://www.figma.com/design/gnKfmVfhmxbFcTmQ5awSJ1/VECTR?node-id=0-1&p=f&t=3T5i
 
 
 # Kanban board
-https://miro.com/app/dashboard/?userEmail=theresa.ampe@ugent.be&invite=&event=mailInvite&mailUserEmail=theresa.ampe@ugent.be&track=true&utm_source=notification&utm_medium=email&utm_campaign=add-to-team&utm_content=cta-button&share_link_id=846299655112&lid=g15tulvqsdky 
+https://miro.com/app/board/uXjVJxWFF5s=/
 
 
 
