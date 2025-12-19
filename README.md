@@ -1,7 +1,6 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/DxqGQVx4)
 
 
-
 # How to install
 VECTR – Feature Prioritization Platform
 
@@ -56,16 +55,8 @@ Create a .env file in the project root (sent through email)
 flask run
 
 
-
-# User stories
-
-<img width="1431" height="669" alt="image" src="https://github.com/user-attachments/assets/77bfc427-d868-48ac-b7e5-a64e78d6de0a" />
-
-
-
 # UI Prototype
 https://www.figma.com/design/gnKfmVfhmxbFcTmQ5awSJ1/VECTR?node-id=0-1&p=f&t=3T5i6WDFanhClpVo-0
-
 
 # Kanban board
 https://miro.com/app/board/uXjVJxWFF5s=/
