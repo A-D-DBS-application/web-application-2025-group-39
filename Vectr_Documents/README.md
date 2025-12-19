@@ -67,10 +67,6 @@ flask run
 https://www.figma.com/design/gnKfmVfhmxbFcTmQ5awSJ1/VECTR?node-id=0-1&p=f&t=3T5i6WDFanhClpVo-0
 
 
-# Demo VECTR
-https://drive.google.com/file/d/1UEULXApCka3Q_thxLJ9BnAYO_K2QLO9z/view?usp=sharing
-
-
 # Kanban board
 https://miro.com/app/dashboard/?userEmail=theresa.ampe@ugent.be&invite=&event=mailInvite&mailUserEmail=theresa.ampe@ugent.be&track=true&utm_source=notification&utm_medium=email&utm_campaign=add-to-team&utm_content=cta-button&share_link_id=846299655112&lid=g15tulvqsdky 
 
@@ -91,3 +87,10 @@ Please use the links below to watch the recordings:
 - [Watch video - Sprint 3 part 1](https://drive.google.com/file/d/19HzqdRwAsp6PtW9johogoR5P16EsI8zR/view?usp=drive_link)
 - [Watch video - Sprint 3 part 2](https://drive.google.com/file/d/16LKCjIwDeAIuaM8Tg4rRZsc0jpcUMrIP/view?usp=sharing)
 - [Watch video - Sprint 3 part 3](https://drive.google.com/file/d/1EAl4ZUXQ9bi88qVH7UdlPoU1rPTevSOx/view?usp=sharing)
+
+
+# Demo VECTR
+https://drive.google.com/file/d/1UEULXApCka3Q_thxLJ9BnAYO_K2QLO9z/view?usp=sharing
+
+# Link to VECTR
+https://web-application-2025-group-39.onrender.com
