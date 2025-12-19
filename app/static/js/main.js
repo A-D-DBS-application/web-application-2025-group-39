@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Live ROI/TTV berekening via server
   // =========================
   const inputs = document.querySelectorAll(
-    "[name='extra_revenue'], [name='churn_reduction'], [name='cost_savings'], [name='investment_hours'], [name='hourly_rate'], [name='opex_hours'], [name='other_costs'], [name='ttm_weeks'], [name='ttbv_weeks']"
+    "[name='extra_revenue'], [name='churn_reduction'], [name='cost_savings'], [name='investment_hours'], [name='hourly_rate'], [name='opex'], [name='other_costs'], [name='ttm_weeks'], [name='ttbv_weeks']"
   );
 
   async function updateCalculations() {
