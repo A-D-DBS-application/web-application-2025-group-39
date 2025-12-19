@@ -67,7 +67,7 @@
         <!-- ATTACHMENT -->
         <div class="mb-3">
             <label class="form-label">Attachment URL</label>
-            <input type="text" name="attachment_url" class="form-control" value="{{ evidence.attachment_url }}">                {# Optionele link naar bijlage (drive link, doc, screenshot, ...) #}
+            <input type="text" name="attachment_url" class="form-control" value="{{ evidence.attachment_url or ''}}">                {# Optionele link naar bijlage (drive link, doc, screenshot, ...) #}
         </div>
 
         <!-- NEW CONFIDENCE -->
