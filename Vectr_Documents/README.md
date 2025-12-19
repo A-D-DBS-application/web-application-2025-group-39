@@ -58,7 +58,8 @@ flask run
 
 
 # User stories
-<img width="1416" height="653" alt="image" src="https://github.com/user-attachments/assets/f492352e-f261-4f61-8c0d-2b7ec9b4ffd2" />
+
+<img width="1431" height="669" alt="image" src="https://github.com/user-attachments/assets/77bfc427-d868-48ac-b7e5-a64e78d6de0a" />
 
 
 
